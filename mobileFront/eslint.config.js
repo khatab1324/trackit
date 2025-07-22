@@ -1,11 +1,9 @@
 // eslint.config.js
-import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 import reactPlugin from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 
 export default [
-  js.configs.recommended,
   ...tseslint.configs.recommended,
   {
     files: ["**/*.ts", "**/*.tsx",],
@@ -17,6 +15,8 @@ export default [
         ecmaFeatures: {
           jsx: true,
         },
+        ecmaFeatures: { jsx: true },
+        project: "./tsconfig.json",
       },
     },
     plugins: {

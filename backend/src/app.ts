@@ -1,5 +1,20 @@
-import fastify from "fastify";
+import fastify, { FastifyReply, FastifyRequest } from "fastify";
+import {
+  serializerCompiler,
+  validatorCompiler,
+  ZodTypeProvider,
+} from "fastify-type-provider-zod";
+import fastifyJwt from "@fastify/jwt";
 
-const app = fastify({ logger: true });
+const app = fastify({
+  logger: true,
+}).withTypeProvider<ZodTypeProvider>();
+app.setValidatorCompiler(validatorCompiler);
+app.setSerializerCompiler(serializerCompiler);
+
+// TODO : check if we in jwtService we need to pass the secret ?
+app.register(fastifyJwt, {
+  secret: process.env.JWT_SECRET || "supersecret",
+});
 
 export default app;
