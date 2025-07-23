@@ -5,13 +5,13 @@ import {
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import fastifyJwt from "@fastify/jwt";
-
+import fastifyFormbody from "@fastify/formbody";
 const app = fastify({
   logger: true,
 }).withTypeProvider<ZodTypeProvider>();
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
-
+app.register(fastifyFormbody);
 // TODO : check if we in jwtService we need to pass the secret ?
 app.register(fastifyJwt, {
   secret: process.env.JWT_SECRET || "supersecret",

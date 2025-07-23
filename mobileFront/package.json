@@ -12,12 +12,14 @@
     "test": "jest"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.8.2",
     "@typescript-eslint/eslint-plugin": "^8.37.0",
     "@typescript-eslint/parser": "^8.37.0",
     "expo": "~53.0.17",
     "expo-status-bar": "~2.2.3",
     "react": "^19.1.0",
     "react-native": "0.79.5",
+    "react-redux": "^9.2.0",
     "react-test-renderer": "^19.1.0"
   },
   "devDependencies": {
