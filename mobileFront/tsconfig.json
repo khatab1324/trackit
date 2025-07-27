@@ -4,5 +4,9 @@
     "strict": true,
      "jsx": "react"
   
-  }
+  },"include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "nativewind-env.d.ts"
+  ]
 }

@@ -1,6 +1,7 @@
 import app from "./app";
 import authRoute from "./interface/http/routers/auth.route";
 import helloRouters from "./interface/http/routers/hello.route";
+import memoryRouter from "./interface/http/routers/memory.route";
 import userRouters from "./interface/http/routers/user.route";
 
 async function main() {
@@ -8,7 +9,8 @@ async function main() {
     app.register(helloRouters);
     app.register(userRouters);
     app.register(authRoute);
-    app.listen({ port: 3000 });
+    app.register(memoryRouter);
+    app.listen({ port: 3000, host: "0.0.0.0" });
     console.log("Fastify server ready at http://localhost:3000");
   } catch (error) {
     app.log.error(error);

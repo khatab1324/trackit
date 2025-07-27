@@ -1,0 +1,10 @@
+export * from "./user.relations";
+export * from "./account.relations";
+export * from "./memory.relations";
+export * from "./archivedMemory.relations";
+//TODO add this // export * from "./commentsReply.relations";
+// export * from "./commentLike.relations";
+export * from "./reportMemory.relations";
+export * from "./bookmark.relations";
+export * from "./follows.relations";
+export * from "./viewCount.relations";

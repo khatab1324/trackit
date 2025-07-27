@@ -5,6 +5,7 @@ import { db } from "../db/connection";
 import { users } from "../db/schema/userSchema";
 import { UserSignupInput } from "../../application/DTO/signupDTO";
 import { publicUser } from "../../application/DTO/publicUserDTO";
+import { getTheUserIdFromToken } from "../../application/services/jwtService";
 
 export class UserRepoDB implements UserRepositories {
   constructor() {}
@@ -29,5 +30,20 @@ export class UserRepoDB implements UserRepositories {
       .from(users)
       .where(eq(users.username, username));
     return userFromDB;
+  }
+  async findById(id: string): Promise<User | null> {
+    const [userFromDB] = await db.select().from(users).where(eq(users.id, id));
+    return userFromDB;
+  }
+  async findUserByToken(token: string): Promise<publicUser | null> {
+    const userId = getTheUserIdFromToken(token); // Assuming you have a method to extract user ID from the token
+    if (!userId) return null;
+    const [userFromDB] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId));
+    if (!userFromDB) return null;
+    const { password, ...publicUser } = userFromDB;
+    return publicUser;
   }
 }
