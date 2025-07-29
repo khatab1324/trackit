@@ -7,8 +7,9 @@ import { store } from "./app/store";
 import HomeStack from "./app/navigation/HomeStack";
 import { useSelector } from "react-redux";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { CreateMemoryScreen } from "./app/screens/CreateMemoryScreen";
+
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import CreateMemoryScreen from "./app/screens/CreateMemoryScreen";
 
 export type MainStackParamList = {
   Home: undefined;

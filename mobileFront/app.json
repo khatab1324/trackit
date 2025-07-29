@@ -9,11 +9,11 @@
     "newArchEnabled": true,
     "plugins": [
       [
-        "react-native-vision-camera",
+        "expo-camera",
         {
-          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
-          "enableMicrophonePermission": false,
-          "microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone."
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
         }
       ]
     ],
@@ -35,9 +35,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "permissions": [
-        "android.permission.CAMERA"
-      ],
+      "permissions": ["android.permission.CAMERA"],
       "package": "com.anonymous.mobileFront"
     },
     "web": {
