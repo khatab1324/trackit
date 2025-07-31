@@ -3,7 +3,6 @@ import { HomeScreen } from "../screens/HomeScreen";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { SearchScreen } from "../screens/SeachScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
-
 export type HomeStackParamList = {
   Home: undefined;
   Search: undefined;
