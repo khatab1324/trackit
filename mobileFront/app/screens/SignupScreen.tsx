@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AuthStackParamList } from "../navigation/Authstack";
-import { useSignupMutation } from "../services/authApi";
+import { useSignupMutation } from "../lib/APIs/RTKQuery/authApi";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "SignUp">;
 

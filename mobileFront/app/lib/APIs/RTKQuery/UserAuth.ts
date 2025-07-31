@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { User } from "../../../types/user";
-
+import Config from "react-native-config";
 export const UserApi = createApi({
   reducerPath: "UserApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://aabb079c1cf3.ngrok-free.app",
+    baseUrl: process.env.EXPO_PUBLIC_API_URL,
   }),
   endpoints: (builder) => ({
     getUserByToken: builder.mutation<{ user: User }, { token: string }>({

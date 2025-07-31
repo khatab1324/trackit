@@ -11,14 +11,14 @@ import {
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AuthStackParamList } from "../navigation/Authstack";
 // import { useDispatch } from "react-redux";
-import { useSigninMutation } from "../services/authApi";
+import { useSigninMutation } from "../lib/APIs/RTKQuery/authApi";
 import { useDispatch } from "react-redux";
 import { addUserToReducer } from "../store/slices/userSlice";
 import { setCredentials } from "../store/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
 import { User } from "../types/user";
 import { useGetUserByTokenMutation } from "../lib/APIs/RTKQuery/UserAuth";
+import Config from "react-native-config";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "SignIn">;
 
@@ -32,6 +32,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     (async () => {
       try {
+
         const tokenFromStorage = await AsyncStorage.getItem("token");
         console.log("Token from storage:", tokenFromStorage);
         if (tokenFromStorage) {
