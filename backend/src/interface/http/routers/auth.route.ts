@@ -1,7 +1,9 @@
 import { FastifyInstance } from "fastify";
-import { createUserController } from "../controllers/userController";
 import { createUserValidator } from "../../../application/validators/createUserValidator";
-import { signinController, signupController } from "../controllers/authController";
+import {
+  signinController,
+  signupController,
+} from "../controllers/authController";
 
 export default function authRoute(app: FastifyInstance) {
   app.post("/signin", signinController);
