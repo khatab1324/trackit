@@ -1,6 +1,6 @@
-import { configDotenv } from "dotenv";
 import { FastifyRequest, FastifyReply } from "fastify";
 import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 export async function verifyJWT(request: any, reply: FastifyReply) {
   try {
@@ -12,9 +12,9 @@ export async function verifyJWT(request: any, reply: FastifyReply) {
 
     const token = authHeader.split(" ")[1];
 
-    // const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
 
-    // request.user = { id: decoded.user_id };
+    request.user = { id: decoded.userId };
   } catch (err) {
     console.log((err as Error)?.message || "An unknown error occurred");
 

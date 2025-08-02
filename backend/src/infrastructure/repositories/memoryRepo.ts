@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { MemoryInput } from "../../application/DTO/memoryInputDTO";
 import { Memory } from "../../domain/entities/memory";
 import { MemoryRepository } from "../../domain/repositories/memoryRepository";
@@ -15,5 +16,12 @@ export class MemoryRepositoryImp implements MemoryRepository {
       })
       .returning();
     return createdMemory;
+  }
+  async getUserMemoryFromDB(id: string) {
+    const memoriesFromDB = await db
+      .select()
+      .from(memories)
+      .where(eq(memories.user_id, id));
+    return memoriesFromDB;
   }
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text } from "react-native";
 import {
   PanGestureHandler,
@@ -7,13 +7,13 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../../App";
-
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 type GestureHandlerEvent = PanGestureHandlerGestureEvent;
 
 export const HomeScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
-
   const handleGesture = (event: GestureHandlerEvent) => {
     const { translationX } = event.nativeEvent;
     if (translationX > 50) {

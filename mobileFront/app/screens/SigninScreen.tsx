@@ -32,14 +32,13 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     (async () => {
       try {
-
         const tokenFromStorage = await AsyncStorage.getItem("token");
         console.log("Token from storage:", tokenFromStorage);
         if (tokenFromStorage) {
           const result = await getUserByToken({ token: tokenFromStorage });
           console.log("getUserByToken result:", result);
           if ("data" in result) {
-            console.log("Success:", result.data);
+            console.log("Success:", result.data?.user);
             if (result.data?.user) {
               dispatch(addUserToReducer(result.data.user));
               dispatch(setCredentials(tokenFromStorage));
