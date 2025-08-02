@@ -2,13 +2,15 @@ import { configureStore } from "@reduxjs/toolkit";
 import { authApi } from "../lib/APIs/RTKQuery/authApi";
 import authReducer from "./slices/authSlice";
 import userReducer from "./slices/userSlice";
+import sheardDataThrowAppRedReducer from "./slices/sheardDataSlice";
 import { UserApi } from "../lib/APIs/RTKQuery/UserAuth";
 import { MemoryApi } from "../lib/APIs/RTKQuery/memoryApi";
 export const store = configureStore({
   reducer: {
     [authApi.reducerPath]: authApi.reducer,
-    [UserApi.reducerPath]: UserApi.reducer, // Add UserApi reducer
+    [UserApi.reducerPath]: UserApi.reducer,
     [MemoryApi.reducerPath]: MemoryApi.reducer,
+    sheardDataThrowApp: sheardDataThrowAppRedReducer,
     auth: authReducer,
     user: userReducer,
   },
