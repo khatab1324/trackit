@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { View, Text } from "react-native";
 import {
   PanGestureHandler,
@@ -9,11 +9,13 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../../App";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+
 type GestureHandlerEvent = PanGestureHandlerGestureEvent;
 
 export const HomeScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+
   const handleGesture = (event: GestureHandlerEvent) => {
     const { translationX } = event.nativeEvent;
     if (translationX > 50) {
@@ -21,10 +23,18 @@ export const HomeScreen = () => {
     }
   };
 
+  const isDark = useSelector(
+    (state: RootState) => state.sheardDataThrowApp.darkMode
+  );
+  const bgColor = isDark ? "bg-black" : "bg-white";
+  const textColor = isDark ? "text-white" : "text-black";
+
   return (
     <PanGestureHandler onGestureEvent={handleGesture}>
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Home Screen</Text>
+      <View className={`flex-1 justify-center items-center ${bgColor}`}>
+        <Text className={`text-xl font-semibold ${textColor}`}>
+          Home Screen
+        </Text>
       </View>
     </PanGestureHandler>
   );

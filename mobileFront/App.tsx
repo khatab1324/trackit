@@ -1,15 +1,15 @@
 import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
 import AuthStack from "./app/navigation/Authstack";
 import "./global.css";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
 import HomeStack from "./app/navigation/HomeStack";
-import { useSelector } from "react-redux";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CreateMemoryScreen from "./app/screens/CreateMemoryScreen";
+import { useSelector } from "react-redux";
+import { RootState } from "./app/store";
 
 export type MainStackParamList = {
   Home: undefined;
@@ -17,24 +17,24 @@ export type MainStackParamList = {
   CreateMemory: undefined;
 };
 
-function AppNavigator() {
-  const isAuthenticated = useSelector(
-    (state: any) => state.auth.isAuthenticated
-  );
-  const token = useSelector((state: any) => state.auth.token);
+const RootStack = createNativeStackNavigator<MainStackParamList>();
 
-  const RootStack = createNativeStackNavigator<MainStackParamList>();
+function MainAppNavigator() {
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated
+  );
+  const token = useSelector((state: RootState) => state.auth.token);
+  const isDarkMode = useSelector(
+    (state: RootState) => state.sheardDataThrowApp.darkMode
+  );
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={isDarkMode ? DarkTheme : DefaultTheme}>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         {isAuthenticated && token ? (
           <>
             <RootStack.Screen name="Home" component={HomeStack} />
-            <RootStack.Screen
-              name="CreateMemory"
-              component={CreateMemoryScreen}
-            />
+            <RootStack.Screen name="CreateMemory" component={CreateMemoryScreen} />
           </>
         ) : (
           <RootStack.Screen name="Auth" component={AuthStack} />
@@ -48,7 +48,7 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={store}>
-        <AppNavigator />
+        <MainAppNavigator />
       </Provider>
     </GestureHandlerRootView>
   );

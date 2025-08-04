@@ -18,16 +18,22 @@ type UserType = {
 export function ProfileScreen() {
   const [activeTab, setActiveTab] = useState('Memories');
   const user = useSelector((state: RootState) => state.user) as UserType;
-
+  const isDark = useSelector((state: RootState) => state.sheardDataThrowApp.darkMode);
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
 
+  const bg = isDark ? 'bg-black' : 'bg-white';
+  const text = isDark ? 'text-white' : 'text-black';
+  const subText = isDark ? 'text-gray-400' : 'text-gray-500';
+  const border = isDark ? 'border-gray-700' : 'border-gray-200';
+  const iconColor = isDark ? 'white' : 'black';
+
   return (
-    <View className="flex-1 bg-white px-4 pt-12">
+    <View className={`flex-1 px-4 pt-12 ${bg}`}>
       {/* Header */}
       <View className="flex-row justify-between items-center mb-6">
-        <Text className="text-2xl font-bold">Profile</Text>
+        <Text className={`text-2xl font-bold ${text}`}>Profile</Text>
         <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
-          <Ionicons name="settings-outline" size={24} color="black" />
+          <Ionicons name="settings-outline" size={24} color={iconColor} />
         </TouchableOpacity>
       </View>
 
@@ -40,32 +46,32 @@ export function ProfileScreen() {
           className="w-20 h-20 rounded-full bg-gray-200"
         />
         <View className="ml-4 mt-2">
-          <Text className="text-lg font-semibold">{user?.username || 'Username'}</Text>
-          <Text className="text-gray-500">{user?.bio || 'Bio goes here...'}</Text>
+          <Text className={`text-lg font-semibold ${text}`}>{user?.username || 'Username'}</Text>
+          <Text className={`${subText}`}>{user?.bio || 'Bio goes here...'}</Text>
         </View>
       </View>
 
       {/* Stats */}
       <View className="flex-row justify-around mt-6 mb-4">
         <View className="items-center">
-          <Text className="text-lg font-bold">{user?.memoriesCount || 0}</Text>
-          <Text className="text-gray-500">Memories</Text>
+          <Text className={`text-lg font-bold ${text}`}>{user?.memoriesCount || 0}</Text>
+          <Text className={`${subText}`}>Memories</Text>
         </View>
         <View className="items-center">
-          <Text className="text-lg font-bold">{user?.friendsCount || 0}</Text>
-          <Text className="text-gray-500">Friends</Text>
+          <Text className={`text-lg font-bold ${text}`}>{user?.friendsCount || 0}</Text>
+          <Text className={`${subText}`}>Friends</Text>
         </View>
       </View>
 
       {/* Tabs */}
-      <View className="flex-row justify-around border-b border-gray-200 mb-4">
+      <View className={`flex-row justify-around border-b mb-4 ${border}`}>
         <TouchableOpacity onPress={() => setActiveTab('Memories')}>
-          <Text className={`pb-2 ${activeTab === 'Memories' ? 'border-b-2 border-black font-semibold' : 'text-gray-400'}`}>
+          <Text className={`pb-2 ${activeTab === 'Memories' ? `border-b-2 font-semibold ${text} border-${isDark ? 'white' : 'black'}` : `${subText}`}`}>
             Memories
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setActiveTab('Saved')}>
-          <Text className={`pb-2 ${activeTab === 'Saved' ? 'border-b-2 border-black font-semibold' : 'text-gray-400'}`}>
+          <Text className={`pb-2 ${activeTab === 'Saved' ? `border-b-2 font-semibold ${text} border-${isDark ? 'white' : 'black'}` : `${subText}`}`}>
             Saved
           </Text>
         </TouchableOpacity>
@@ -73,7 +79,7 @@ export function ProfileScreen() {
 
       {/* Tab Content */}
       <View className="items-center mt-8">
-        <Text className="text-gray-400">No content yet.</Text>
+        <Text className={`${subText}`}>No content yet.</Text>
       </View>
     </View>
   );
