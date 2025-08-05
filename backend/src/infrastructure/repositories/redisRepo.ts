@@ -7,7 +7,7 @@ export class RedisMemoryRepository implements RedisRepository {
     const cached = await redis.smembers(cacheKey);
     console.log("cached", cached);
 
-    return cached.map((id) => JSON.parse(id));
+    return cached.map((id) => JSON.parse(id))[0] || [];
   }
 
   async saveSentMemoryIds(userId: string, ids: string[]): Promise<void> {
