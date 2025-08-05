@@ -1,10 +1,10 @@
-import { Memory } from "../../../domain/entities/memory";
 import { MemoryRepository } from "../../../domain/repositories/memoryRepository";
+import { MemoryMemo } from "../../../domain/valueObjects/MemoryMemo";
 
 export class GetCurrentUserMemoriesUseCase {
   constructor(private memoryRepository: MemoryRepository) {}
 
-  async execute(id: string): Promise<Memory[]> {
-    return this.memoryRepository.getUserMemoryFromDB(id);
+  async execute(userId: string): Promise<MemoryMemo[]> {
+    return this.memoryRepository.getUserMemoryMemo(userId);
   }
 }

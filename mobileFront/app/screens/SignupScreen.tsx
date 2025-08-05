@@ -11,6 +11,11 @@ import {
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AuthStackParamList } from "../navigation/Authstack";
 import { useSignupMutation } from "../lib/APIs/RTKQuery/authApi";
+import { useDispatch } from "react-redux";
+import { addUserToReducer } from "../store/slices/userSlice";
+import { setCredentials } from "../store/slices/authSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { User } from "../types/user";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "SignUp">;
 
@@ -20,15 +25,34 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [email, setEmail] = useState("");
   const [signup, { isLoading, error }] = useSignupMutation();
+  const dispatch = useDispatch();
 
   const handleSignup = async () => {
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-    console.log("Signing up with:", username, password);
-    const result = await signup({ username, password, email });
-    console.log(result.data);
+
+    try {
+      const result = await signup({ username, password, email });
+      if ("data" in result) {
+        console.log("Signup Success:", result.data);
+        if (result.data) {
+          const { token, createdUser } = result.data?.data as {
+            token: string;
+            createdUser: User;
+          };
+          dispatch(setCredentials(token));
+          await AsyncStorage.setItem("token", token);
+          dispatch(addUserToReducer(createdUser));
+          navigation.replace("Home");
+        }
+      } else {
+        console.log("Signup RTK error:", result.error);
+      }
+    } catch (error) {
+      console.error("Signup failed:", error);
+    }
   };
 
   return (

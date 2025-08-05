@@ -4,6 +4,8 @@ import { createMemoryController } from "../controllers/memoryController";
 import { memoryInputValidator } from "../../../application/validators/createMemoryValidator";
 import { getCloudinarySignatureController } from "../controllers/getCloudinarySignatureController";
 import { getCurrnetUserMemoryController } from "../controllers/getUserMemoryController";
+import { getMemroyByIdController } from "../controllers/getMemoryByIdController";
+import { GetNearMemoryController } from "../controllers/getNearMemoryController";
 
 export default async function memoryRouter(app: FastifyInstance) {
   app.post(
@@ -12,9 +14,19 @@ export default async function memoryRouter(app: FastifyInstance) {
     createMemoryController
   );
   app.get(
-    "/currentUserMemory",
+    "/currentUserMemories",
     { preHandler: [verifyJWT] },
     getCurrnetUserMemoryController
+  );
+  app.post(
+    "/getNearMemroy",
+    { preHandler: [verifyJWT] },
+    GetNearMemoryController
+  );
+  app.get<{ Params: { memoryId: string } }>(
+    "/getMemroyById/:memoryId",
+    { preHandler: [verifyJWT] },
+    getMemroyByIdController
   );
   app.get("/cloudinarySignature", getCloudinarySignatureController);
 }

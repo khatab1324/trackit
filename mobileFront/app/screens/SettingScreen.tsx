@@ -11,7 +11,11 @@ import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../store/slices/sheardDataSlice";
 import { RootState } from "../store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { clearUser } from "../store/slices/userSlice";
+import { clearCredentials } from "../store/slices/authSlice";
 
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 export function SettingScreen() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -21,6 +25,15 @@ export function SettingScreen() {
 
   const handleToggleTheme = () => {
     dispatch(toggleTheme());
+  };
+  const logoutHandler = async () => {
+    try {
+      await AsyncStorage.removeItem("token"); // Remove token from storage
+      dispatch(clearCredentials());
+      dispatch(clearUser()); // Clear user state
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   const settings = [
@@ -43,6 +56,11 @@ export function SettingScreen() {
       icon: <MaterialIcons name="person-outline" size={22} color="black" />,
       label: "Edit Username",
       onPress: () => {},
+    },
+    {
+      icon: <MaterialIcons name="logout" size={24} color="black" />,
+      label: "Log out",
+      onPress: logoutHandler,
     },
   ];
 

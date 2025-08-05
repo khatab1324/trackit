@@ -20,7 +20,13 @@ export const HomeScreen = () => {
       navigation.navigate("CreateMemory");
     }
   };
-
+  const jwt = useSelector((state: RootState) => state.auth.token);
+  const user = useSelector((state: RootState) => state.user);
+  useEffect(() => {
+    console.log("JWT:", jwt);
+    console.log("user:", user);
+    console.log();
+  }, [user]);
   return (
     <PanGestureHandler onGestureEvent={handleGesture}>
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
