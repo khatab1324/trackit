@@ -1,12 +1,12 @@
 import {
   createApi,
   fetchBaseQuery,
-  RootState,
 } from "@reduxjs/toolkit/query/react";
 import { User } from "../../../types/user";
 import {
   CloudinarySignatureResponse,
   MemoryInput,
+  Memory,
 } from "../../../types/memory";
 
 export const MemoryApi = createApi({
@@ -14,32 +14,41 @@ export const MemoryApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.EXPO_PUBLIC_API_URL,
     prepareHeaders: (headers, { getState }) => {
-      //TODO : fix the any and put instad RootState
       const token = (getState() as any).auth.token;
-
       if (token) {
         headers.set("authorization", `bearer ${token}`);
       }
-
       return headers;
     },
   }),
 
   endpoints: (builder) => ({
-    // TODO: the response will get back have {message}|{error} not void
     saveMemory: builder.mutation<void, MemoryInput>({
-      query: (body) => ({ url: "/memory", method: "POST", body }),
+      query: (body) => ({
+        url: "/memory",
+        method: "POST",
+        body,
+      }),
     }),
-    getCloudinarySignature: builder.mutation<CloudinarySignatureResponse, void>(
-      {
-        query: () => ({
-          url: "/cloudinarySignature",
-          method: "GET",
-        }),
-      }
-    ),
+
+    getCloudinarySignature: builder.mutation<CloudinarySignatureResponse, void>({
+      query: () => ({
+        url: "/cloudinarySignature",
+        method: "GET",
+      }),
+    }),
+
+    getCurrentUserMemories: builder.query<Memory[], void>({
+      query: () => ({
+        url: "/currentUserMemory",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useGetCloudinarySignatureMutation, useSaveMemoryMutation } =
-  MemoryApi;
+export const {
+  useGetCloudinarySignatureMutation,
+  useSaveMemoryMutation,
+  useGetCurrentUserMemoriesQuery,
+} = MemoryApi;

@@ -16,6 +16,22 @@ export interface MemoryInput {
   longitude: string;
   isPublic: boolean;
 }
+
 export enum ContentType {
   Image = "image",
+  Video = "video", 
+}
+
+export interface Memory {
+  id: string;
+  user_id: string;
+  title: string;
+  description?: string;
+  content_url: string;
+  content_type: ContentType;
+  latitude: string;
+  longitude: string;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
