@@ -19,4 +19,8 @@ export class FollowRequestUseCase {
   async getRequests(user_id: string) {
     return this.followRequestRepository.getFollowRequests(user_id);
   }
+
+  async getFollowers(user_id: string) {
+    return this.followRequestRepository.getFollowers(user_id);
+  }
 }

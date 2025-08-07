@@ -39,12 +39,12 @@ export default async function memoryRouter(app: FastifyInstance) {
     { preHandler: [verifyJWT] },
     getMemroyByIdController
   );
+
   app.get(
-    "/getMemoryComments/:memoryId",
+    "/getUserMemoryArchive",
     { preHandler: [verifyJWT] },
-    () => {}
+    getUserArchivedMemoriesController
   );
-  app.get("/getUserMemoryArchive", { preHandler: [verifyJWT] }, getUserArchivedMemoriesController);
   app.post("/memoryViewd", { preHandler: [verifyJWT] }, memoryViewController);
   app.post("/getNearMemroyMap", { preHandler: [verifyJWT] }, () => {});
   app.post("/memoryLike", { preHandler: [verifyJWT] }, memoryLikeController);
@@ -58,8 +58,16 @@ export default async function memoryRouter(app: FastifyInstance) {
     { preHandler: [verifyJWT] },
     getUserBookmarksController
   );
-  app.post("/memoryArchive", { preHandler: [verifyJWT] }, archiveMemoryController);
-  app.post("/memoryUnarchive", { preHandler: [verifyJWT] }, unarchiveMemoryController);
+  app.post(
+    "/memoryArchive",
+    { preHandler: [verifyJWT] },
+    archiveMemoryController
+  );
+  app.post(
+    "/memoryUnarchive",
+    { preHandler: [verifyJWT] },
+    unarchiveMemoryController
+  );
   app.post("/memoryDelete", { preHandler: [verifyJWT] }, () => {});
 
   app.get("/cloudinarySignature", getCloudinarySignatureController);

@@ -11,9 +11,15 @@ import { memoryLikes } from "../db/schema/memoryLikesSchema";
 import { log } from "console";
 import id from "zod/v4/locales/id.cjs";
 import { viewCounts } from "../db/schema/viewCountSchema";
-import { MemoryViewInput, MemoryViewResponse } from "../../application/DTO/memoryViewDTO";
+import {
+  MemoryViewInput,
+  MemoryViewResponse,
+} from "../../application/DTO/memoryViewDTO";
 import { archivedMemories } from "../db/schema/archiveMemory";
-import { MemoryArchiveInput, MemoryArchiveResponse } from "../../application/DTO/memoryArchiveDTO";
+import {
+  MemoryArchiveInput,
+  MemoryArchiveResponse,
+} from "../../application/DTO/memoryArchiveDTO";
 import { ArchivedMemory } from "../../application/DTO/memoryArchiveDTO";
 
 export class MemoryRepositoryImp implements MemoryRepository {
@@ -261,7 +267,9 @@ export class MemoryRepositoryImp implements MemoryRepository {
     }
   }
 
-  async archiveMemory(input: MemoryArchiveInput): Promise<MemoryArchiveResponse> {
+  async archiveMemory(
+    input: MemoryArchiveInput
+  ): Promise<MemoryArchiveResponse> {
     try {
       // this for check if the memory already archived
       const existing = await db
@@ -297,7 +305,9 @@ export class MemoryRepositoryImp implements MemoryRepository {
     }
   }
 
-  async unarchiveMemory(input: MemoryArchiveInput): Promise<MemoryArchiveResponse> {
+  async unarchiveMemory(
+    input: MemoryArchiveInput
+  ): Promise<MemoryArchiveResponse> {
     try {
       const deleted = await db
         .delete(archivedMemories)

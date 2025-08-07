@@ -1,6 +1,9 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { FollowRequestUseCase } from "../../../application/useCase/follow/followRequestUseCase";
 import { FollowRequestRepositoryImp } from "../../../infrastructure/repositories/followRequestRepo";
+import { db } from "../../../infrastructure/db/connection";
+import { follows } from "../../../infrastructure/db/schema/followsSchema";
+import { users } from "../../../infrastructure/db/schema/userSchema";
 
 export const sendFollowRequestController = async (
   request: FastifyRequest,
@@ -102,5 +105,30 @@ export const getFollowRequestsController = async (
     reply
       .code(500)
       .send({ error: "An error occurred while getting follow requests" });
+  }
+};
+
+export const getCurrentUserFollowersController = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+) => {
+  try {
+    const userReq = request.user as { id: string };
+    const user_id = userReq.id;
+    if (!user_id) {
+      return reply.code(401).send({ error: "Unauthorized" });
+    }
+    const result = await new FollowRequestUseCase(
+      new FollowRequestRepositoryImp()
+    ).getFollowers(user_id);
+    reply.code(200).send({
+      message: "Followers retrieved",
+      followers: result,
+    });
+  } catch (error) {
+    console.log(error);
+    reply
+      .code(500)
+      .send({ error: "An error occurred while getting followers" });
   }
 };
