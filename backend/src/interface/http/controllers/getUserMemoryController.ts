@@ -7,6 +7,7 @@ export async function getCurrnetUserMemoryController(
   reply: FastifyReply
 ) {
   try {
+    // TODO fix the type of request.user
     const user_id = request.user?.id;
     if (!user_id) {
       return reply.code(401).send({ error: "Unauthorized" });

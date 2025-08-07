@@ -1,7 +1,4 @@
-import {
-  createApi,
-  fetchBaseQuery,
-} from "@reduxjs/toolkit/query/react";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { User } from "../../../types/user";
 import {
   CloudinarySignatureResponse,
@@ -31,16 +28,18 @@ export const MemoryApi = createApi({
       }),
     }),
 
-    getCloudinarySignature: builder.mutation<CloudinarySignatureResponse, void>({
-      query: () => ({
-        url: "/cloudinarySignature",
-        method: "GET",
-      }),
-    }),
+    getCloudinarySignature: builder.mutation<CloudinarySignatureResponse, void>(
+      {
+        query: () => ({
+          url: "/cloudinarySignature",
+          method: "GET",
+        }),
+      }
+    ),
 
-    getCurrentUserMemories: builder.query<Memory[], void>({
+    getCurrentUserMemories: builder.mutation<Memory[], void>({
       query: () => ({
-        url: "/currentUserMemory",
+        url: "/currentUserMemories",
         method: "GET",
       }),
     }),
@@ -50,5 +49,5 @@ export const MemoryApi = createApi({
 export const {
   useGetCloudinarySignatureMutation,
   useSaveMemoryMutation,
-  useGetCurrentUserMemoriesQuery,
+  useGetCurrentUserMemoriesMutation,
 } = MemoryApi;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text } from "react-native";
 import {
   PanGestureHandler,
@@ -22,19 +22,17 @@ export const HomeScreen = () => {
       navigation.navigate("CreateMemory");
     }
   };
-
-  const isDark = useSelector(
-    (state: RootState) => state.sheardDataThrowApp.darkMode
-  );
-  const bgColor = isDark ? "bg-black" : "bg-white";
-  const textColor = isDark ? "text-white" : "text-black";
-
+  const jwt = useSelector((state: RootState) => state.auth.token);
+  const user = useSelector((state: RootState) => state.user);
+  useEffect(() => {
+    console.log("JWT:", jwt);
+    console.log("user:", user);
+    console.log();
+  }, [user]);
   return (
     <PanGestureHandler onGestureEvent={handleGesture}>
-      <View className={`flex-1 justify-center items-center ${bgColor}`}>
-        <Text className={`text-xl font-semibold ${textColor}`}>
-          Home Screen
-        </Text>
+      <View className={`flex-1 justify-center items-center `}>
+        <Text className={`text-xl font-semibold `}>Home Screen</Text>
       </View>
     </PanGestureHandler>
   );

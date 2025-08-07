@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,7 +13,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParamList } from "../navigation/HomeStack";
-import { useGetCurrentUserMemoriesQuery } from "../lib/APIs/RTKQuery/memoryApi";
+import { useGetCurrentUserMemoriesMutation } from "../lib/APIs/RTKQuery/memoryApi";
+import { setMemories } from "../store/slices/memorySlice";
 
 type UserType = {
   username?: string;
@@ -29,14 +30,52 @@ export function ProfileScreen() {
   const isDark = useSelector(
     (state: RootState) => state.sheardDataThrowApp.darkMode
   );
+  type Memory = {
+    id: string;
+    content_type: string;
+    content_url: string;
+    count: string;
+    description?: string;
+    isFollowed: boolean;
+    is_saved: boolean;
+    lang: number;
+    long: number;
+    num_comments: string;
+    num_likes: string;
+    userInfo: {
+      user_id: string;
+      username: string;
+    };
+  };
+
+  const [memories, setMemories] = useState<
+    { id: string; content_url: string }[]
+  >([]);
   const navigation =
     useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
 
-  const {
-    data: memories,
-    isLoading,
-    isError,
-  } = useGetCurrentUserMemoriesQuery();
+  const [getCurrentUserMemories, { isLoading, isError }] =
+    useGetCurrentUserMemoriesMutation();
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", async () => {
+      try {
+        const result = await getCurrentUserMemories();
+        if (!result) throw new Error("coookiiie");
+        if (result.data) {
+          const { data } = result.data as { id: string; content_url: string }[];
+          console.log(data);
+
+          setMemories(data || []);
+        } else if ("error" in result) {
+          console.error("Error fetching memories:", result.error);
+        }
+      } catch (error) {
+        console.error("Error in useEffect:", error);
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, getCurrentUserMemories]);
 
   const bg = isDark ? "bg-black" : "bg-white";
   const text = isDark ? "text-white" : "text-black";
@@ -44,18 +83,13 @@ export function ProfileScreen() {
   const border = isDark ? "border-gray-700" : "border-gray-200";
   const iconColor = isDark ? "white" : "black";
 
-  const renderMemoryItem = ({ item }: any) => (
-    <View className="mb-4">
+  const renderMemoryItem = ({ item }: { item: Memory }) => (
+    <View className="mb-4 ">
       <Image
-        source={{ uri: item.imageUrl }}
-        className="w-full h-64 rounded-lg"
+        source={{ uri: item.content_url }}
+        className="w-32 h-36 rounded-lg"
+        resizeMode="cover"
       />
-      {item.caption && (
-        <Text className={`mt-2 text-base ${text}`}>{item.caption}</Text>
-      )}
-      {item.location && (
-        <Text className={`text-sm ${subText}`}>📍 {item.location}</Text>
-      )}
     </View>
   );
 
@@ -83,7 +117,9 @@ export function ProfileScreen() {
           <Text className={`text-lg font-semibold ${text}`}>
             {user?.username || "Username"}
           </Text>
-          <Text className={`${subText}`}>{user?.bio || "Bio goes here..."}</Text>
+          <Text className={`${subText}`}>
+            {user?.bio || "Bio goes here..."}
+          </Text>
         </View>
       </View>
 
@@ -91,7 +127,7 @@ export function ProfileScreen() {
       <View className="flex-row justify-around mt-6 mb-4">
         <View className="items-center">
           <Text className={`text-lg font-bold ${text}`}>
-            {user?.memoriesCount || 0}
+            {memories.length || 0}
           </Text>
           <Text className={`${subText}`}>Memories</Text>
         </View>
@@ -147,6 +183,8 @@ export function ProfileScreen() {
             keyExtractor={(item) => item.id}
             renderItem={renderMemoryItem}
             className="mb-10"
+            numColumns={3}
+            columnWrapperStyle={{ justifyContent: "space-between" }} // Add spacing between columns
             showsVerticalScrollIndicator={false}
           />
         ) : (

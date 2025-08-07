@@ -17,7 +17,11 @@ export const authSlice = createSlice({
       state.isAuthenticated = true;
       state.token = action.payload;
     },
+    clearCredentials(state) {
+      state.isAuthenticated = false;
+      state.token = null;
+    },
   },
 });
-export const { setCredentials } = authSlice.actions;
+export const { setCredentials, clearCredentials } = authSlice.actions;
 export default authSlice.reducer;
