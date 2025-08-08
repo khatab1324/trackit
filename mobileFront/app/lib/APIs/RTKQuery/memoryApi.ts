@@ -63,12 +63,14 @@ export const MemoryApi = createApi({
       transformResponse: (res: { data: Memory; message: string }) => res.data,
     }),
 
-    getCloudinarySignature: builder.query<CloudinarySignatureResponse, void>({
-      query: () => ({
-        url: "/cloudinarySignature",
-        method: "GET",
-      }),
-    }),
+    getCloudinarySignature: builder.mutation<CloudinarySignatureResponse, void>(
+      {
+        query: () => ({
+          url: "/cloudinarySignature",
+          method: "GET",
+        }),
+      }
+    ),
 
     getCurrentUserMemories: builder.query<Memory[], void>({
       query: () => ({
@@ -82,7 +84,7 @@ export const MemoryApi = createApi({
 });
 
 export const {
-  useGetCloudinarySignatureQuery,
+  useGetCloudinarySignatureMutation,
   useSaveMemoryMutation,
   useGetCurrentUserMemoriesQuery,
   useGetMemoriesQuery,

@@ -16,7 +16,7 @@ import { useDispatch } from "react-redux";
 import { addUserToReducer } from "../store/slices/userSlice";
 import { setCredentials } from "../store/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { User } from "../types/user";
+import { User } from "../core/types/user";
 import { useGetUserByTokenMutation } from "../lib/APIs/RTKQuery/UserAuth";
 import Config from "react-native-config";
 

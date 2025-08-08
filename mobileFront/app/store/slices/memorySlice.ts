@@ -7,7 +7,6 @@ export interface Memory {
   caption?: string;
   location?: string;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface MemoryState {
