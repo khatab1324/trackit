@@ -54,6 +54,14 @@ export const MemoryApi = createApi({
         { type: "UserMemory", id: "CURRENT" },
       ],
     }),
+    //TODO: make this as query not mutation
+    getMemoryById: builder.mutation<Memory, string>({
+      query: (id) => ({
+        url: `/getMemoryById/${id}`,
+        method: "GET",
+      }),
+      transformResponse: (res: { data: Memory; message: string }) => res.data,
+    }),
 
     getCloudinarySignature: builder.query<CloudinarySignatureResponse, void>({
       query: () => ({
@@ -67,10 +75,8 @@ export const MemoryApi = createApi({
         url: "/currentUserMemories",
         method: "GET",
       }),
-      providesTags: (result) => [
-        { type: "UserMemory", id: "CURRENT" },
-        ...(result ?? []).map((m) => ({ type: "Memory" as const, id: m.id })),
-      ],
+      transformResponse: (res: { data: Memory[]; message: string }) => res.data,
+      providesTags: (result) => providesList(result, "Memory"),
     }),
   }),
 });
@@ -80,4 +86,5 @@ export const {
   useSaveMemoryMutation,
   useGetCurrentUserMemoriesQuery,
   useGetMemoriesQuery,
+  useGetMemoryByIdMutation,
 } = MemoryApi;

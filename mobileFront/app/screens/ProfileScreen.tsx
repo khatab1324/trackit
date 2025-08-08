@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,13 +8,12 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParamList } from "../navigation/HomeStack";
-import { useGetCurrentUserMemoriesMutation } from "../lib/APIs/RTKQuery/memoryApi";
-import { setMemories } from "../store/slices/memorySlice";
+import { useGetCurrentUserMemoriesQuery } from "../lib/APIs/RTKQuery/memoryApi";
 
 type UserType = {
   username?: string;
@@ -24,58 +23,46 @@ type UserType = {
   friendsCount?: number;
 };
 
+type Memory = {
+  id: string;
+  content_url: string;
+  content_type?: string;
+  description?: string | null;
+  num_likes?: number;
+  num_comments?: number;
+  userInfo?: {
+    user_id: string;
+    username: string;
+  };
+};
+
 export function ProfileScreen() {
   const [activeTab, setActiveTab] = useState("Memories");
   const user = useSelector((state: RootState) => state.user) as UserType;
   const isDark = useSelector(
     (state: RootState) => state.sheardDataThrowApp.darkMode
   );
-  type Memory = {
-    id: string;
-    content_type: string;
-    content_url: string;
-    count: string;
-    description?: string;
-    isFollowed: boolean;
-    is_saved: boolean;
-    lang: number;
-    long: number;
-    num_comments: string;
-    num_likes: string;
-    userInfo: {
-      user_id: string;
-      username: string;
-    };
-  };
 
-  const [memories, setMemories] = useState<
-    { id: string; content_url: string }[]
-  >([]);
   const navigation =
     useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
 
-  const [getCurrentUserMemories, { isLoading, isError }] =
-    useGetCurrentUserMemoriesMutation();
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", async () => {
-      try {
-        const result = await getCurrentUserMemories();
-        if (!result) throw new Error("coookiiie");
-        if (result.data) {
-          const { data } = result.data as { id: string; content_url: string }[];
-          console.log(data);
+  // Use RTK Query hook directly. Response shape: { message, data }
+  const { data, isLoading, isError, refetch } = useGetCurrentUserMemoriesQuery(
+    undefined,
+    {
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+    }
+  );
 
-          setMemories(data || []);
-        } else if ("error" in result) {
-          console.error("Error fetching memories:", result.error);
-        }
-      } catch (error) {
-        console.error("Error in useEffect:", error);
-      }
-    });
+  // Ensure fresh data on screen focus
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     refetch();
+  //   }, [refetch])
+  // );
 
-    return unsubscribe;
-  }, [navigation, getCurrentUserMemories]);
+  const memories = (data as Memory[]) ?? [];
 
   const bg = isDark ? "bg-black" : "bg-white";
   const text = isDark ? "text-white" : "text-black";
@@ -184,7 +171,7 @@ export function ProfileScreen() {
             renderItem={renderMemoryItem}
             className="mb-10"
             numColumns={3}
-            columnWrapperStyle={{ justifyContent: "space-between" }} // Add spacing between columns
+            columnWrapperStyle={{ justifyContent: "space-between" }}
             showsVerticalScrollIndicator={false}
           />
         ) : (
