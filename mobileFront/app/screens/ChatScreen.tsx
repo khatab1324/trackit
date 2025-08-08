@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 
-export const SearchScreen = () => {
+export const ChatScreen = () => {
   const isDark = useSelector(
     (state: RootState) => state.sheardDataThrowApp.darkMode
   );
@@ -13,9 +13,7 @@ export const SearchScreen = () => {
 
   return (
     <View className={`flex-1 items-center justify-center ${bgColor}`}>
-      <Text className={`text-lg font-semibold ${textColor}`}>
-        Search screen
-      </Text>
+      <Text className={`text-lg font-semibold ${textColor}`}>Chat screen</Text>
     </View>
   );
 };

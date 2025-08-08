@@ -1,12 +1,14 @@
 import React from "react";
 import { HomeScreen } from "../screens/HomeScreen";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { SearchScreen } from "../screens/SeachScreen";
+import { ChatScreen } from "../screens/ChatScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
-import { SettingScreen } from "../screens/SettingScreen"; 
+import { SettingScreen } from "../screens/SettingScreen";
+import { MapScreen } from "../screens/MapScreen";
 export type HomeStackParamList = {
+  Map: undefined;
   Home: undefined;
-  Search: undefined;
+  Chat: undefined;
   Profile: undefined;
   Settings: undefined;
 };
@@ -17,7 +19,8 @@ export default function HomeStack() {
       initialRouteName="Home"
       screenOptions={{ headerShown: false }}
     >
-      <Stack.Screen name="Search" component={SearchScreen} />
+      <Stack.Screen name="Map" component={MapScreen} />
+      <Stack.Screen name="Chat" component={ChatScreen} />
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen
