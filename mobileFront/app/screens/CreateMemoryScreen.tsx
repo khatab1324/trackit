@@ -14,6 +14,7 @@ import { MainStackParamList } from "../../App";
 import { HeaderForCamera } from "../components/headerForCamera";
 import SaveMemoryPic from "../components/SaveMemoryPic";
 import { CameraPremiisionDenied } from "../components/CameraPremissionDenied";
+import { useSelector } from "react-redux";
 
 type Nav = NativeStackNavigationProp<MainStackParamList, "CreateMemory">;
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React ,{useEffect}from "react";
 import { View, Text } from "react-native";
 import {
   PanGestureHandler,
@@ -29,6 +29,13 @@ export const HomeScreen = () => {
   const bgColor = isDark ? "bg-black" : "bg-white";
   const textColor = isDark ? "text-white" : "text-black";
 
+  const jwt = useSelector((state: RootState) => state.auth.token);
+  const user = useSelector((state: RootState) => state.user);
+  useEffect(() => {
+    console.log("JWT:", jwt);
+    console.log("user:", user);
+    console.log();
+  }, [user]);
   return (
     <PanGestureHandler onGestureEvent={handleGesture}>
       <View className={`flex-1 justify-center items-center ${bgColor}`}>
