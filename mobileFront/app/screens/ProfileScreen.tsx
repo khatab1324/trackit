@@ -54,20 +54,9 @@ export function ProfileScreen() {
   useEffect(() => {
     const unsub = navigation.addListener("focus", async () => {
       try {
-        const resAny: any = await getCurrentUserMemories().unwrap();
-        const list = Array.isArray(resAny)
-          ? resAny
-          : resAny?.data ?? resAny?.memories ?? resAny?.results ?? [];
-        const mapped: SimpleMemory[] = (list ?? [])
-          .map(
-            (m: any): SimpleMemory => ({
-              id: String(m.id ?? m._id ?? m.memory_id ?? ""),
-              content_url: String(m.content_url ?? m.url ?? m.imageUrl ?? ""),
-            })
-          )
-          .filter((x: SimpleMemory) => x.id && x.content_url);
-
-        setMemories(mapped);
+        const resAny = (await getCurrentUserMemories().unwrap()) as any;
+        console.log(resAny);
+        setMemories(resAny.data as SimpleMemory[]);
       } catch (e) {
         console.error("Error loading memories:", e);
         setMemories([]);
@@ -94,8 +83,8 @@ export function ProfileScreen() {
       className="mb-1"
       onPress={() =>
         navigation.navigate("MemoryDetails", {
-          memories: memories.map((m) => m.content_url),   
-          startIndex: index,  
+          memories: memories.map((m) => m.content_url),
+          startIndex: index,
         })
       }
     >
@@ -129,7 +118,9 @@ export function ProfileScreen() {
           <Text className={`text-lg font-semibold ${text}`}>
             {user?.username || "Username"}
           </Text>
-          <Text className={`${subText}`}>{user?.bio || "Bio goes here..."}</Text>
+          <Text className={`${subText}`}>
+            {user?.bio || "Bio goes here..."}
+          </Text>
         </View>
       </View>
 
