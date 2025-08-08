@@ -219,9 +219,9 @@ export class MemoryRepositoryImp implements MemoryRepository {
         and(
           between(memories.latitude, minLat, maxLat),
           between(memories.longitude, minLong, maxLong),
-          // excludeIds.length > 0
-          //   ? notInArray(memories.id, excludeIds)
-          //   : undefined,
+          excludeIds.length > 0
+            ? notInArray(memories.id, excludeIds)
+            : undefined,
           // eq(memories.isPublic, true),
           notInArray(memories.user_id, [currentUserId])
         )
@@ -352,5 +352,49 @@ export class MemoryRepositoryImp implements MemoryRepository {
       console.error("Error getting archived memories:", error);
       throw new Error("Failed to get archived memories");
     }
+  }
+
+  async getAllMemoriesMemo(currentUserId: string): Promise<MemoryMemo[]> {
+    let count = 1;
+    const memoriesFromDB = await db
+      .select({
+        id: memories.id,
+        count: sql<number>`(${count++})`.as("counter"),
+        content_url: memories.content_url,
+        content_type: memories.content_type,
+        lang: memories.latitude,
+        long: memories.longitude,
+        description: memories.description,
+        num_likes: sql<number>`(
+          SELECT COUNT(*) FROM memory_likes WHERE memory_likes.memory_id = ${memories.id}
+        )`.as("num_likes"),
+        num_comments: sql<number>`(
+          SELECT COUNT(*) FROM memory_comments WHERE memory_comments.memory_id = ${memories.id}
+        )`.as("num_comments"),
+        isFollowed: sql<boolean>`EXISTS(
+          SELECT 1 FROM follows 
+          WHERE follows.follower_id = ${currentUserId}
+          AND follows.followed_id = ${memories.user_id}
+        )`.as("isFollowed"),
+        is_saved: sql<boolean>`EXISTS(
+          SELECT 1 FROM bookmarks
+          WHERE bookmarks.memory_id = ${memories.id}
+          AND bookmarks.user_id = ${currentUserId}
+        )`.as("is_saved"),
+        is_liked: sql<boolean>`EXISTS(
+          SELECT 1 FROM memory_likes
+          WHERE memory_likes.memory_id = ${memories.id}
+          AND memory_likes.user_id = ${currentUserId}
+        )`.as("is_liked"),
+        userInfo: {
+          user_id: users.id,
+          username: users.username,
+        },
+      })
+      .from(memories)
+      .innerJoin(users, eq(users.id, memories.user_id))
+      .orderBy(memories.created_at);
+
+    return memoriesFromDB as unknown as MemoryMemo[];
   }
 }

@@ -7,6 +7,6 @@ export class GetCurrentUserMemoriesUseCase {
   async execute(
     userId: string
   ): Promise<{ id: string; content_url: string }[]> {
-    return this.memoryRepository.getUserMemoryIds(userId);
+    return this.memoryRepository.getUserMemoryMemo(userId);
   }
 }
