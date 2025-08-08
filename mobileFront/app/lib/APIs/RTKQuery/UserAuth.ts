@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { User } from "../../../types/user";
+import { User } from "../../../core/types/user";
 import Config from "react-native-config";
 export const UserApi = createApi({
   reducerPath: "UserApi",

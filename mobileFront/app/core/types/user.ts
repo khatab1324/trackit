@@ -2,7 +2,7 @@ export type User = {
   id: string;
   username: string;
   email: string;
-  profile_image: string | null;
+  profileImage: string | null;
   bio: string | null;
-  created_at: Date;
+  createdAt: Date;
 };

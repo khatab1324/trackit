@@ -15,6 +15,7 @@ import { clearUser } from "../store/slices/userSlice";
 import { clearCredentials } from "../store/slices/authSlice";
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+
 export function SettingScreen() {
   const navigation = useNavigation();
   const dispatch = useDispatch();

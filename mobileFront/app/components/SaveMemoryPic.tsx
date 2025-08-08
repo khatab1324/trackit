@@ -17,10 +17,10 @@ import {
   useSaveMemoryMutation,
 } from "../lib/APIs/RTKQuery/memoryApi";
 import Location from "expo-location";
-import { ContentType, MemoryInput } from "../types/memory";
+import { ContentType, MemoryInput } from "../core/types/memory";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
-import { User } from "../types/user";
+import { User } from "../core/types/user";
 interface RootStackParamList extends ParamListBase {
   Home: undefined;
 }

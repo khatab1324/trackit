@@ -12,7 +12,7 @@ import { boolean } from "drizzle-orm/pg-core";
 import { ContentType } from "../../../application/DTO/memoryInputDTO";
 
 export const memories = pgTable("memories", {
-  id: uuid().primaryKey().defaultRandom().notNull(),
+  id: uuid().primaryKey().defaultRandom().notNull(),   
   user_id: uuid()
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),

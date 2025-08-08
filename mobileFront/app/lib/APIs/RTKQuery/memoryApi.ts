@@ -1,10 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { User } from "../../../types/user";
 import {
   CloudinarySignatureResponse,
   MemoryInput,
   Memory,
-} from "../../../types/memory";
+} from "../../../core/types/memory";
 
 export const MemoryApi = createApi({
   reducerPath: "MemoryApi",
@@ -37,7 +36,7 @@ export const MemoryApi = createApi({
       }
     ),
 
-    getCurrentUserMemories: builder.mutation<Memory[], void>({
+    getCurrentUserMemories: builder.mutation<{data: Memory[]}, void>({
       query: () => ({
         url: "/currentUserMemories",
         method: "GET",

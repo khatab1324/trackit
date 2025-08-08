@@ -31,8 +31,8 @@ export const HomeScreen = () => {
   }, [user]);
   return (
     <PanGestureHandler onGestureEvent={handleGesture}>
-      <View className={`flex-1 justify-center items-center `}>
-        <Text className={`text-xl font-semibold `}>Home Screen</Text>
+      <View className={`flex-1 justify-center items-center`}>
+        <Text className={`text-xl font-semibold`}>Home Screen</Text>
       </View>
     </PanGestureHandler>
   );
