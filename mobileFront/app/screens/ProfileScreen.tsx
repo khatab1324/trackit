@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,12 +8,20 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import {
+  CompositeNavigationProp,
+  useNavigation,
+} from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+import { MainStackParamList } from "../../App";
 import { HomeStackParamList } from "../navigation/HomeStack";
-import { useGetCurrentUserMemoriesQuery } from "../lib/APIs/RTKQuery/memoryApi";
+
+import { useGetCurrentUserMemoriesMutation } from "../lib/APIs/RTKQuery/memoryApi";
 
 type UserType = {
   username?: string;
@@ -23,20 +31,51 @@ type UserType = {
   friendsCount?: number;
 };
 
+type SimpleMemory = { id: string; content_url: string };
+
+type Nav = CompositeNavigationProp<
+  NativeStackNavigationProp<MainStackParamList>,
+  BottomTabNavigationProp<HomeStackParamList>
+>;
+
 export function ProfileScreen() {
-  const [activeTab, setActiveTab] = useState("Memories");
+  const [activeTab, setActiveTab] = useState<"Memories" | "Saved">("Memories");
   const user = useSelector((state: RootState) => state.user) as UserType;
   const isDark = useSelector(
     (state: RootState) => state.sheardDataThrowApp.darkMode
   );
-  const navigation =
-    useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
 
-  const {
-    data: memories,
-    isLoading,
-    isError,
-  } = useGetCurrentUserMemoriesQuery();
+  const navigation = useNavigation<Nav>();
+
+  const [memories, setMemories] = useState<SimpleMemory[]>([]);
+  const [getCurrentUserMemories, { isLoading, isError }] =
+    useGetCurrentUserMemoriesMutation();
+
+  useEffect(() => {
+    const unsub = navigation.addListener("focus", async () => {
+      try {
+        const resAny: any = await getCurrentUserMemories().unwrap();
+        const list = Array.isArray(resAny)
+          ? resAny
+          : resAny?.data ?? resAny?.memories ?? resAny?.results ?? [];
+        const mapped: SimpleMemory[] = (list ?? [])
+          .map(
+            (m: any): SimpleMemory => ({
+              id: String(m.id ?? m._id ?? m.memory_id ?? ""),
+              content_url: String(m.content_url ?? m.url ?? m.imageUrl ?? ""),
+            })
+          )
+          .filter((x: SimpleMemory) => x.id && x.content_url);
+
+        setMemories(mapped);
+      } catch (e) {
+        console.error("Error loading memories:", e);
+        setMemories([]);
+      }
+    });
+
+    return unsub;
+  }, [navigation, getCurrentUserMemories]);
 
   const bg = isDark ? "bg-black" : "bg-white";
   const text = isDark ? "text-white" : "text-black";
@@ -44,24 +83,32 @@ export function ProfileScreen() {
   const border = isDark ? "border-gray-700" : "border-gray-200";
   const iconColor = isDark ? "white" : "black";
 
-  const renderMemoryItem = ({ item }: any) => (
-    <View className="mb-4">
+  const renderMemoryItem = ({
+    item,
+    index,
+  }: {
+    item: SimpleMemory;
+    index: number;
+  }) => (
+    <TouchableOpacity
+      className="mb-1"
+      onPress={() =>
+        navigation.navigate("MemoryDetails", {
+          memories: memories.map((m) => m.content_url),   
+          startIndex: index,  
+        })
+      }
+    >
       <Image
-        source={{ uri: item.imageUrl }}
-        className="w-full h-64 rounded-lg"
+        source={{ uri: item.content_url }}
+        className="w-32 h-32 rounded-lg"
+        resizeMode="cover"
       />
-      {item.caption && (
-        <Text className={`mt-2 text-base ${text}`}>{item.caption}</Text>
-      )}
-      {item.location && (
-        <Text className={`text-sm ${subText}`}>📍 {item.location}</Text>
-      )}
-    </View>
+    </TouchableOpacity>
   );
 
   return (
     <View className={`flex-1 px-4 pt-12 ${bg}`}>
-      {/* Header */}
       <View className="flex-row justify-between items-center mb-6">
         <Text className={`text-2xl font-bold ${text}`}>Profile</Text>
         <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
@@ -69,7 +116,6 @@ export function ProfileScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Profile Info */}
       <View className="flex-row items-start">
         <Image
           source={{
@@ -87,11 +133,10 @@ export function ProfileScreen() {
         </View>
       </View>
 
-      {/* Stats */}
       <View className="flex-row justify-around mt-6 mb-4">
         <View className="items-center">
           <Text className={`text-lg font-bold ${text}`}>
-            {user?.memoriesCount || 0}
+            {memories.length || 0}
           </Text>
           <Text className={`${subText}`}>Memories</Text>
         </View>
@@ -103,7 +148,6 @@ export function ProfileScreen() {
         </View>
       </View>
 
-      {/* Tabs */}
       <View className={`flex-row justify-around border-b mb-4 ${border}`}>
         <TouchableOpacity onPress={() => setActiveTab("Memories")}>
           <Text
@@ -133,7 +177,6 @@ export function ProfileScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Tab Content */}
       {activeTab === "Memories" ? (
         isLoading ? (
           <ActivityIndicator size="large" color={iconColor} className="mt-10" />
@@ -142,11 +185,12 @@ export function ProfileScreen() {
             Failed to load memories.
           </Text>
         ) : memories?.length ? (
-          <FlatList
+          <FlatList<SimpleMemory>
             data={memories}
             keyExtractor={(item) => item.id}
             renderItem={renderMemoryItem}
-            className="mb-10"
+            numColumns={3}
+            columnWrapperStyle={{ justifyContent: "space-between" }}
             showsVerticalScrollIndicator={false}
           />
         ) : (

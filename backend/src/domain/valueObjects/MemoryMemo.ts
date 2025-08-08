@@ -10,6 +10,7 @@ export interface MemoryMemo {
   num_comments: number;
   isFollowed: boolean;
   is_saved: boolean;
+  is_liked: boolean;
   userInfo: {
     username: string;
     user_id: string;
