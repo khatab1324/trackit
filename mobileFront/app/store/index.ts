@@ -5,6 +5,8 @@ import userReducer from "./slices/userSlice";
 import sheardDataThrowAppRedReducer from "./slices/sheardDataSlice";
 import { UserApi } from "../lib/APIs/RTKQuery/UserAuth";
 import { MemoryApi } from "../lib/APIs/RTKQuery/memoryApi";
+import memoryReducer from "./slices/memorySlice";
+
 export const store = configureStore({
   reducer: {
     [authApi.reducerPath]: authApi.reducer,
@@ -13,6 +15,8 @@ export const store = configureStore({
     sheardDataThrowApp: sheardDataThrowAppRedReducer,
     auth: authReducer,
     user: userReducer,
+
+    memory: memoryReducer, // مهم
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
