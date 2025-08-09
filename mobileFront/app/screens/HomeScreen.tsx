@@ -9,6 +9,11 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../../App";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+import {
+  useGetCurrentUserMemoriesQuery,
+  useGetNearMemoryQuery,
+} from "../lib/APIs/RTKQuery/memoryApi";
+import { MemoListComp } from "../components/MemoList";
 
 type GestureHandlerEvent = PanGestureHandlerGestureEvent;
 
@@ -29,10 +34,17 @@ export const HomeScreen = () => {
     console.log("user:", user);
     console.log();
   }, [user]);
+  const { data } = useGetNearMemoryQuery({
+    location: {
+      lang: 31.994482,
+      long: 35.95843,
+    },
+  });
+
   return (
     <PanGestureHandler onGestureEvent={handleGesture}>
       <View className={`flex-1 justify-center items-center`}>
-        <Text className={`text-xl font-semibold`}>Home Screen</Text>
+        {data ? <MemoListComp data={data} /> : <Text>Loading...</Text>}
       </View>
     </PanGestureHandler>
   );

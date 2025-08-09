@@ -1,5 +1,9 @@
 import React from "react";
-import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  DefaultTheme,
+  DarkTheme,
+} from "@react-navigation/native";
 import AuthStack from "./app/navigation/Authstack";
 import "./global.css";
 import { Provider } from "react-redux";
@@ -10,11 +14,13 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CreateMemoryScreen from "./app/screens/CreateMemoryScreen";
 import { useSelector } from "react-redux";
 import { RootState } from "./app/store";
+import { CurrentUserMemoScreen } from "./app/screens/CurrentUserMemoScreen";
 
 export type MainStackParamList = {
   Home: undefined;
   Auth: undefined;
   CreateMemory: undefined;
+  CurrentUserMemo: undefined;
 };
 
 const RootStack = createNativeStackNavigator<MainStackParamList>();
@@ -34,7 +40,14 @@ function MainAppNavigator() {
         {isAuthenticated && token ? (
           <>
             <RootStack.Screen name="Home" component={HomeStack} />
-            <RootStack.Screen name="CreateMemory" component={CreateMemoryScreen} />
+            <RootStack.Screen
+              name="CreateMemory"
+              component={CreateMemoryScreen}
+            />
+            <RootStack.Screen
+              name="CurrentUserMemo"
+              component={CurrentUserMemoScreen}
+            />
           </>
         ) : (
           <RootStack.Screen name="Auth" component={AuthStack} />

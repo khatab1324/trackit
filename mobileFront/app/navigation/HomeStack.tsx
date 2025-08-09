@@ -5,12 +5,14 @@ import { ChatScreen } from "../screens/ChatScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
 import { SettingScreen } from "../screens/SettingScreen";
 import { MapScreen } from "../screens/MapScreen";
+import { CurrentUserMemoScreen } from "../screens/CurrentUserMemoScreen";
 export type HomeStackParamList = {
   Map: undefined;
   Home: undefined;
   Chat: undefined;
   Profile: undefined;
   Settings: undefined;
+  CurrentUserMemo: undefined;
 };
 const Stack = createBottomTabNavigator<HomeStackParamList>();
 export default function HomeStack() {

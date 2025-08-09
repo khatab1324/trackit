@@ -3,7 +3,7 @@ import {
   CloudinarySignatureResponse,
   MemoryInput,
   Memory,
-} from "../../../types/memory";
+} from "../../../core/types/memory";
 
 function providesList<R extends { id: string | number }[], T extends string>(
   resultsWithIds: R | undefined,
@@ -80,6 +80,23 @@ export const MemoryApi = createApi({
       transformResponse: (res: { data: Memory[]; message: string }) => res.data,
       providesTags: (result) => providesList(result, "Memory"),
     }),
+    getNearMemory: builder.query<
+      Memory[],
+      {
+        location: {
+          lang: number;
+          long: number;
+        };
+      }
+    >({
+      query: (body) => ({
+        url: "/getNearMemroyMemo",
+        method: "POST",
+        body,
+      }),
+      transformResponse: (res: { data: Memory[]; message: string }) => res.data,
+      providesTags: (result) => providesList(result, "Memory"),
+    }),
   }),
 });
 
@@ -89,4 +106,5 @@ export const {
   useGetCurrentUserMemoriesQuery,
   useGetMemoriesQuery,
   useGetMemoryByIdMutation,
+  useGetNearMemoryQuery,
 } = MemoryApi;

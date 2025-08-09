@@ -4,7 +4,7 @@ import { Platform, Text, View, StyleSheet } from "react-native";
 
 import * as Location from "expo-location";
 
-export default function App() {
+export default function LocationPremission() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
   );
