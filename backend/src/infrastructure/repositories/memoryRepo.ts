@@ -219,9 +219,9 @@ export class MemoryRepositoryImp implements MemoryRepository {
         and(
           between(memories.latitude, minLat, maxLat),
           between(memories.longitude, minLong, maxLong),
-          excludeIds.length > 0
-            ? notInArray(memories.id, excludeIds)
-            : undefined,
+          // excludeIds.length > 0
+          //   ? notInArray(memories.id, excludeIds)
+          //   : undefined,
           // eq(memories.isPublic, true),
           notInArray(memories.user_id, [currentUserId])
         )
