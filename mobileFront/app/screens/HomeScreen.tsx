@@ -32,7 +32,7 @@ export const HomeScreen = () => {
   useEffect(() => {
     console.log("JWT:", jwt);
     console.log("user:", user);
-    console.log();
+    console.log(data);
   }, [user]);
   const { data } = useGetNearMemoryQuery({
     location: {
