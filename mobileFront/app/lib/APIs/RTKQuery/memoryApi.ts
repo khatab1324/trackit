@@ -97,14 +97,25 @@ export const MemoryApi = createApi({
       transformResponse: (res: { data: Memory[]; message: string }) => res.data,
       providesTags: (result) => providesList(result, "Memory"),
     }),
+
+    // GET to fetch a specific user's friends' memories
+    getUserFriendsMemories: builder.query<Memory[], void>({
+      query: (userId) => ({
+        url: `/getUserFriendsMemories/`,
+        method: "GET",
+      }),
+      transformResponse: (res: { data: Memory[]; message: string }) => res.data,
+      providesTags: (result) => providesList(result, "Memory"),
+    }),
   }),
 });
 
 export const {
-  useGetCloudinarySignatureMutation,
-  useSaveMemoryMutation,
-  useGetCurrentUserMemoriesQuery,
   useGetMemoriesQuery,
+  useSaveMemoryMutation,
   useGetMemoryByIdMutation,
+  useGetCloudinarySignatureMutation,
+  useGetCurrentUserMemoriesQuery,
   useGetNearMemoryQuery,
+  useGetUserFriendsMemoriesQuery,
 } = MemoryApi;

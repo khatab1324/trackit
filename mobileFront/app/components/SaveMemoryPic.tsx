@@ -12,12 +12,10 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { ParamListBase } from "@react-navigation/native";
 import {
-  MemoryApi,
   useGetCloudinarySignatureMutation,
   useSaveMemoryMutation,
 } from "../lib/APIs/RTKQuery/memoryApi";
-import Location from "expo-location";
-import { ContentType, MemoryInput } from "../core/types/memory";
+import { ContentType, Coords, MemoryInput } from "../core/types/memory";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { User } from "../core/types/user";
@@ -34,7 +32,7 @@ export default function SaveMemoryPic({
 }: {
   photoUri: string;
   photoUriSetter: (value: string | null) => void;
-  location: Location.LocationObject | null;
+  location: Coords | null;
 }) {
   const navigation = useNavigation<NavigationProp>();
 
@@ -99,8 +97,8 @@ export default function SaveMemoryPic({
         user_id: user.id,
         content_type: ContentType.Image,
         content_url: result.secure_url,
-        latitude: location.coords.latitude.toString(),
-        longitude: location.coords.longitude.toString(),
+        latitude: location.lang.toString(),
+        longitude: location.long.toString(),
         title: "Memory from " + new Date().toLocaleDateString(),
         description: "Created with the app",
         isPublic: false,

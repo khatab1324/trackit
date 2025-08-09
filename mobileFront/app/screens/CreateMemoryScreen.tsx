@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+
 import {
   View,
   Text,
@@ -8,7 +9,6 @@ import {
   StyleSheet,
 } from "react-native";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
-import * as Location from "expo-location";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../../App";
@@ -17,6 +17,9 @@ import SaveMemoryPic from "../components/SaveMemoryPic";
 import { CameraPremiisionDenied } from "../components/CameraPremissionDenied";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 type Nav = NativeStackNavigationProp<MainStackParamList, "CreateMemory">;
 
@@ -40,32 +43,25 @@ export default function CreateMemoryScreen() {
 
   const [permission, requestPermission] = useCameraPermissions();
   const [photoUri, setPhotoUri] = useState<string | null>(null);
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+
+  const coords = useSelector((s: RootState) => s.sheardDataThrowApp.location);
 
   const cameraRef = useRef<CameraView | null>(null);
 
   useEffect(() => {
     (async () => {
-      if (permission?.status === "undetermined") requestPermission();
-
-      const { status: locationStatus } =
-        await Location.requestForegroundPermissionsAsync();
-      if (locationStatus === "granted") {
-        try {
-          const currentLocation = await Location.getCurrentPositionAsync({});
-          setLocation(currentLocation);
-          console.log("Location captured:", currentLocation);
-        } catch (error) {
-          console.error("Error getting location:", error);
-        }
+      if (permission?.status === "undetermined") {
+        await requestPermission();
       }
     })();
-  }, [permission]);
+  }, [permission, requestPermission]);
 
   const flip = () => setFacing((p) => (p === "back" ? "front" : "back"));
 
   const toggleFlash = () =>
-    setFlash((prev) => (prev === "off" ? "on" : prev === "on" ? "auto" : "off"));
+    setFlash((prev) =>
+      prev === "off" ? "on" : prev === "on" ? "auto" : "off"
+    );
 
   const takePictureHandler = async () => {
     if (!cameraRef.current) return;
@@ -75,11 +71,7 @@ export default function CreateMemoryScreen() {
       });
       setPhotoUri(photo.uri);
 
-      const currentLocation = await Location.getCurrentPositionAsync({});
-      setLocation(currentLocation);
-
       console.log("Photo saved:", photo.uri);
-      console.log("Location captured:", currentLocation);
     } catch (error) {
       console.error("Error taking picture or getting location:", error);
     }
@@ -157,11 +149,11 @@ export default function CreateMemoryScreen() {
 
   if (!permission.granted) return <CameraPremiisionDenied />;
 
-  if (!location) {
+  if (!coords) {
     return (
-      <View className="flex-1 items-center justify-center bg-black">
-        <Text className="text-white">
-          Location permission is required to proceed.
+      <View className="flex-1 items-center justify-center bg-black px-6">
+        <Text className="text-white text-center">
+          Waiting for location… Please allow location access on Home first.
         </Text>
       </View>
     );
@@ -172,7 +164,7 @@ export default function CreateMemoryScreen() {
       <SaveMemoryPic
         photoUri={photoUri}
         photoUriSetter={setPhotoUri}
-        location={location}
+        location={coords}
       />
     );
   }
@@ -197,7 +189,9 @@ export default function CreateMemoryScreen() {
             className="mb-3 h-12 w-12 items-center justify-center rounded-full bg-black/50"
             onPress={toggleFlash}
           >
-            {flash === "off" && <Ionicons name="flash-off" size={22} color="#fff" />}
+            {flash === "off" && (
+              <Ionicons name="flash-off" size={22} color="#fff" />
+            )}
             {flash === "on" && <Ionicons name="flash" size={22} color="#fff" />}
             {flash === "auto" && (
               <Ionicons name="flash-outline" size={22} color="#fff" />
@@ -232,9 +226,15 @@ export default function CreateMemoryScreen() {
                         active ? "border-white" : "border-white/60"
                       }`}
                     >
-                      {f.key === "warm" && <View className="flex-1 bg-orange-300/60" />}
-                      {f.key === "cool" && <View className="flex-1 bg-blue-300/60" />}
-                      {f.key === "sepia" && <View className="flex-1 bg-amber-700/60" />}
+                      {f.key === "warm" && (
+                        <View className="flex-1 bg-orange-300/60" />
+                      )}
+                      {f.key === "cool" && (
+                        <View className="flex-1 bg-blue-300/60" />
+                      )}
+                      {f.key === "sepia" && (
+                        <View className="flex-1 bg-amber-700/60" />
+                      )}
                       {f.key === "rose" && (
                         <LinearGradient
                           colors={["#ff0066aa", "#ffffff00"]}
@@ -247,7 +247,9 @@ export default function CreateMemoryScreen() {
                           style={{ flex: 1 }}
                         />
                       )}
-                      {f.key === "none" && <View className="flex-1 bg-white/10" />}
+                      {f.key === "none" && (
+                        <View className="flex-1 bg-white/10" />
+                      )}
                     </View>
                     <Text
                       className={`mt-1 text-xs ${

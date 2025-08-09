@@ -1,10 +1,14 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, Button } from "react-native";
 import type { Memory } from "../core/types/memory";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+import { useNavigationState } from "@react-navigation/native";
+import { HeaderMemo } from "./Memo/HeaderMemo";
+import { InteractionMemo } from "./Memo/InteractionMemo";
+import { UserMemo } from "./Memo/UserMemo";
 
 type Props = {
   memory: Memory;
@@ -19,58 +23,32 @@ export const MemoComponent: React.FC<Props> = ({
 }) => {
   const navigation = useNavigation();
   const currentUser = useSelector((state: RootState) => state.user);
-
+  const isHomeScreen = useNavigationState(
+    (state) => state.routes[state.index].name === "Home"
+  );
   return (
     <View
-      className="bg-black relative"
+      className="bg-black relative "
       style={{ height: screenHeight, width: screenWidth }}
     >
-      <TouchableOpacity
-        className="absolute left-3 top-14 z-10"
-        onPress={() => (navigation as any).goBack?.()}
-        activeOpacity={0.8}
-      >
-        <Ionicons name="arrow-back" size={32} color="white" />
-      </TouchableOpacity>
+      <HeaderMemo />
 
       <Image
         source={{ uri: memory.content_url }}
         className="absolute inset-0 w-full h-full"
         resizeMode="cover"
       />
+      <InteractionMemo
+        num_comments={memory.num_comments}
+        num_likes={memory.num_likes}
+      />
 
-      {/* Right-bottom action rail */}
-      <View className="absolute right-3 bottom-24 items-center gap-6">
-        <View className="flex-col items-center gap-2">
-          <TouchableOpacity activeOpacity={0.8}>
-            <Ionicons name="heart-outline" size={32} color="white" />
-          </TouchableOpacity>
-          <Text className="text-white text-lg">{memory.num_likes}</Text>
-        </View>
-
-        <View className="flex-col items-center gap-2">
-          <TouchableOpacity activeOpacity={0.8}>
-            <Ionicons name="chatbubble-outline" size={30} color="white" />
-          </TouchableOpacity>
-          <Text className="text-white text-lg">{memory.num_comments}</Text>
-        </View>
-
-        <TouchableOpacity activeOpacity={0.8}>
-          <FontAwesome name="bookmark-o" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-
-      {memory.userInfo.user_id !== currentUser?.id && (
-        <View className="absolute left-3 right-20 bottom-24">
-          <Text className="text-white text-base font-semibold">
-            @{memory.userInfo.username}
-          </Text>
-          {!!memory.description && (
-            <Text className="text-white text-sm mt-1" numberOfLines={2}>
-              {memory.description}
-            </Text>
-          )}
-        </View>
+      {memory.userInfo.user_id !== currentUser.id && (
+        <UserMemo
+          username={memory.userInfo.username}
+          userId={memory.userInfo.user_id}
+          description={memory.description}
+        />
       )}
     </View>
   );

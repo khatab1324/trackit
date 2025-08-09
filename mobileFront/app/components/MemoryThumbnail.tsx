@@ -28,7 +28,7 @@ export default function MemoryThumbnail({ item }: { item: Memory }) {
         borderRadius: 9,
         overflow: "hidden",
       }}
-      onPress={() => navigation.navigate("CurrentUserMemo")}
+      onPress={() => navigation.navigate("NearMemories")}
     >
       <Image
         source={{ uri: item.content_url }}
