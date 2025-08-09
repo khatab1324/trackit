@@ -28,3 +28,4 @@ export type Memory = {
     username: string;
   };
 };
+export type Coords = { lang: number; long: number };

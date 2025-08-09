@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { FlatList, useWindowDimensions, View } from "react-native";
 import type { Memory } from "../core/types/memory";
 import { MemoComponent } from "./MemoComponent";
-
+import { FlashList } from "@shopify/flash-list";
 export const MemoListComp = ({ data }: { data: Memory[] | undefined }) => {
   const { height, width } = useWindowDimensions();
   useEffect(() => {
@@ -13,7 +13,7 @@ export const MemoListComp = ({ data }: { data: Memory[] | undefined }) => {
     }
   }, [data]);
   return (
-    <View className="">
+    <View className=" bg-black">
       <FlatList
         data={data}
         keyExtractor={(m) => m.id}

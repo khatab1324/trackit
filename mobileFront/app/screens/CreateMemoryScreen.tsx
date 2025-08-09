@@ -1,13 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  SafeAreaView,
-  Image,
-} from "react-native";
+import { View, Text, TouchableOpacity, SafeAreaView } from "react-native";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
-import * as Location from "expo-location";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../../App";
@@ -15,6 +8,7 @@ import { HeaderForCamera } from "../components/headerForCamera";
 import SaveMemoryPic from "../components/SaveMemoryPic";
 import { CameraPremiisionDenied } from "../components/CameraPremissionDenied";
 import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 type Nav = NativeStackNavigationProp<MainStackParamList, "CreateMemory">;
 
@@ -23,48 +17,28 @@ export default function CreateMemoryScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
   const [photoUri, setPhotoUri] = useState<string | null>(null);
-  const [location, setLocation] = useState<Location.LocationObject | null>(
-    null
-  );
+
+  const coords = useSelector((s: RootState) => s.sheardDataThrowApp.location); 
 
   const cameraRef = useRef<CameraView | null>(null);
 
   useEffect(() => {
     (async () => {
-      if (permission?.status === "undetermined") requestPermission();
-
-      const { status: locationStatus } =
-        await Location.requestForegroundPermissionsAsync();
-      if (locationStatus === "granted") {
-        try {
-          const currentLocation = await Location.getCurrentPositionAsync({});
-          setLocation(currentLocation);
-          console.log("Location captured:", currentLocation);
-        } catch (error) {
-          console.error("Error getting location:", error);
-        }
+      if (permission?.status === "undetermined") {
+        await requestPermission();
       }
     })();
-  }, [permission]);
+  }, [permission, requestPermission]);
 
   const flip = () => setFacing((p) => (p === "back" ? "front" : "back"));
 
   const takePictureHandler = async () => {
-    if (cameraRef.current) {
-      try {
-        const photo = await cameraRef.current.takePictureAsync({
-          quality: 0.7,
-        });
-        setPhotoUri(photo.uri);
-
-        const currentLocation = await Location.getCurrentPositionAsync({});
-        setLocation(currentLocation);
-
-        console.log("Photo saved:", photo.uri);
-        console.log("Location captured:", currentLocation);
-      } catch (error) {
-        console.error("Error taking picture or getting location:", error);
-      }
+    if (!cameraRef.current) return;
+    try {
+      const photo = await cameraRef.current.takePictureAsync({ quality: 0.7 });
+      setPhotoUri(photo.uri);
+    } catch (error) {
+      console.error("Error taking picture:", error);
     }
   };
 
@@ -76,21 +50,24 @@ export default function CreateMemoryScreen() {
     );
 
   if (!permission.granted) return <CameraPremiisionDenied />;
-  if (!location) {
+
+  // Require location from Redux (set earlier in HomeScreen)
+  if (!coords) {
     return (
-      <View className="flex-1 items-center justify-center bg-black">
-        <Text className="text-white">
-          Location permission is required to proceed.
+      <View className="flex-1 items-center justify-center bg-black px-6">
+        <Text className="text-white text-center">
+          Waiting for location… Please allow location access on Home first.
         </Text>
       </View>
     );
   }
+
   if (photoUri) {
     return (
       <SaveMemoryPic
         photoUri={photoUri}
         photoUriSetter={setPhotoUri}
-        location={location}
+        location={coords}
       />
     );
   }
