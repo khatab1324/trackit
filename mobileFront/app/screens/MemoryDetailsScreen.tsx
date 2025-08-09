@@ -23,114 +23,124 @@ type R = RouteProp<MainStackParamList, "MemoryDetails">;
 
 export default function MemoryDetailsScreen() {
   const route = useRoute<R>();
-  const { memories, startIndex = 0 } = route.params; // string[]
+  const { memories, startIndex = 0 } = route.params;
+
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
-
   const iconColor = isDark ? "white" : "black";
   const textColor = iconColor;
   const bgColor = isDark ? "#000" : "#fff";
   const { height: H, width: W } = Dimensions.get("window");
 
-  // الميموريز الكاملة المخزنة بالريدكس
   const viewer = useSelector((s: RootState) => s.memory.viewerMemories);
+  const currentUser = useSelector((s: RootState) => (s as any).user) as any;
   const dispatch = useDispatch();
 
-  // API mutations
   const [toggleLike] = useToggleLikeMutation();
   const [toggleSave] = useToggleSaveMutation();
+
+  const normalize = (u?: string) =>
+    (u || "").trim().toLowerCase().replace(/\/+$/, "");
+
+  // خريطة url -> meta
+  const byUrl = useMemo(() => {
+    const map: Record<string, any> = {};
+    for (const m of viewer) {
+      map[normalize(m.content_url)] = m;
+    }
+    return map;
+  }, [viewer]);
 
   const getItemLayout = useMemo(
     () => (_: unknown, index: number) => ({ length: H, offset: H * index, index }),
     [H]
   );
 
-  // ---- Handlers (Optimistic UI) ----
   const onLikePress = async (contentUrl: string) => {
-    const meta = viewer.find(m => m.content_url === contentUrl);
+    const meta = byUrl[normalize(contentUrl)];
     if (!meta) return;
+
+    const id = (meta.id || (meta as any)._id) as string;
+    if (!id) return;
 
     const wasLiked = !!meta.is_liked;
     const currentLikes = meta.num_likes ?? 0;
     const nextLiked = !wasLiked;
     const nextLikes = Math.max(0, currentLikes + (nextLiked ? 1 : -1));
 
-    // تحديث فوري محلي
-    dispatch(
-      patchOneInViewer({
-        id: meta.id,
-        is_liked: nextLiked,
-        num_likes: nextLikes,
-      })
-    );
+    dispatch(patchOneInViewer({ id, is_liked: nextLiked, num_likes: nextLikes }));
 
-    // نداء API
     try {
-      await toggleLike({ memoryId: meta.id }).unwrap();
+      await toggleLike({ memoryId: id }).unwrap();
     } catch {
-      dispatch(
-        patchOneInViewer({
-          id: meta.id,
-          is_liked: wasLiked,
-          num_likes: currentLikes,
-        })
-      );
+      dispatch(patchOneInViewer({ id, is_liked: wasLiked, num_likes: currentLikes }));
     }
   };
 
   const onSavePress = async (contentUrl: string) => {
-    const meta = viewer.find(m => m.content_url === contentUrl);
+    const meta = byUrl[normalize(contentUrl)];
     if (!meta) return;
 
-    const wasSaved = !!meta.is_saved;
-    const nextSaved = !wasSaved;
+    const id = (meta.id || (meta as any)._id) as string;
+    if (!id) return;
 
-    dispatch(
-      patchOneInViewer({
-        id: meta.id,
-        is_saved: nextSaved,
-      })
-    );
+    const wasSaved = !!meta.is_saved;
+    const currentSaves = meta.num_saves ?? 0;
+    const nextSaved = !wasSaved;
+    const nextSaves = Math.max(0, currentSaves + (nextSaved ? 1 : -1));
+
+    dispatch(patchOneInViewer({ id, is_saved: nextSaved, num_saves: nextSaves }));
 
     try {
-      await toggleSave({ memoryId: meta.id }).unwrap();
+      await toggleSave({ memoryId: id }).unwrap();
     } catch {
-      dispatch(
-        patchOneInViewer({
-          id: meta.id,
-          is_saved: wasSaved,
-        })
-      );
+      dispatch(patchOneInViewer({ id, is_saved: wasSaved, num_saves: currentSaves }));
     }
   };
 
   const renderItem = ({ item }: { item: string }) => {
-    // item = content_url
-    const meta = viewer.find(m => m.content_url === item);
+    const meta = byUrl[normalize(item)];
 
     const likes = meta?.num_likes ?? 0;
+    const saves = meta?.num_saves ?? 0;
     const comments = meta?.num_comments ?? 0;
     const isLiked = !!meta?.is_liked;
     const isSaved = !!meta?.is_saved;
+
     const username =
-      meta?.userInfo?.username ??
-      (meta as any)?.user?.username ?? // لو السيرفر بيرجع user بدل userInfo
+      meta?.userInfo?.username ||
+      (meta as any)?.user?.username ||
+      currentUser?.username ||
       "Unknown";
+
     const desc = meta?.description ?? "";
 
     return (
       <View style={{ height: H, width: W, backgroundColor: bgColor }}>
-        <Image source={{ uri: item }} style={{ width: "100%", height: "85%" }} resizeMode="cover" />
+        <Image
+          source={{ uri: item }}
+          style={{ width: "100%", height: "85%" }}
+          resizeMode="cover"
+        />
 
         <View style={{ paddingHorizontal: 16, paddingTop: 10 }}>
           <Text style={{ color: textColor, fontWeight: "600" }}>{username}</Text>
-          {!!desc && <Text style={{ color: isDark ? "#d1d5db" : "#4b5563" }}>{desc}</Text>}
+          {!!desc && (
+            <Text style={{ color: isDark ? "#d1d5db" : "#4b5563" }}>{desc}</Text>
+          )}
 
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 24, marginTop: 10 }}>
-            {/* Like */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              columnGap: 24,
+              marginTop: 10,
+            }}
+          >
             <TouchableOpacity
               onPress={() => onLikePress(item)}
-              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+              style={{ flexDirection: "row", alignItems: "center", columnGap: 6 }}
+              hitSlop={10}
             >
               <Ionicons
                 name={isLiked ? "heart" : "heart-outline"}
@@ -140,23 +150,22 @@ export default function MemoryDetailsScreen() {
               <Text style={{ color: textColor }}>{likes}</Text>
             </TouchableOpacity>
 
-            {/* Comments */}
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", columnGap: 6 }}>
               <Ionicons name="chatbubble-outline" size={24} color={iconColor} />
               <Text style={{ color: textColor }}>{comments}</Text>
             </View>
 
-            {/* Save */}
             <TouchableOpacity
               onPress={() => onSavePress(item)}
-              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+              style={{ flexDirection: "row", alignItems: "center", columnGap: 6 }}
+              hitSlop={10}
             >
               <Ionicons
                 name={isSaved ? "bookmark" : "bookmark-outline"}
                 size={24}
                 color={isSaved ? "#3b82f6" : iconColor}
               />
-              <Text style={{ color: textColor }}>{isSaved ? "Saved" : "Save"}</Text>
+              <Text style={{ color: textColor }}>{saves}</Text>
             </TouchableOpacity>
           </View>
         </View>

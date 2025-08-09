@@ -29,12 +29,14 @@ export const MemoryApi = createApi({
       query: () => ({ url: "/currentUserMemories", method: "GET" }),
     }),
 
-    getNearMemories: builder.mutation<Memory[], { lat: string; lng: string }>({
-      query: ({ lat, lng }) => ({
-        url: `/memories/near?lat=${lat}&lng=${lng}`,
-        method: "GET",
-      }),
-    }),
+    getNearMemories: builder.mutation<Memory[], { lat: string; lng: string }>(
+      {
+        query: ({ lat, lng }) => ({
+          url: `/memories/near?lat=${lat}&lng=${lng}`,
+          method: "GET",
+        }),
+      }
+    ),
 
     getMemoryById: builder.query<Memory, string>({
       query: (memoryId) => ({ url: `/memory/${memoryId}`, method: "GET" }),
@@ -45,17 +47,29 @@ export const MemoryApi = createApi({
       { liked: boolean; likesCount?: number },
       { memoryId: string }
     >({
-      query: ({ memoryId }) => ({ url: `/memory/${memoryId}/like`, method: "POST" }),
+      query: ({ memoryId }) => ({
+        url: `/memory/${memoryId}/like`,
+        method: "POST",
+      }),
       invalidatesTags: (_r, _e, { memoryId }) => [{ type: "Memory", id: memoryId }],
     }),
 
-    toggleSave: builder.mutation<{ saved: boolean }, { memoryId: string }>({
-      query: ({ memoryId }) => ({ url: `/memory/${memoryId}/save`, method: "POST" }),
+    toggleSave: builder.mutation<
+      { saved: boolean; savesCount?: number },
+      { memoryId: string }
+    >({
+      query: ({ memoryId }) => ({
+        url: `/memory/${memoryId}/save`,
+        method: "POST",
+      }),
       invalidatesTags: (_r, _e, { memoryId }) => [{ type: "Memory", id: memoryId }],
     }),
 
     getComments: builder.query<{ comments: any[] }, { memoryId: string }>({
-      query: ({ memoryId }) => ({ url: `/memory/${memoryId}/comments`, method: "GET" }),
+      query: ({ memoryId }) => ({
+        url: `/memory/${memoryId}/comments`,
+        method: "GET",
+      }),
       providesTags: (_r, _e, { memoryId }) => [{ type: "Comments", id: memoryId }],
     }),
   }),
