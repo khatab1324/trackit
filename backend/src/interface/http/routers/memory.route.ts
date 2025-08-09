@@ -18,6 +18,7 @@ import {
   getUserArchivedMemoriesController,
 } from "../controllers/memoryArchiveController";
 import { getAllMemoriesController } from "../controllers/getAllMemoriesController";
+import { getUserFriendsMemoriesController } from "../controllers/getUserFriendsMemoriesController";
 
 export default async function memoryRouter(app: FastifyInstance) {
   app.get(
@@ -81,4 +82,9 @@ export default async function memoryRouter(app: FastifyInstance) {
   app.post("/memoryDelete", { preHandler: [verifyJWT] }, () => {});
 
   app.get("/cloudinarySignature", getCloudinarySignatureController);
+  app.get(
+    "/getUserFriendsMemories",
+    { preHandler: [verifyJWT] },
+    getUserFriendsMemoriesController
+  );
 }

@@ -1,8 +1,15 @@
 import { MemoryInput } from "../../application/DTO/memoryInputDTO";
 import { Memory } from "../entities/memory";
 import { MemoryMemo } from "../valueObjects/MemoryMemo";
-import { MemoryViewInput, MemoryViewResponse } from "../../application/DTO/memoryViewDTO";
-import { MemoryArchiveInput, MemoryArchiveResponse, ArchivedMemory } from "../../application/DTO/memoryArchiveDTO";
+import {
+  MemoryViewInput,
+  MemoryViewResponse,
+} from "../../application/DTO/memoryViewDTO";
+import {
+  MemoryArchiveInput,
+  MemoryArchiveResponse,
+  ArchivedMemory,
+} from "../../application/DTO/memoryArchiveDTO";
 
 export interface MemoryRepository {
   addMemoryToDB(memory: MemoryInput): Promise<Memory>;
@@ -23,4 +30,6 @@ export interface MemoryRepository {
   archiveMemory(input: MemoryArchiveInput): Promise<MemoryArchiveResponse>;
   unarchiveMemory(input: MemoryArchiveInput): Promise<MemoryArchiveResponse>;
   getUserArchivedMemories(user_id: string): Promise<ArchivedMemory[]>;
+  getAllMemoriesMemo(currentUserId: string): Promise<MemoryMemo[]>;
+  getUserFriendsMemoriesMemo(currentUserId: string): Promise<MemoryMemo[]>;
 }
