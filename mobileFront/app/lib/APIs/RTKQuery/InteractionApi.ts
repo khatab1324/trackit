@@ -66,7 +66,7 @@ export const InteractionApi = createApi({
         method: "GET",
       }),
       transformResponse: (res: { data: Reply[]; message: string }) => res.data,
-      providesTags: (result) => providesList(result, "Reply"),
+      providesTags: (result) => providesList(result, "Reply" as const),
     }),
     getMemoryComments: builder.query<Comment[], Id>({
       query: (memoryId) => ({
@@ -75,7 +75,7 @@ export const InteractionApi = createApi({
       }),
       transformResponse: (res: { data: Comment[]; message: string }) =>
         res.data,
-      providesTags: (result) => providesList(result, "Comment"),
+      providesTags: (result) => providesList(result, "Comment" as const),
     }),
     addComment: builder.mutation<Comment, AddCommentInput>({
       query: (body) => ({
@@ -155,10 +155,9 @@ export const InteractionApi = createApi({
       invalidatesTags: () => [
         { type: "FollowRequest" as const, id: "LIST" },
         { type: "Memory" as const, id: "LIST" },
-        { type: "UserMemory" as const, id: "LIST" }
+        { type: "UserMemory" as const, id: "LIST" },
       ],
     }),
-
     cancelFollowRequest: builder.mutation<
       { success: boolean },
       { target_id: Id }
@@ -178,7 +177,6 @@ export const InteractionApi = createApi({
         { type: "UserMemory" as const, id: "LIST" }
       ],
     }),
-
     acceptFollowRequest: builder.mutation<
       { success: boolean },
       { requestId: Id }
@@ -196,7 +194,7 @@ export const InteractionApi = createApi({
         { type: "FollowRequest" as const, id: "LIST" },
         { type: "Follower" as const, id: "LIST" },
         { type: "Memory" as const, id: "LIST" },
-        { type: "UserMemory" as const, id: "LIST" }
+        { type: "UserMemory" as const, id: "LIST" },
       ],
     }),
     rejectFollowRequest: builder.mutation<
@@ -215,7 +213,7 @@ export const InteractionApi = createApi({
       invalidatesTags: () => [
         { type: "FollowRequest" as const, id: "LIST" },
         { type: "Memory" as const, id: "LIST" },
-        { type: "UserMemory" as const, id: "LIST" }
+        { type: "UserMemory" as const, id: "LIST" },
       ],
     }),
     getFollowRequests: builder.query<FollowRequest[], void>({
@@ -225,7 +223,7 @@ export const InteractionApi = createApi({
       }),
       transformResponse: (res: { data: FollowRequest[]; message: string }) =>
         res.data,
-      providesTags: (result) => providesList(result, "FollowRequest"),
+      providesTags: (result) => providesList(result, "FollowRequest" as const),
     }),
     getCurrentUserFollowers: builder.query<Follower[], void>({
       query: () => ({
@@ -234,7 +232,7 @@ export const InteractionApi = createApi({
       }),
       transformResponse: (res: { data: Follower[]; message: string }) =>
         res.data,
-      providesTags: (result) => providesList(result, "Follower"),
+      providesTags: (result) => providesList(result, "Follower" as const),
     }),
     toggleMemoryLike: builder.mutation<
       // server returns: { message, result: { isLiked, memory_id, num_likes? } }
@@ -271,10 +269,10 @@ export const {
   useReplyCommentMutation,
   // thes for follows
   useMakeFollowRequestMutation,
-  useCancelFollowRequestMutation,
   useAcceptFollowRequestMutation,
   useRejectFollowRequestMutation,
   useGetFollowRequestsQuery,
   useGetCurrentUserFollowersQuery,
   useToggleMemoryLikeMutation,
+  useCancelFollowRequestMutation,
 } = InteractionApi;

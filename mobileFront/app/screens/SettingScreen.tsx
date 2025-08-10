@@ -13,6 +13,7 @@ import { RootState } from "../store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { clearUser } from "../store/slices/userSlice";
 import { clearCredentials } from "../store/slices/authSlice";
+import { resetStore } from "../store";
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
@@ -29,8 +30,7 @@ export function SettingScreen() {
   const logoutHandler = async () => {
     try {
       await AsyncStorage.removeItem("token"); // Remove token from storage
-      dispatch(clearCredentials());
-      dispatch(clearUser()); // Clear user state
+      dispatch(resetStore()); // Reset all reducers to initial state
     } catch (error) {
       console.error("Logout failed:", error);
     }
