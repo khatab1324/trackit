@@ -1,12 +1,7 @@
-import React from "react";
+  import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { HomeScreen } from "../screens/HomeScreen";
@@ -59,24 +54,14 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
             } else if (route.name === "Chat") {
               icon = <Ionicons name={isFocused ? "chatbubble" : "chatbubble-outline"} size={24} color={color} />;
             } else if (route.name === "Map") {
-              icon = (
-                <Ionicons
-                  name={isFocused ? "compass" : "compass-outline"}
-                  size={26}
-                  color={color}
-                />
-              );
+              icon = <Ionicons name={isFocused ? "map" : "map-outline"} size={26} color={color} />;
             } else if (route.name === "Profile") {
               icon = avatarUri ? (
                 <View style={[styles.avatarWrap, isFocused && styles.avatarActive]}>
                   <Image source={{ uri: avatarUri }} style={styles.avatar} />
                 </View>
               ) : (
-                <Ionicons
-                  name={isFocused ? "person-circle" : "person-circle-outline"}
-                  size={26}
-                  color={color}
-                />
+                <Ionicons name={isFocused ? "person-circle" : "person-circle-outline"} size={26} color={color} />
               );
             }
 
@@ -125,7 +110,7 @@ export default function HomeStack() {
 
 const styles = StyleSheet.create({
   safe: {
-    backgroundColor: "#fff", // دمج لون الشريط مع الخلفية
+    backgroundColor: "#fff",
   },
   container: {
     height: 60,
@@ -134,14 +119,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     justifyContent: "space-between",
     alignItems: "center",
-    borderTopWidth: 0,     
-    elevation: 0,          
-    shadowOpacity: 0,      
+    borderTopWidth: 0,
+    elevation: 0,
+    shadowOpacity: 0,
     shadowRadius: 0,
     shadowColor: "transparent",
   },
   tabBtn: { flex: 1, alignItems: "center" },
-  iconLift: { transform: [{ translateY: -2 }] }, 
+  iconLift: { transform: [{ translateY: -2 }] },
   avatarWrap: { borderRadius: 999 },
   avatarActive: { borderWidth: 2, borderColor: "#111", padding: 2 },
   avatar: { width: 26, height: 26, borderRadius: 999 },
