@@ -19,7 +19,7 @@ export type Memory = {
   description?: string;
   isFollowed: boolean;
   is_saved: boolean;
-  lang: number;
+  lang: number; 
   long: number;
   num_comments: string;
   num_likes: string;
@@ -27,4 +27,15 @@ export type Memory = {
     user_id: string;
     username: string;
   };
+};
+
+export type MemoryInput = {
+  user_id: string;
+  content_type: ContentType | "image" | "video";
+  content_url: string;
+  latitude: number | string;     
+  longitude: number | string;    
+  title?: string;
+  description?: string;
+  isPublic?: boolean;
 };
