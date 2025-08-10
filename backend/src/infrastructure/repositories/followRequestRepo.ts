@@ -90,7 +90,25 @@ export class FollowRequestRepositoryImp implements FollowRequestRepository {
     input: FollowRequestActionInput
   ): Promise<FollowRequestResponse> {
     try {
-      const updated = await db
+      const req = await db
+        .select()
+        .from(followRequests)
+        .where(
+          and(
+            eq(followRequests.id, input.request_id),
+            eq(followRequests.target_id, input.user_id),
+            eq(followRequests.status, "pending")
+          )
+        )
+        .limit(1);
+      if (req.length === 0) {
+        return {
+          success: false,
+          message: "No pending follow request found to reject.",
+        };
+      }
+
+      await db
         .update(followRequests)
         .set({ status: "rejected" })
         .where(
@@ -100,16 +118,52 @@ export class FollowRequestRepositoryImp implements FollowRequestRepository {
             eq(followRequests.status, "pending")
           )
         );
-      if (updated.rowCount === 0) {
-        return {
-          success: false,
-          message: "No pending follow request found to reject.",
-        };
-      }
       return { success: true, message: "Follow request rejected." };
     } catch (error) {
       console.error("Error rejecting follow request:", error);
       throw new Error("Failed to reject follow request");
+    }
+  }
+
+  async cancelFollowRequest(
+    input: FollowRequestInput
+  ): Promise<FollowRequestResponse> {
+    try {
+      // Check if a pending request exists
+      const existing = await db
+        .select()
+        .from(followRequests)
+        .where(
+          and(
+            eq(followRequests.requester_id, input.requester_id),
+            eq(followRequests.target_id, input.target_id),
+            eq(followRequests.status, "pending")
+          )
+        )
+        .limit(1);
+      
+      if (existing.length === 0) {
+        return {
+          success: false,
+          message: "No pending follow request found to cancel.",
+        };
+      }
+
+      // Delete the pending request
+      await db
+        .delete(followRequests)
+        .where(
+          and(
+            eq(followRequests.requester_id, input.requester_id),
+            eq(followRequests.target_id, input.target_id),
+            eq(followRequests.status, "pending")
+          )
+        );
+      
+      return { success: true, message: "Follow request cancelled." };
+    } catch (error) {
+      console.error("Error cancelling follow request:", error);
+      throw new Error("Failed to cancel follow request");
     }
   }
 

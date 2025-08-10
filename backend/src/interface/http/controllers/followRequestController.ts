@@ -83,6 +83,32 @@ export const rejectFollowRequestController = async (
   }
 };
 
+export const cancelFollowRequestController = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+) => {
+  try {
+    const { target_id } = request.body as { target_id: string };
+    const userReq = request.user as { id: string };
+    const requester_id = userReq.id;
+    if (!requester_id) {
+      return reply.code(401).send({ error: "Unauthorized" });
+    }
+    const result = await new FollowRequestUseCase(
+      new FollowRequestRepositoryImp()
+    ).cancel({ requester_id, target_id });
+    reply.code(200).send({
+      message: "Follow request cancelled",
+      result,
+    });
+  } catch (error) {
+    console.log(error);
+    reply
+      .code(500)
+      .send({ error: "An error occurred while cancelling follow request" });
+  }
+};
+
 export const getFollowRequestsController = async (
   request: FastifyRequest,
   reply: FastifyReply

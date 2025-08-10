@@ -50,7 +50,14 @@ export const InteractionApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Comment", "Reply", "FollowRequest", "Follower"] as const,
+  tagTypes: [
+    "Comment",
+    "Reply",
+    "FollowRequest",
+    "Follower",
+    "Memory",
+    "UserMemory",
+  ] as const,
   endpoints: (builder) => ({
     // Comments
     getRepliesByCommentId: builder.query<Reply[], Id>({
@@ -78,8 +85,8 @@ export const InteractionApi = createApi({
       }),
       transformResponse: (res: { data: Comment; message: string }) => res.data,
       invalidatesTags: (_res, _err, arg) => [
-        { type: "Comment", id: "LIST" },
-        ...(arg.parentCommentId ? [{ type: "Reply", id: "LIST" }] : []),
+        { type: "Comment" as const, id: "LIST" },
+        ...(arg.parentCommentId ? [{ type: "Reply" as const, id: "LIST" }] : []),
       ],
     }),
     likeComment: builder.mutation<{ success: boolean }, LikeCommentInput>({
@@ -93,7 +100,7 @@ export const InteractionApi = createApi({
         message: string;
       }) => res.data,
       invalidatesTags: (_res, _err, arg) => [
-        { type: "Comment", id: arg.commentId },
+        { type: "Comment" as const, id: arg.commentId },
       ],
     }),
     deleteComment: builder.mutation<{ success: boolean }, DeleteCommentInput>({
@@ -106,7 +113,7 @@ export const InteractionApi = createApi({
         data: { success: boolean };
         message: string;
       }) => res.data,
-      invalidatesTags: () => [{ type: "Comment", id: "LIST" }],
+      invalidatesTags: () => [{ type: "Comment" as const, id: "LIST" }],
     }),
     editComment: builder.mutation<Comment, EditCommentInput>({
       query: (body) => ({
@@ -116,7 +123,7 @@ export const InteractionApi = createApi({
       }),
       transformResponse: (res: { data: Comment; message: string }) => res.data,
       invalidatesTags: (_res, _err, arg) => [
-        { type: "Comment", id: arg.commentId },
+        { type: "Comment" as const, id: arg.commentId },
       ],
     }),
     replyComment: builder.mutation<Reply, ReplyCommentInput>({
@@ -127,8 +134,8 @@ export const InteractionApi = createApi({
       }),
       transformResponse: (res: { data: Reply; message: string }) => res.data,
       invalidatesTags: () => [
-        { type: "Reply", id: "LIST" },
-        { type: "Comment", id: "LIST" },
+        { type: "Reply" as const, id: "LIST" },
+        { type: "Comment" as const, id: "LIST" },
       ],
     }),
 
@@ -145,8 +152,33 @@ export const InteractionApi = createApi({
         data: { success: boolean };
         message: string;
       }) => res.data,
-      invalidatesTags: () => [{ type: "FollowRequest", id: "LIST" }],
+      invalidatesTags: () => [
+        { type: "FollowRequest" as const, id: "LIST" },
+        { type: "Memory" as const, id: "LIST" },
+        { type: "UserMemory" as const, id: "LIST" }
+      ],
     }),
+
+    cancelFollowRequest: builder.mutation<
+      { success: boolean },
+      { target_id: Id }
+    >({
+      query: (body) => ({
+        url: "/cancelFollowRequest",
+        method: "POST",
+        body,
+      }),
+      transformResponse: (res: {
+        data: { success: boolean };
+        message: string;
+      }) => res.data,
+      invalidatesTags: () => [
+        { type: "FollowRequest" as const, id: "LIST" },
+        { type: "Memory" as const, id: "LIST" },
+        { type: "UserMemory" as const, id: "LIST" }
+      ],
+    }),
+
     acceptFollowRequest: builder.mutation<
       { success: boolean },
       { requestId: Id }
@@ -161,8 +193,10 @@ export const InteractionApi = createApi({
         message: string;
       }) => res.data,
       invalidatesTags: () => [
-        { type: "FollowRequest", id: "LIST" },
-        { type: "Follower", id: "LIST" },
+        { type: "FollowRequest" as const, id: "LIST" },
+        { type: "Follower" as const, id: "LIST" },
+        { type: "Memory" as const, id: "LIST" },
+        { type: "UserMemory" as const, id: "LIST" }
       ],
     }),
     rejectFollowRequest: builder.mutation<
@@ -178,7 +212,11 @@ export const InteractionApi = createApi({
         data: { success: boolean };
         message: string;
       }) => res.data,
-      invalidatesTags: () => [{ type: "FollowRequest", id: "LIST" }],
+      invalidatesTags: () => [
+        { type: "FollowRequest" as const, id: "LIST" },
+        { type: "Memory" as const, id: "LIST" },
+        { type: "UserMemory" as const, id: "LIST" }
+      ],
     }),
     getFollowRequests: builder.query<FollowRequest[], void>({
       query: () => ({
@@ -198,6 +236,27 @@ export const InteractionApi = createApi({
         res.data,
       providesTags: (result) => providesList(result, "Follower"),
     }),
+    toggleMemoryLike: builder.mutation<
+      // server returns: { message, result: { isLiked, memory_id, num_likes? } }
+      {
+        message: string;
+        result: { isLiked: boolean; memory_id: string; num_likes?: number };
+      },
+      { memoryId: string }
+    >({
+      query: ({ memoryId }) => ({
+        url: "/memoryLike",
+        method: "POST",
+        body: { memory_id: memoryId },
+      }),
+      transformResponse: (res: {
+        message: string;
+        result: { isLiked: boolean; memory_id: string; num_likes?: number };
+      }) => res,
+      invalidatesTags: (_res, _err, { memoryId }) => [
+        { type: "Memory" as const, id: memoryId },
+      ],
+    }),
   }),
 });
 
@@ -212,8 +271,10 @@ export const {
   useReplyCommentMutation,
   // thes for follows
   useMakeFollowRequestMutation,
+  useCancelFollowRequestMutation,
   useAcceptFollowRequestMutation,
   useRejectFollowRequestMutation,
   useGetFollowRequestsQuery,
   useGetCurrentUserFollowersQuery,
+  useToggleMemoryLikeMutation,
 } = InteractionApi;

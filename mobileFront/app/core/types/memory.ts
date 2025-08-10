@@ -19,6 +19,8 @@ export type Memory = {
   description?: string;
   isFollowed: boolean;
   is_saved: boolean;
+  is_liked: boolean;
+  is_requested: boolean;
   lang: number;
   long: number;
   num_comments: string;

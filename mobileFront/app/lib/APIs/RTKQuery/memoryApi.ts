@@ -29,7 +29,7 @@ export const MemoryApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Memory", "UserMemory"] as const,
+  tagTypes: ["Memory", "UserMemory", "FollowRequest"] as const,
 
   endpoints: (builder) => ({
     getMemories: builder.query<Memory[], void>({

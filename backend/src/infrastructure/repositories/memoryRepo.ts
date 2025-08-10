@@ -22,6 +22,7 @@ import {
 } from "../../application/DTO/memoryArchiveDTO";
 import { ArchivedMemory } from "../../application/DTO/memoryArchiveDTO";
 import { follows } from "../db/schema/followsSchema";
+import { followRequests } from "../db/schema/followRequestSchema";
 
 export class MemoryRepositoryImp implements MemoryRepository {
   async addMemoryToDB(memory: MemoryInput): Promise<Memory> {
@@ -100,6 +101,12 @@ export class MemoryRepositoryImp implements MemoryRepository {
         WHERE memory_likes.memory_id = ${memories.id}
         AND memory_likes.user_id = ${currentUserId}
       )`.as("is_liked"),
+        is_requested: sql<boolean>`EXISTS(
+        SELECT 1 FROM ${followRequests}
+        WHERE ${followRequests.requester_id} = ${currentUserId}
+        AND ${followRequests.target_id} = ${memories.user_id}
+        AND ${followRequests.status} = 'pending'
+      )`.as("is_requested"),
         userInfo: {
           user_id: users.id,
           username: users.username,
@@ -142,11 +149,17 @@ export class MemoryRepositoryImp implements MemoryRepository {
       WHERE bookmarks.memory_id = ${memories.id}
       AND bookmarks.user_id = ${currentUserId}
       )`.as("is_saved"),
-        is_liked: sql<boolean>`EXISTS(
+                is_liked: sql<boolean>`EXISTS(
       SELECT 1 FROM memory_likes
       WHERE memory_likes.memory_id = ${memories.id}
       AND memory_likes.user_id = ${currentUserId}
-      )`.as("is_liked"),
+    )`.as("is_liked"),
+        is_requested: sql<boolean>`EXISTS(
+      SELECT 1 FROM ${followRequests}
+      WHERE ${followRequests.requester_id} = ${currentUserId}
+      AND ${followRequests.target_id} = ${memories.user_id}
+      AND ${followRequests.status} = 'pending'
+    )`.as("is_requested"),
         userInfo: {
           user_id: users.id,
           username: users.username,
@@ -209,6 +222,12 @@ export class MemoryRepositoryImp implements MemoryRepository {
         WHERE memory_likes.memory_id = ${memories.id}
         AND memory_likes.user_id = ${currentUserId}
       )`.as("is_liked"),
+        is_requested: sql<boolean>`EXISTS(
+        SELECT 1 FROM ${followRequests}
+        WHERE ${followRequests.requester_id} = ${currentUserId}
+        AND ${followRequests.target_id} = ${memories.user_id}
+        AND ${followRequests.status} = 'pending'
+      )`.as("is_requested"),
         userInfo: {
           user_id: users.id,
           username: users.username,
@@ -387,6 +406,12 @@ export class MemoryRepositoryImp implements MemoryRepository {
           WHERE memory_likes.memory_id = ${memories.id}
           AND memory_likes.user_id = ${currentUserId}
         )`.as("is_liked"),
+        is_requested: sql<boolean>`EXISTS(
+          SELECT 1 FROM ${followRequests}
+          WHERE ${followRequests.requester_id} = ${currentUserId}
+          AND ${followRequests.target_id} = ${memories.user_id}
+          AND ${followRequests.status} = 'pending'
+        )`.as("is_requested"),
         userInfo: {
           user_id: users.id,
           username: users.username,
@@ -433,6 +458,12 @@ export class MemoryRepositoryImp implements MemoryRepository {
           WHERE memory_likes.memory_id = ${memories.id}
           AND memory_likes.user_id = ${currentUserId}
         )`.as("is_liked"),
+        is_requested: sql<boolean>`EXISTS(
+          SELECT 1 FROM ${followRequests}
+          WHERE ${followRequests.requester_id} = ${currentUserId}
+          AND ${followRequests.target_id} = ${memories.user_id}
+          AND ${followRequests.status} = 'pending'
+        )`.as("is_requested"),
         userInfo: {
           user_id: users.id,
           username: users.username,
@@ -440,7 +471,7 @@ export class MemoryRepositoryImp implements MemoryRepository {
       })
       .from(memories)
       .innerJoin(users, eq(users.id, memories.user_id))
-      .innerJoin(
+              .innerJoin(
         follows,
         and(
           eq(follows.follower_id, currentUserId),

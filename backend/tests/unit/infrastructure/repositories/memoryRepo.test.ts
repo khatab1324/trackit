@@ -43,6 +43,8 @@ describe("MemoryRepositoryImp - getUserMemoryMemo", () => {
         num_comments: 5,
         isFollowed: true,
         is_saved: false,
+        is_liked: false,
+        is_requested: false,
         userInfo: {
           user_id: "user123",
           username: "testuser",
@@ -66,6 +68,8 @@ describe("MemoryRepositoryImp - getUserMemoryMemo", () => {
       num_comments: expect.anything(),
       isFollowed: expect.anything(),
       is_saved: expect.anything(),
+      is_liked: expect.anything(),
+      is_requested: expect.anything(),
       userInfo: expect.anything(),
     });
 

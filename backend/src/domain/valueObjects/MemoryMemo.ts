@@ -11,6 +11,7 @@ export interface MemoryMemo {
   isFollowed: boolean;
   is_saved: boolean;
   is_liked: boolean;
+  is_requested: boolean;
   userInfo: {
     username: string;
     user_id: string;

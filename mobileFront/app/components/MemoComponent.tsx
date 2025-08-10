@@ -39,15 +39,24 @@ export const MemoComponent: React.FC<Props> = ({
         resizeMode="cover"
       />
       <InteractionMemo
+        memoryId={memory.id}
         num_comments={memory.num_comments}
         num_likes={memory.num_likes}
+        isLiked={memory.is_liked}
+        isSaved={memory.is_saved}
+        is_requested={memory.is_requested}
+        targetUserId={memory.userInfo.user_id}
+        currentUserId={(currentUser as any)?.id}
       />
 
-      {memory.userInfo.user_id !== currentUser.id && (
+      {memory.userInfo.user_id !== (currentUser as any).id && (
         <UserMemo
           username={memory.userInfo.username}
           userId={memory.userInfo.user_id}
           description={memory.description}
+          isFollowed={memory.isFollowed}
+          isRequested={memory.is_requested}
+          currentUserId={(currentUser as any).id}
         />
       )}
     </View>

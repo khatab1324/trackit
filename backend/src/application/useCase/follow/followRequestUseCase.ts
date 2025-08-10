@@ -16,6 +16,10 @@ export class FollowRequestUseCase {
     return this.followRequestRepository.rejectFollowRequest(input);
   }
 
+  async cancel(input: FollowRequestInput) {
+    return this.followRequestRepository.cancelFollowRequest(input);
+  }
+
   async getRequests(user_id: string) {
     return this.followRequestRepository.getFollowRequests(user_id);
   }

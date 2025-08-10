@@ -1,33 +1,50 @@
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useMakeFollowRequestMutation } from "../../lib/APIs/RTKQuery/InteractionApi";
+import { useMakeFollowRequestMutation, useCancelFollowRequestMutation } from "../../lib/APIs/RTKQuery/InteractionApi";
 
 export const UserMemo = ({
   username,
   description,
   userId,
   currentUserId,
+  isFollowed,
+  isRequested,
 }: {
   username: string;
   description?: string;
   userId: string;
   currentUserId?: string;
+  isFollowed: boolean;
+  isRequested: boolean;
 }) => {
-  const [makeFollowRequest, { isLoading }] = useMakeFollowRequestMutation();
-  const [requested, setRequested] = useState(false);
+  const [makeFollowRequest, { isLoading: isMakingRequest }] = useMakeFollowRequestMutation();
+  const [cancelFollowRequest, { isLoading: isCancellingRequest }] = useCancelFollowRequestMutation();
+  const [localRequested, setLocalRequested] = useState(isRequested);
+  const [localFollowed, setLocalFollowed] = useState(isFollowed);
 
   const onPressFollowHandler = async () => {
-    if (isLoading || requested) return;
+    if (isMakingRequest || localRequested || localFollowed) return;
     try {
-      await makeFollowRequest({ toUserId: userId }).unwrap();
-      setRequested(true);
+      await makeFollowRequest({ target_id: userId }).unwrap();
+      setLocalRequested(true);
     } catch (e) {
       console.log("Follow request failed", e);
     }
   };
 
+  const onPressCancelRequestHandler = async () => {
+    if (isCancellingRequest || !localRequested) return;
+    try {
+      await cancelFollowRequest({ target_id: userId }).unwrap();
+      setLocalRequested(false);
+    } catch (e) {
+      console.log("Cancel follow request failed", e);
+    }
+  };
+
   const showFollow = currentUserId ? currentUserId !== userId : true;
+  const isLoading = isMakingRequest || isCancellingRequest;
 
   return (
     <View className="absolute left-3 right-20 bottom-24">
@@ -38,17 +55,24 @@ export const UserMemo = ({
 
         {showFollow && (
           <TouchableOpacity
-            onPress={onPressFollowHandler}
-            disabled={isLoading || requested}
+            onPress={localRequested ? onPressCancelRequestHandler : onPressFollowHandler}
+            disabled={isLoading || localFollowed}
             className={`border-2 border-white rounded-lg px-3 py-1
-              ${isLoading || requested ? "opacity-60" : "opacity-100"}`}
+              ${isLoading || localFollowed ? "opacity-60" : "opacity-100"}`}
             activeOpacity={0.8}
           >
             <View className="flex-row items-center gap-1">
-              {requested ? (
+              {localFollowed ? (
                 <>
-                  <Ionicons name="checkmark" size={16} color="#fff" />
-                  <Text className="text-white font-semibold">Requested</Text>
+                  <Ionicons name="checkmark-circle" size={16} color="#fff" />
+                  <Text className="text-white font-semibold">Following</Text>
+                </>
+              ) : localRequested ? (
+                <>
+                  <Ionicons name="close-circle" size={16} color="#fff" />
+                  <Text className="text-white font-semibold">
+                    {isCancellingRequest ? "Cancelling..." : "Requested"}
+                  </Text>
                 </>
               ) : isLoading ? (
                 <Text className="text-white font-semibold">Sending…</Text>

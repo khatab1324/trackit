@@ -9,13 +9,14 @@ export const memoryLikeController = async (
 ) => {
   try {
     const { memory_id } = request.body as MemoryLikeInput;
+    console.log("request body", request.body);
 
     const userReq = request.user as { id: string };
     const currentUserId = userReq.id;
     if (!currentUserId) {
       return reply.code(401).send({ error: "Unauthorized" });
     }
-    
+
     const result = await new MemoryLikeUseCase(new LikeRepositoryImp()).execute(
       { memory_id, user_id: currentUserId }
     );
