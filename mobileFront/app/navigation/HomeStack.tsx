@@ -1,4 +1,4 @@
-  import React from "react";
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
@@ -11,6 +11,8 @@ import { SettingScreen } from "../screens/SettingScreen";
 import { MapScreen } from "../screens/MapScreen";
 import { CurrentUserMemoScreen } from "../screens/CurrentUserMemoScreen";
 
+import NotificationsScreen from "../screens/NotificationsScreen";
+
 export type HomeStackParamList = {
   Map: undefined;
   Home: undefined;
@@ -18,13 +20,14 @@ export type HomeStackParamList = {
   Profile: undefined;
   Settings: undefined;
   CurrentUserMemo: undefined;
+  Notifications: undefined;
 };
 
 const Tab = createBottomTabNavigator<HomeStackParamList>();
 
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const avatarUri: string | undefined = undefined;
-  const visibleRoutes = ["Map", "Chat", "Home", "Profile"];
+  const visibleRoutes = ["Map", "Chat", "Home", "Profile"]; 
 
   return (
     <SafeAreaView style={styles.safe} edges={["bottom"]}>
@@ -47,8 +50,8 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
             };
 
             const color = isFocused ? "#111" : "#767676";
-
             let icon = null;
+
             if (route.name === "Home") {
               icon = <Ionicons name={isFocused ? "home" : "home-outline"} size={26} color={color} />;
             } else if (route.name === "Chat") {
@@ -93,7 +96,7 @@ export default function HomeStack() {
       <Tab.Screen name="Chat" component={ChatScreen} />
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
-      {/* شاشات خارج الشريط */}
+
       <Tab.Screen
         name="Settings"
         component={SettingScreen}
@@ -104,14 +107,18 @@ export default function HomeStack() {
         component={CurrentUserMemoScreen}
         options={{ tabBarButton: () => null, headerShown: false }}
       />
+
+      <Tab.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{ tabBarButton: () => null, headerShown: false }}
+      />
     </Tab.Navigator>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    backgroundColor: "#fff",
-  },
+  safe: { backgroundColor: "#fff" },
   container: {
     height: 60,
     backgroundColor: "#fff",
