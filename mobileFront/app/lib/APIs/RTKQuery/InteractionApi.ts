@@ -13,7 +13,7 @@ type Comment = {
 };
 type Reply = Comment;
 
-type AddCommentInput = { memoryId: Id; content: string; parentCommentId?: Id };
+type AddCommentInput = { memory_id: Id; content: string; parentCommentId?: Id };
 type EditCommentInput = { commentId: Id; content: string };
 type DeleteCommentInput = { commentId: Id };
 type LikeCommentInput = { commentId: Id };
