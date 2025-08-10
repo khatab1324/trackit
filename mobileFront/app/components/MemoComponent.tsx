@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, Image, TouchableOpacity, Button } from "react-native";
 import type { Memory } from "../core/types/memory";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
@@ -9,6 +9,7 @@ import { useNavigationState } from "@react-navigation/native";
 import { HeaderMemo } from "./Memo/HeaderMemo";
 import { InteractionMemo } from "./Memo/InteractionMemo";
 import { UserMemo } from "./Memo/UserMemo";
+import { CommentSection } from "./Memo/CommentSection";
 
 type Props = {
   memory: Memory;
@@ -26,16 +27,18 @@ export const MemoComponent: React.FC<Props> = ({
   const isHomeScreen = useNavigationState(
     (state) => state.routes[state.index].name === "Home"
   );
+  const [isCommentSectionVisible, setIsCommentSectionVisible] = useState(false);
   return (
     <View
-      className="bg-black relative "
+      className="bg-black relative"
       style={{ height: screenHeight, width: screenWidth }}
     >
       <HeaderMemo />
 
       <Image
         source={{ uri: memory.content_url }}
-        className="absolute inset-0 w-full h-full"
+        className="absolute top-0 left-0 right-0 w-full"
+        style={{ height: screenHeight - 43 }} // Subtract navbar height
         resizeMode="cover"
       />
       <InteractionMemo
@@ -44,6 +47,7 @@ export const MemoComponent: React.FC<Props> = ({
         num_likes={memory.num_likes}
         isLiked={memory.is_liked}
         isSaved={memory.is_saved}
+        onCommentPress={() => setIsCommentSectionVisible(true)}
       />
 
       {memory.userInfo.user_id !== (currentUser as any).id && (
@@ -56,6 +60,12 @@ export const MemoComponent: React.FC<Props> = ({
           currentUserId={(currentUser as any).id}
         />
       )}
+
+      <CommentSection
+        memoryId={memory.id}
+        isVisible={isCommentSectionVisible}
+        onClose={() => setIsCommentSectionVisible(false)}
+      />
     </View>
   );
 };

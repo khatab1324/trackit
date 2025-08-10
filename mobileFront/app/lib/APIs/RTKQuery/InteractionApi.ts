@@ -21,8 +21,8 @@ type ReplyCommentInput = { commentId: Id; content: string };
 
 type FollowRequest = {
   id: Id;
-  fromUserId: Id;
-  toUserId: Id;
+  requester_id: Id;
+  target_id: Id;
   status: "pending" | "accepted" | "rejected";
   created_at?: string;
 };
@@ -179,7 +179,7 @@ export const InteractionApi = createApi({
     }),
     acceptFollowRequest: builder.mutation<
       { success: boolean },
-      { requestId: Id }
+      { request_id: Id }
     >({
       query: (body) => ({
         url: "/acceptFollowRequest",
@@ -199,7 +199,7 @@ export const InteractionApi = createApi({
     }),
     rejectFollowRequest: builder.mutation<
       { success: boolean },
-      { requestId: Id }
+      { request_id: Id }
     >({
       query: (body) => ({
         url: "/rejectFollowRequest",
@@ -221,6 +221,7 @@ export const InteractionApi = createApi({
         url: "/getFollowRequests",
         method: "GET",
       }),
+      keepUnusedDataFor: 0, // Disable caching - always fetch fresh data
       transformResponse: (res: { data: FollowRequest[]; message: string }) =>
         res.data,
       providesTags: (result) => providesList(result, "FollowRequest" as const),

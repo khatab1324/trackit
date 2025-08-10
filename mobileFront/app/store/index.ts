@@ -1,27 +1,30 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { authApi } from "../lib/APIs/RTKQuery/authApi";
-import authReducer from "./slices/authSlice";
-import userReducer from "./slices/userSlice";
-import sheardDataThrowAppRedReducer from "./slices/sheardDataSlice";
 import { UserApi } from "../lib/APIs/RTKQuery/UserAuth";
 import { MemoryApi } from "../lib/APIs/RTKQuery/memoryApi";
 import { InteractionApi } from "../lib/APIs/RTKQuery/InteractionApi";
+import { NotificationsApi } from "../lib/APIs/RTKQuery/notificationsApi";
 
-// Create a root reducer that can be reset
+import authReducer from "./slices/authSlice";
+import userReducer from "./slices/userSlice";
+import sheardDataThrowAppRedReducer from "./slices/sheardDataSlice";
+import notificationsReducer from "./slices/notificationsSlice";
+
+
 const appReducer = combineReducers({
   [authApi.reducerPath]: authApi.reducer,
   [UserApi.reducerPath]: UserApi.reducer,
   [MemoryApi.reducerPath]: MemoryApi.reducer,
   [InteractionApi.reducerPath]: InteractionApi.reducer,
+  [NotificationsApi.reducerPath]: NotificationsApi.reducer,
   sheardDataThrowApp: sheardDataThrowAppRedReducer,
   auth: authReducer,
   user: userReducer,
+  notifications: notificationsReducer,
 });
 
-// Root reducer with reset functionality
 const rootReducer = (state: any, action: any) => {
   if (action.type === 'RESET_STORE') {
-    // Reset all state to initial values
     state = undefined;
   }
   return appReducer(state, action);
@@ -34,7 +37,8 @@ export const store = configureStore({
       .concat(authApi.middleware)
       .concat(UserApi.middleware)
       .concat(MemoryApi.middleware)
-      .concat(InteractionApi.middleware),
+      .concat(InteractionApi.middleware)
+      .concat(NotificationsApi.middleware),
 });
 
 // Action creator for resetting the store

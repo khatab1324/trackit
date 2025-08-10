@@ -6,10 +6,14 @@ import Feather from "@expo/vector-icons/Feather";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParamList } from "../../navigation/HomeStack";
 import clsx from "clsx";
-import { MainStackParamList } from "../../../App";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store";
+
 export const HeaderMemo = () => {
   const navigation =
-    useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+    useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
+
+  const unread = useSelector((s: RootState) => s.notifications.unreadCount);
 
   const isHomeScreen = useNavigationState(
     (state) => state.routes[state.index].name === "Home"
@@ -17,21 +21,34 @@ export const HeaderMemo = () => {
   const isFriendsScreen = useNavigationState(
     (state) => state.routes[state.index].name === "FriendsMemo"
   );
+
   return (
     <View>
       {isHomeScreen || isFriendsScreen ? (
         <View className="absolute top-10 left-0 right-0 p-4 z-10 w-full">
           <View className="flex-row items-center justify-center gap-x-4">
-            <View className=" absolute right-0 flex-row items-center justify-center ">
-              <Text className="text-white text-lg font-semibold">
+            <View className="absolute right-0 flex-row items-center justify-center">
+              <TouchableOpacity
+                onPress={() => navigation.navigate("Notifications")}
+                activeOpacity={0.7}
+                className="relative"
+              >
                 <Feather name="bell" size={24} color="white" />
-              </Text>
+                {/* ✅ اختفاء عند 0 */}
+                {unread > 0 && (
+                  <View
+                    className="absolute -top-1 -right-1 bg-red-500 rounded-full items-center justify-center"
+                    style={{ minWidth: 16, height: 16, paddingHorizontal: 3 }}
+                  >
+                    <Text className="text-white text-[10px]">{unread}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
             </View>
+
             <TouchableOpacity
-              className=" items-center gap-2"
-              onPress={() => {
-                navigation.replace("NearMemories");
-              }}
+              className="items-center gap-2"
+              onPress={() => (navigation as any).replace("NearMemories")}
             >
               <Text
                 className={clsx(
@@ -42,11 +59,10 @@ export const HeaderMemo = () => {
                 Near Memo
               </Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               className="flex-row items-center gap-2"
-              onPress={() => {
-                navigation.replace("FriendsMemo");
-              }}
+              onPress={() => (navigation as any).replace("FriendsMemo")}
             >
               <Text
                 className={clsx(
@@ -54,7 +70,6 @@ export const HeaderMemo = () => {
                   isFriendsScreen ? "text-slate-400" : "text-white"
                 )}
               >
-                {" "}
                 Friends Memo
               </Text>
             </TouchableOpacity>

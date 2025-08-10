@@ -9,6 +9,7 @@ type Props = {
   num_comments: number | string;
   isLiked: boolean;
   isSaved: boolean;
+  onCommentPress: () => void;
 };
 
 export const InteractionMemo: React.FC<Props> = ({
@@ -17,6 +18,7 @@ export const InteractionMemo: React.FC<Props> = ({
   num_comments,
   isLiked,
   isSaved,
+  onCommentPress,
 }) => {
   const [liked, setLiked] = useState<boolean>(!!isLiked);
   const [saved, setSaved] = useState<boolean>(!!isSaved);
@@ -43,8 +45,7 @@ export const InteractionMemo: React.FC<Props> = ({
   };
 
   const onPressCommentHandler = () => {
-    // TODO: Navigate to comments screen
-    console.log("Navigate to comments");
+    onCommentPress();
   };
 
   return (
