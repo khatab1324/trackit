@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { FontAwesome, Ionicons } from "@expo/vector-icons";
-import { useToggleMemoryLikeMutation, useCancelFollowRequestMutation } from "../../lib/APIs/RTKQuery/InteractionApi";
+import { Ionicons } from "@expo/vector-icons";
+import { useToggleMemoryLikeMutation } from "../../lib/APIs/RTKQuery/InteractionApi";
 
 type Props = {
   memoryId: string;
@@ -9,9 +9,6 @@ type Props = {
   num_comments: number | string;
   isLiked: boolean;
   isSaved: boolean;
-  is_requested: boolean;
-  targetUserId?: string;
-  currentUserId?: string;
 };
 
 export const InteractionMemo: React.FC<Props> = ({
@@ -20,98 +17,83 @@ export const InteractionMemo: React.FC<Props> = ({
   num_comments,
   isLiked,
   isSaved,
-  is_requested,
-  targetUserId,
-  currentUserId,
 }) => {
-  // local optimistic state
   const [liked, setLiked] = useState<boolean>(!!isLiked);
   const [saved, setSaved] = useState<boolean>(!!isSaved);
-  const [localRequested, setLocalRequested] = useState(is_requested);
+  const [likeCount, setLikeCount] = useState<number>(Number(num_likes) || 0);
 
   const [toggleMemoryLike, { isLoading: isLikeLoading }] = useToggleMemoryLikeMutation();
-  const [cancelFollowRequest, { isLoading: isCancellingRequest }] = useCancelFollowRequestMutation();
 
   const onPressLikeHandler = async () => {
     if (isLikeLoading) return;
     try {
       const result = await toggleMemoryLike({ memoryId }).unwrap();
       setLiked(result.result.isLiked);
+      result.result.isLiked ? setLikeCount(likeCount + 1) : setLikeCount(likeCount - 1);
     } catch (e) {
+      setLiked(!liked);
+      setLikeCount(likeCount);
       console.log("Like failed", e);
     }
   };
 
-  const onPressCancelRequestHandler = async () => {
-    if (isCancellingRequest || !targetUserId) return;
-    try {
-      await cancelFollowRequest({ target_id: targetUserId }).unwrap();
-      setLocalRequested(false);
-    } catch (e) {
-      console.log("Cancel follow request failed", e);
-    }
+  const onPressSaveHandler = () => {
+    // TODO: Implement save functionality
+    setSaved(!saved);
   };
 
-  const showFollowRequest = targetUserId && currentUserId && targetUserId !== currentUserId;
+  const onPressCommentHandler = () => {
+    // TODO: Navigate to comments screen
+    console.log("Navigate to comments");
+  };
 
   return (
-    <View className="absolute right-3 bottom-24 items-center gap-6">
-      {/* Follow Request Indicator */}
-      {showFollowRequest && localRequested && (
-        <View className="flex-col items-center gap-2 mb-4">
-          <TouchableOpacity
-            onPress={onPressCancelRequestHandler}
-            disabled={isCancellingRequest}
-            className="bg-blue-500 rounded-full p-2"
-            activeOpacity={0.8}
-          >
-            <Ionicons 
-              name={isCancellingRequest ? "hourglass" : "close-circle"} 
-              size={24} 
-              color="white" 
-            />
-          </TouchableOpacity>
-          <Text className="text-blue-400 text-xs text-center">
-            {isCancellingRequest ? "Cancelling..." : "Requested"}
-          </Text>
-        </View>
-      )}
-
+    <View className="absolute right-3 bottom-36 items-center gap-6">
       {/* Like */}
-      <View className="flex-col items-center gap-2">
-        <TouchableOpacity
-          onPress={onPressLikeHandler}
-          disabled={isLikeLoading}
-          className="bg-white rounded-full p-2"
-          activeOpacity={0.8}
-        >
-          <FontAwesome
-            name={liked ? "heart" : "heart-o"}
-            size={24}
-            color={liked ? "#ff4757" : "#000"}
-          />
-        </TouchableOpacity>
-        <Text className="text-white text-xs">{num_likes}</Text>
-      </View>
+      <TouchableOpacity
+        onPress={onPressLikeHandler}
+        disabled={isLikeLoading}
+        className="items-center"
+        activeOpacity={0.7}
+      >
+        <Ionicons
+          name={liked ? "heart" : "heart-outline"}
+          size={40}
+          color={liked ? "#ff3040" : "white"}
+        />
+        <Text className="text-white text-lg mt-1 font-medium">
+          {likeCount}
+        </Text>
+      </TouchableOpacity>
 
       {/* Comment */}
-      <View className="flex-col items-center gap-2">
-        <TouchableOpacity className="bg-white rounded-full p-2" activeOpacity={0.8}>
-          <FontAwesome name="comment-o" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text className="text-white text-xs">{num_comments}</Text>
-      </View>
+      <TouchableOpacity
+        onPress={onPressCommentHandler}
+        className="items-center"
+        activeOpacity={0.7}
+      >
+        <Ionicons
+          name="chatbubble-outline"
+          size={40}
+          color="white"
+        />
+        <Text className="text-white text-lg mt-1 font-medium">
+          {num_comments}
+        </Text>
+      </TouchableOpacity>
 
       {/* Save */}
-      <View className="flex-col items-center gap-2">
-        <TouchableOpacity className="bg-white rounded-full p-2" activeOpacity={0.8}>
-          <FontAwesome
-            name={saved ? "bookmark" : "bookmark-o"}
-            size={24}
-            color="#000"
-          />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        onPress={onPressSaveHandler}
+        className="items-center"
+        activeOpacity={0.7}
+      >
+        <Ionicons
+          name={saved ? "bookmark" : "bookmark-outline"}
+          size={40}
+          color="white"
+        />
+      </TouchableOpacity>
     </View>
   );
 };

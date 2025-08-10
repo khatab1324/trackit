@@ -18,6 +18,7 @@ export const UserMemo = ({
   isFollowed: boolean;
   isRequested: boolean;
 }) => {
+ //TODO: refact this file 
   const [makeFollowRequest, { isLoading: isMakingRequest }] = useMakeFollowRequestMutation();
   const [cancelFollowRequest, { isLoading: isCancellingRequest }] = useCancelFollowRequestMutation();
   const [localRequested, setLocalRequested] = useState(isRequested);
@@ -69,7 +70,6 @@ export const UserMemo = ({
                 </>
               ) : localRequested ? (
                 <>
-                  <Ionicons name="close-circle" size={16} color="#fff" />
                   <Text className="text-white font-semibold">
                     {isCancellingRequest ? "Cancelling..." : "Requested"}
                   </Text>

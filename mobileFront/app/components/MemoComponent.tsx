@@ -44,9 +44,6 @@ export const MemoComponent: React.FC<Props> = ({
         num_likes={memory.num_likes}
         isLiked={memory.is_liked}
         isSaved={memory.is_saved}
-        is_requested={memory.is_requested}
-        targetUserId={memory.userInfo.user_id}
-        currentUserId={(currentUser as any)?.id}
       />
 
       {memory.userInfo.user_id !== (currentUser as any).id && (
