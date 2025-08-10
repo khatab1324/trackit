@@ -108,6 +108,7 @@ export default function HomeStack() {
       <Tab.Screen name="Chat" component={ChatScreen} />
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
+      {/* شاشات خارج الشريط */}
       <Tab.Screen
         name="Settings"
         component={SettingScreen}
@@ -124,7 +125,7 @@ export default function HomeStack() {
 
 const styles = StyleSheet.create({
   safe: {
-    backgroundColor: "#fff",  
+    backgroundColor: "#fff", // دمج لون الشريط مع الخلفية
   },
   container: {
     height: 60,
