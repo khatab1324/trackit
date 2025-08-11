@@ -41,4 +41,26 @@ export type MemoryInput = {
   description?: string;
   isPublic?: boolean;
 };
+
 export type Coords = { lang: number; long: number };
+
+export type BookmarkedMemory = {
+  id: string;
+  memory_id: string;
+  saved_at: string;
+
+    title: string;
+    description?: string;
+    content_url: string;
+    content_type: string;
+    latitude: number;
+    longitude: number;
+    isPublic: boolean;
+    created_at: string;
+  user: {
+    user_id: string;
+    username: string;
+    profile_image: string;
+    bio: string;
+  };
+};

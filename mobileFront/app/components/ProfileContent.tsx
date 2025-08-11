@@ -5,20 +5,20 @@ import {
     TouchableOpacity,
     FlatList,
 } from "react-native";
-import { Memory } from "../core/types/memory";
+import { BookmarkedMemory, Memory } from "../core/types/memory";
 import { colors } from "../core/theme/colors";
 import MemoryThumbnail from "../components/MemoryThumbnail";
 import { RootState } from "../store";
 import { useSelector } from "react-redux";
 
-export default function ProfileContent({ memories: memoriesList, saved: savedList }: { memories: Memory[] | null, saved: Memory[] | null }) {
+export default function ProfileContent({ memories: memoriesList, saved: savedList }: { memories: Memory[] | null, saved: BookmarkedMemory[] | null }) {
     const isDark = useSelector(
         (state: RootState) => state.sheardDataThrowApp.darkMode
     );
     const colorScheme = isDark ? colors.dark : colors.light;
     
     const [activeTab, setActiveTab] = useState(0);
-
+    console.log("savedList", savedList);
     const tabsList = [
         {
             name: "Memories",

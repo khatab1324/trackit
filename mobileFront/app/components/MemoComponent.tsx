@@ -38,7 +38,7 @@ export const MemoComponent: React.FC<Props> = ({
       <Image
         source={{ uri: memory.content_url }}
         className="absolute top-0 left-0 right-0 w-full"
-        style={{ height: screenHeight - 43 }} // Subtract navbar height
+        style={{ height: screenHeight - 43 }} 
         resizeMode="cover"
       />
       <InteractionMemo

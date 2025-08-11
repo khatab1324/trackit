@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useMakeFollowRequestMutation, useCancelFollowRequestMutation } from "../../lib/APIs/RTKQuery/InteractionApi";
+import {  useMarkFollowRequested } from "../../core/hooks/useFollowRequest";
 
 export const UserMemo = ({
   username,
@@ -23,12 +24,14 @@ export const UserMemo = ({
   const [cancelFollowRequest, { isLoading: isCancellingRequest }] = useCancelFollowRequestMutation();
   const [localRequested, setLocalRequested] = useState(isRequested);
   const [localFollowed, setLocalFollowed] = useState(isFollowed);
+  const markRequested = useMarkFollowRequested();
 
   const onPressFollowHandler = async () => {
     if (isMakingRequest || localRequested || localFollowed) return;
     try {
       await makeFollowRequest({ target_id: userId }).unwrap();
       setLocalRequested(true);
+      markRequested(userId, true);
     } catch (e) {
       console.log("Follow request failed", e);
     }
@@ -39,10 +42,14 @@ export const UserMemo = ({
     try {
       await cancelFollowRequest({ target_id: userId }).unwrap();
       setLocalRequested(false);
+      markRequested(userId, false);
     } catch (e) {
       console.log("Cancel follow request failed", e);
     }
   };
+  useEffect(() => {
+    setLocalRequested(isRequested);
+  }, [isRequested]);
 
   const showFollow = currentUserId ? currentUserId !== userId : true;
   const isLoading = isMakingRequest || isCancellingRequest;

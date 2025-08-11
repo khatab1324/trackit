@@ -28,17 +28,34 @@ type FollowRequest = {
 };
 type Follower = { id: Id; userId: Id; followerId: Id };
 
-function providesList<R extends { id: Id }[], T extends string>(
-  resultsWithIds: R | undefined,
-  tagType: T
-) {
-  return resultsWithIds
-    ? [
-        { type: tagType as any, id: "LIST" },
-        ...resultsWithIds.map(({ id }) => ({ type: tagType as any, id })),
-      ]
-    : [{ type: tagType as any, id: "LIST" }];
-}
+type BookmarkResponse = {
+  success: boolean;
+  message: string;
+  isBookmarked?: boolean;
+};
+
+type BookmarkedMemory = {
+  id: string;
+  memory_id: string;
+  saved_at: string;
+  memory: {
+    id: string;
+    title: string;
+    description?: string;
+    content_url: string;
+    content_type: string;
+    latitude: number;
+    longitude: number;
+    isPublic: boolean;
+    created_at: string;
+    user: {
+      id: string;
+      username: string;
+      profile_image: string;
+      bio: string;
+    };
+  };
+};
 
 export const InteractionApi = createApi({
   reducerPath: "InteractionApi",
@@ -57,6 +74,7 @@ export const InteractionApi = createApi({
     "Follower",
     "Memory",
     "UserMemory",
+    "BookmarkedMemory",
   ] as const,
   endpoints: (builder) => ({
     // Comments
@@ -66,8 +84,9 @@ export const InteractionApi = createApi({
         method: "GET",
       }),
       transformResponse: (res: { data: Reply[]; message: string }) => res.data,
-      providesTags: (result) => providesList(result, "Reply" as const),
+      keepUnusedDataFor: 0, // Disable caching
     }),
+    
     getMemoryComments: builder.query<Comment[], Id>({
       query: (memoryId) => ({
         url: `/getMemoryComments/${memoryId}`,
@@ -75,7 +94,7 @@ export const InteractionApi = createApi({
       }),
       transformResponse: (res: { data: Comment[]; message: string }) =>
         res.data,
-      providesTags: (result) => providesList(result, "Comment" as const),
+      keepUnusedDataFor: 0, // Disable caching
       // Add error handling
       async onQueryStarted(arg, { queryFulfilled }) {
         try {
@@ -85,6 +104,7 @@ export const InteractionApi = createApi({
         }
       },
     }),
+    
     addComment: builder.mutation<Comment, AddCommentInput>({
       query: (body) => ({
         url: "/addComment",
@@ -92,13 +112,8 @@ export const InteractionApi = createApi({
         body,
       }),
       transformResponse: (res: { data: Comment; message: string }) => res.data,
-      invalidatesTags: (_res, _err, arg) => [
-        { type: "Comment" as const, id: "LIST" },
-        ...(arg.parentCommentId
-          ? [{ type: "Reply" as const, id: "LIST" }]
-          : []),
-      ],
     }),
+    
     likeComment: builder.mutation<{ success: boolean }, LikeCommentInput>({
       query: (body) => ({
         url: "/likeComment",
@@ -109,10 +124,8 @@ export const InteractionApi = createApi({
         data: { success: boolean };
         message: string;
       }) => res.data,
-      invalidatesTags: (_res, _err, arg) => [
-        { type: "Comment" as const, id: arg.commentId },
-      ],
     }),
+    
     deleteComment: builder.mutation<{ success: boolean }, DeleteCommentInput>({
       query: (body) => ({
         url: "/deleteComment",
@@ -123,8 +136,8 @@ export const InteractionApi = createApi({
         data: { success: boolean };
         message: string;
       }) => res.data,
-      invalidatesTags: () => [{ type: "Comment" as const, id: "LIST" }],
     }),
+    
     editComment: builder.mutation<Comment, EditCommentInput>({
       query: (body) => ({
         url: "/editComment",
@@ -132,10 +145,8 @@ export const InteractionApi = createApi({
         body,
       }),
       transformResponse: (res: { data: Comment; message: string }) => res.data,
-      invalidatesTags: (_res, _err, arg) => [
-        { type: "Comment" as const, id: arg.commentId },
-      ],
     }),
+    
     replyComment: builder.mutation<Reply, ReplyCommentInput>({
       query: (body) => ({
         url: "/replyComment",
@@ -143,10 +154,6 @@ export const InteractionApi = createApi({
         body,
       }),
       transformResponse: (res: { data: Reply; message: string }) => res.data,
-      invalidatesTags: () => [
-        { type: "Reply" as const, id: "LIST" },
-        { type: "Comment" as const, id: "LIST" },
-      ],
     }),
 
     makeFollowRequest: builder.mutation<
@@ -158,16 +165,9 @@ export const InteractionApi = createApi({
         method: "POST",
         body,
       }),
-      transformResponse: (res: {
-        data: { success: boolean };
-        message: string;
-      }) => res.data,
-      invalidatesTags: () => [
-        { type: "FollowRequest" as const, id: "LIST" },
-        { type: "Memory" as const, id: "LIST" },
-        { type: "UserMemory" as const, id: "LIST" },
-      ],
+      transformResponse: (res: { data: { success: boolean }; message: string }) => res.data,
     }),
+    
     cancelFollowRequest: builder.mutation<
       { success: boolean },
       { target_id: Id }
@@ -181,12 +181,8 @@ export const InteractionApi = createApi({
         data: { success: boolean };
         message: string;
       }) => res.data,
-      invalidatesTags: () => [
-        { type: "FollowRequest" as const, id: "LIST" },
-        { type: "Memory" as const, id: "LIST" },
-        { type: "UserMemory" as const, id: "LIST" },
-      ],
     }),
+    
     acceptFollowRequest: builder.mutation<
       { success: boolean },
       { request_id: Id }
@@ -200,13 +196,8 @@ export const InteractionApi = createApi({
         data: { success: boolean };
         message: string;
       }) => res.data,
-      invalidatesTags: () => [
-        { type: "FollowRequest" as const, id: "LIST" },
-        { type: "Follower" as const, id: "LIST" },
-        { type: "Memory" as const, id: "LIST" },
-        { type: "UserMemory" as const, id: "LIST" },
-      ],
     }),
+    
     rejectFollowRequest: builder.mutation<
       { success: boolean },
       { request_id: Id }
@@ -220,12 +211,8 @@ export const InteractionApi = createApi({
         data: { success: boolean };
         message: string;
       }) => res.data,
-      invalidatesTags: () => [
-        { type: "FollowRequest" as const, id: "LIST" },
-        { type: "Memory" as const, id: "LIST" },
-        { type: "UserMemory" as const, id: "LIST" },
-      ],
     }),
+    
     getFollowRequests: builder.query<FollowRequest[], void>({
       query: () => ({
         url: "/getFollowRequests",
@@ -234,8 +221,8 @@ export const InteractionApi = createApi({
       keepUnusedDataFor: 0, // Disable caching - always fetch fresh data
       transformResponse: (res: { data: FollowRequest[]; message: string }) =>
         res.data,
-      providesTags: (result) => providesList(result, "FollowRequest" as const),
     }),
+    
     getCurrentUserFollowers: builder.query<Follower[], void>({
       query: () => ({
         url: "/getCurrentUserFollowers",
@@ -243,8 +230,9 @@ export const InteractionApi = createApi({
       }),
       transformResponse: (res: { data: Follower[]; message: string }) =>
         res.data,
-      providesTags: (result) => providesList(result, "Follower" as const),
+      keepUnusedDataFor: 0, // Disable caching
     }),
+    
     toggleMemoryLike: builder.mutation<
       // server returns: { message, result: { isLiked, memory_id, num_likes? } }
       {
@@ -262,9 +250,38 @@ export const InteractionApi = createApi({
         message: string;
         result: { isLiked: boolean; memory_id: string; num_likes?: number };
       }) => res,
-      invalidatesTags: (_res, _err, { memoryId }) => [
-        { type: "Memory" as const, id: memoryId },
-      ],
+    }),
+
+    // Bookmark functionality
+    toggleBookmark: builder.mutation<BookmarkResponse, { memory_id: string }>({
+      query: (body) => ({
+        url: "/memorySave",
+        method: "POST",
+        body,
+      }),
+      transformResponse: (res: { message: string; result: BookmarkResponse }) => res.result,
+      // Invalidate bookmarks cache to refetch data
+      async onQueryStarted({ memory_id }, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // After successful bookmark toggle, invalidate the bookmarks cache
+          dispatch(
+            InteractionApi.util.invalidateTags(['BookmarkedMemory'])
+          );
+        } catch (error) {
+          console.error("Failed to invalidate bookmarks cache:", error);
+        }
+      },
+    }),
+
+    getUserBookmarks: builder.query<BookmarkedMemory[], void>({
+      query: () => ({
+        url: "/userBookmarks",
+        method: "GET",
+      }),
+      transformResponse: (res: { bookmarks: BookmarkedMemory[]; message: string }) => res.bookmarks,
+      keepUnusedDataFor: 0, // Disable caching - always fetch fresh data
+      providesTags: ['BookmarkedMemory'],
     }),
   }),
 });
@@ -286,4 +303,7 @@ export const {
   useGetCurrentUserFollowersQuery,
   useToggleMemoryLikeMutation,
   useCancelFollowRequestMutation,
+  // bookmark
+  useToggleBookmarkMutation,
+  useGetUserBookmarksQuery,
 } = InteractionApi;

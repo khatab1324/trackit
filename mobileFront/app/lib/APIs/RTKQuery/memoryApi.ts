@@ -5,20 +5,6 @@ import {
   Memory,
 } from "../../../core/types/memory";
 
-function providesList<R extends { id: string | number }[], T extends string>(
-  resultsWithIds: R | undefined,
-  tagType: T
-) {
-  console.log("Providing tags for results:", resultsWithIds);
-
-  return resultsWithIds
-    ? [
-        { type: tagType as any, id: "LIST" },
-        ...resultsWithIds.map(({ id }) => ({ type: tagType as any, id })),
-      ]
-    : [{ type: tagType as any, id: "LIST" }];
-}
-
 export const MemoryApi = createApi({
   reducerPath: "MemoryApi",
   baseQuery: fetchBaseQuery({
@@ -29,7 +15,6 @@ export const MemoryApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Memory", "UserMemory", "FollowRequest"] as const,
 
   endpoints: (builder) => ({
     getMemories: builder.query<Memory[], void>({
@@ -37,10 +22,8 @@ export const MemoryApi = createApi({
         url: "/getMemories",
         method: "GET",
       }),
-
       transformResponse: (res: { data: Memory[]; message: string }) => res.data,
-
-      providesTags: (result) => providesList(result, "Memory"),
+      keepUnusedDataFor: 0, // Disable caching
     }),
 
     saveMemory: builder.mutation<void, MemoryInput>({
@@ -49,12 +32,8 @@ export const MemoryApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: () => [
-        { type: "Memory", id: "LIST" },
-        { type: "UserMemory", id: "CURRENT" },
-      ],
     }),
-    //TODO: make this as query not mutation
+    
     getMemoryById: builder.mutation<Memory, string>({
       query: (id) => ({
         url: `/getMemoryById/${id}`,
@@ -78,8 +57,9 @@ export const MemoryApi = createApi({
         method: "GET",
       }),
       transformResponse: (res: { data: Memory[]; message: string }) => res.data,
-      providesTags: (result) => providesList(result, "Memory"),
+      keepUnusedDataFor: 0, // Disable caching
     }),
+    
     getNearMemory: builder.query<
       Memory[],
       {
@@ -95,17 +75,16 @@ export const MemoryApi = createApi({
         body,
       }),
       transformResponse: (res: { data: Memory[]; message: string }) => res.data,
-      providesTags: (result) => providesList(result, "Memory"),
+      keepUnusedDataFor: 0, // Disable caching
     }),
 
-    // GET to fetch a specific user's friends' memories
     getUserFriendsMemories: builder.query<Memory[], void>({
       query: (userId) => ({
         url: `/getUserFriendsMemories/`,
         method: "GET",
       }),
       transformResponse: (res: { data: Memory[]; message: string }) => res.data,
-      providesTags: (result) => providesList(result, "Memory"),
+      keepUnusedDataFor: 0, // Disable caching
     }),
   }),
 });

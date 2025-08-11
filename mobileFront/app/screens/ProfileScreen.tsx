@@ -11,6 +11,7 @@ import { Memory } from "../core/types/memory";
 import { colors } from "../core/theme/colors";
 import ProfileInfo from "../components/ProfileInfo";
 import ProfileContent from "../components/ProfileContent";
+import { useGetUserBookmarksQuery } from "../lib/APIs/RTKQuery/InteractionApi";
 
 export function ProfileScreen() {
   const isDark = useSelector(
@@ -29,10 +30,17 @@ export function ProfileScreen() {
       refetchOnReconnect: true,
     }
   );
+  const { data: bookmarks, isLoading: isBookmarksLoading, isError: isBookmarksError } = useGetUserBookmarksQuery(
+    undefined,
+    {
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+    }
+  );
 
   const memories = (data as Memory[]) ?? [];
 
-  let content = <ProfileContent memories={memories} saved={[]} />;
+  let content = <ProfileContent memories={memories} saved={bookmarks } />;
   if (isLoading) {
     content = (
       <View className="flex-1 justify-center items-center">

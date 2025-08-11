@@ -63,11 +63,19 @@ export class BookmarkRepositoryImp implements BookmarkRepository {
         .select({
           id: bookmarks.id,
           memory_id: bookmarks.memory_id,
-          saved_at: bookmarks.saved_at,
-          memory: {
-            id: memories.id,
+            title: memories.title,
+            description: memories.description,
             content_url: memories.content_url,
+            content_type: memories.content_type,
+            latitude: memories.latitude,
+            longitude: memories.longitude,
+            isPublic: memories.isPublic,
+            created_at: memories.created_at,  
+            user: {
+            id: users.id ,
+            username: users.username,
           },
+          
         })
         .from(bookmarks)
         .innerJoin(memories, eq(bookmarks.memory_id, memories.id))
@@ -75,7 +83,7 @@ export class BookmarkRepositoryImp implements BookmarkRepository {
         .where(eq(bookmarks.user_id, userId))
         .orderBy(bookmarks.saved_at);
 
-      return bookmarkedMemories as BookmarkedMemory[];
+      return bookmarkedMemories as unknown as BookmarkedMemory[];
     } catch (error) {
       console.error("Error getting user bookmarks:", error);
       throw new Error("Failed to get user bookmarks");

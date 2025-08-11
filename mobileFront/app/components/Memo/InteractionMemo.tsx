@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useToggleMemoryLikeMutation } from "../../lib/APIs/RTKQuery/InteractionApi";
+import { useToggleMemoryLikeMutation, useToggleBookmarkMutation, useGetUserBookmarksQuery } from "../../lib/APIs/RTKQuery/InteractionApi";
 
 type Props = {
   memoryId: string;
@@ -25,6 +25,10 @@ export const InteractionMemo: React.FC<Props> = ({
   const [likeCount, setLikeCount] = useState<number>(Number(num_likes) || 0);
 
   const [toggleMemoryLike, { isLoading: isLikeLoading }] = useToggleMemoryLikeMutation();
+  const [toggleBookmark, { isLoading: isSaveLoading }] = useToggleBookmarkMutation();
+  
+  // Get refetch function to refresh bookmarks data
+  const { refetch: refetchBookmarks } = useGetUserBookmarksQuery();
 
   const onPressLikeHandler = async () => {
     if (isLikeLoading) return;
@@ -39,9 +43,18 @@ export const InteractionMemo: React.FC<Props> = ({
     }
   };
 
-  const onPressSaveHandler = () => {
-    // TODO: Implement save functionality
-    setSaved(!saved);
+  const onPressSaveHandler = async () => {
+    if (isSaveLoading) return;
+    try {
+      const result = await toggleBookmark({ memory_id: memoryId }).unwrap();
+      setSaved(result.isBookmarked || false);
+      
+      // Refetch bookmarks data to update the saved tab
+      refetchBookmarks();
+    } catch (e) {
+      console.log("Save failed", e);
+      // Keep the current state if the API call fails
+    }
   };
 
   const onPressCommentHandler = () => {
@@ -86,14 +99,20 @@ export const InteractionMemo: React.FC<Props> = ({
       {/* Save */}
       <TouchableOpacity
         onPress={onPressSaveHandler}
+        disabled={isSaveLoading}
         className="items-center"
         activeOpacity={0.7}
       >
         <Ionicons
           name={saved ? "bookmark" : "bookmark-outline"}
           size={40}
-          color="white"
+          color={saved ? "#ffd700" : "white"}
         />
+        {isSaveLoading && (
+          <View className="mt-1">
+            <Text className="text-white text-xs">Saving...</Text>
+          </View>
+        )}
       </TouchableOpacity>
     </View>
   );

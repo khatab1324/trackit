@@ -13,8 +13,18 @@ export interface BookmarkedMemory {
   id: string;
   memory_id: string;
   saved_at: Date;
-  memory: {
-    id: string;
+
+    
+    title: string;
+    description?: string;
     content_url: string;
+    content_type: string;
+    latitude: number;
+    longitude: number;
+    isPublic: boolean;
+    created_at: Date;
+      user: {
+    user_id: string;
+    username: string;
   };
 }

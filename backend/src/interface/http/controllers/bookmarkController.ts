@@ -44,7 +44,7 @@ export const getUserBookmarksController = async (
     const bookmarks = await new BookmarkUseCase(
       new BookmarkRepositoryImp()
     ).getUserBookmarks(userId);
-
+    console.log("bookmarks", bookmarks);
     reply.code(200).send({
       message: "User bookmarks retrieved successfully",
       bookmarks,

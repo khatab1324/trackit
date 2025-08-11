@@ -33,24 +33,22 @@ export const NotificationsApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Notifications"],
   endpoints: (builder) => ({
     getNotifications: builder.query<NotificationsResponse, void>({
       query: () => "/notifications",
       keepUnusedDataFor: 0, // Disable caching - always fetch fresh data
-      providesTags: [{ type: "Notifications", id: "LIST" }],
     }),
+    
     markRead: builder.mutation<{ ok: true }, { ids?: string[] | "all" }>({
       query: (body) => ({ url: "/notifications/mark-read", method: "POST", body }),
-      invalidatesTags: [{ type: "Notifications", id: "LIST" }],
     }),
+    
     acceptFollow: builder.mutation<{ ok: true }, { user_id: string }>({
       query: (body) => ({ url: "/follow/accept", method: "POST", body }),
-      invalidatesTags: [{ type: "Notifications", id: "LIST" }],
     }),
+    
     rejectFollow: builder.mutation<{ ok: true }, { user_id: string }>({
       query: (body) => ({ url: "/follow/reject", method: "POST", body }),
-      invalidatesTags: [{ type: "Notifications", id: "LIST" }],
     }),
   }),
 });
