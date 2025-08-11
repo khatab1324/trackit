@@ -20,8 +20,6 @@ type Props = {
   onClose: () => void;
 };
 
-
-
 export const CommentSection: React.FC<Props> = ({
   memoryId,
   isVisible,
@@ -30,7 +28,14 @@ export const CommentSection: React.FC<Props> = ({
   const [slideAnim] = useState(new Animated.Value(screenHeight));
   const [backdropOpacity] = useState(new Animated.Value(0));
 
-  const { data: comments, isLoading, refetch } = useGetMemoryCommentsQuery(memoryId);
+  const {
+    data: comments,
+    isLoading,
+    error,
+    refetch,
+  } = useGetMemoryCommentsQuery(memoryId, {
+    skip: !isVisible, // Only fetch when comment section is visible
+  });
 
   useEffect(() => {
     const animations = [
@@ -49,11 +54,15 @@ export const CommentSection: React.FC<Props> = ({
     Animated.parallel(animations).start();
   }, [isVisible, slideAnim, backdropOpacity]);
 
-
+  const handleRefresh = () => {
+    refetch();
+  };
 
   const formatTimeAgo = (dateString: string) => {
-    const diffInSeconds = Math.floor((Date.now() - new Date(dateString).getTime()) / 1000);
-    
+    const diffInSeconds = Math.floor(
+      (Date.now() - new Date(dateString).getTime()) / 1000
+    );
+
     if (diffInSeconds < 60) return "now";
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
@@ -63,11 +72,13 @@ export const CommentSection: React.FC<Props> = ({
   const renderComment = ({ item }: { item: any }) => {
     const username = item.username || `User${item.userId.slice(0, 4)}`;
     const avatarInitial = username.charAt(0).toUpperCase();
-    
+
     return (
       <View className="flex-row items-start space-x-3 px-4 py-3">
         <View className="w-8 h-8 rounded-full bg-gray-300 items-center justify-center">
-          <Text className="text-gray-600 font-semibold text-sm">{avatarInitial}</Text>
+          <Text className="text-gray-600 font-semibold text-sm">
+            {avatarInitial}
+          </Text>
         </View>
         <View className="flex-1">
           <View className="flex-row items-center space-x-2">
@@ -76,7 +87,9 @@ export const CommentSection: React.FC<Props> = ({
               {formatTimeAgo(item.created_at || new Date().toISOString())}
             </Text>
           </View>
-          <Text className="text-white text-sm mt-1 leading-5">{item.content}</Text>
+          <Text className="text-white text-sm mt-1 leading-5">
+            {item.content}
+          </Text>
         </View>
         <TouchableOpacity className="p-2">
           <Ionicons name="heart-outline" size={16} color="white" />
@@ -104,8 +117,8 @@ export const CommentSection: React.FC<Props> = ({
         className="absolute left-0 right-0 bg-gray-900 rounded-t-3xl"
         style={{
           transform: [{ translateY: slideAnim }],
-          bottom: 43, 
-          maxHeight: (screenHeight - 43) * 0.8, 
+          bottom: 43,
+          maxHeight: (screenHeight - 43) * 0.8,
         }}
       >
         <SafeAreaView edges={["bottom"]}>
@@ -122,6 +135,8 @@ export const CommentSection: React.FC<Props> = ({
             keyExtractor={(item: any) => item.id}
             className="flex-1"
             showsVerticalScrollIndicator={false}
+            refreshing={isLoading}
+            onRefresh={handleRefresh}
             ListEmptyComponent={
               <View className="py-16 items-center">
                 <Text className="text-gray-400">
@@ -131,9 +146,9 @@ export const CommentSection: React.FC<Props> = ({
             }
           />
 
-         <AddComment memoryId={memoryId} refetch={refetch} />
+          <AddComment memoryId={memoryId} refetch={handleRefresh} />
         </SafeAreaView>
       </Animated.View>
     </View>
   );
-}; 
+};

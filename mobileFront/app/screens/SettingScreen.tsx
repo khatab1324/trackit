@@ -29,8 +29,8 @@ export function SettingScreen() {
   };
   const logoutHandler = async () => {
     try {
-      await AsyncStorage.removeItem("token"); // Remove token from storage
-      dispatch(resetStore()); // Reset all reducers to initial state
+      await AsyncStorage.removeItem("token");
+      dispatch(resetStore()); 
     } catch (error) {
       console.error("Logout failed:", error);
     }

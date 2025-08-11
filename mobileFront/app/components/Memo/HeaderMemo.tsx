@@ -34,7 +34,6 @@ export const HeaderMemo = () => {
                 className="relative"
               >
                 <Feather name="bell" size={24} color="white" />
-                {/* ✅ اختفاء عند 0 */}
                 {unread > 0 && (
                   <View
                     className="absolute -top-1 -right-1 bg-red-500 rounded-full items-center justify-center"
@@ -48,7 +47,7 @@ export const HeaderMemo = () => {
 
             <TouchableOpacity
               className="items-center gap-2"
-              onPress={() => (navigation as any).replace("NearMemories")}
+              onPress={() => (navigation as any).navigate("NearMemories")}
             >
               <Text
                 className={clsx(
@@ -59,10 +58,9 @@ export const HeaderMemo = () => {
                 Near Memo
               </Text>
             </TouchableOpacity>
-
             <TouchableOpacity
               className="flex-row items-center gap-2"
-              onPress={() => (navigation as any).replace("FriendsMemo")}
+              onPress={() => (navigation as any).navigate("FriendsMemo")}
             >
               <Text
                 className={clsx(

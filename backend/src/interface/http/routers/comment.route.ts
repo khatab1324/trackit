@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { verifyJWT } from "../middlewares/auth";
 import { addCommentController } from "../controllers/commentController";
+import { getMemoryCommentsController } from "../controllers/getMemoryCommentsController";
 
 export default async function commentRouter(app: FastifyInstance) {
   app.get(
@@ -11,7 +12,7 @@ export default async function commentRouter(app: FastifyInstance) {
   app.get(
     "/getMemoryComments/:memoryId",
     { preHandler: [verifyJWT] },
-    () => {}
+    getMemoryCommentsController
   );
   app.post("/addComment", { preHandler: [verifyJWT] }, addCommentController);
   app.post("/likeComment", { preHandler: [verifyJWT] }, () => {});

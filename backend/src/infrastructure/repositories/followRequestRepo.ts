@@ -129,7 +129,6 @@ export class FollowRequestRepositoryImp implements FollowRequestRepository {
     input: FollowRequestInput
   ): Promise<FollowRequestResponse> {
     try {
-      // Check if a pending request exists
       const existing = await db
         .select()
         .from(followRequests)
@@ -148,8 +147,6 @@ export class FollowRequestRepositoryImp implements FollowRequestRepository {
           message: "No pending follow request found to cancel.",
         };
       }
-
-      // Delete the pending request
       await db
         .delete(followRequests)
         .where(

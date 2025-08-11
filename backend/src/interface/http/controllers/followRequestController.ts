@@ -89,6 +89,8 @@ export const cancelFollowRequestController = async (
 ) => {
   try {
     const { target_id } = request.body as { target_id: string };
+    console.log("target_id", target_id);
+
     const userReq = request.user as { id: string };
     const requester_id = userReq.id;
     if (!requester_id) {
@@ -119,12 +121,13 @@ export const getFollowRequestsController = async (
     if (!user_id) {
       return reply.code(401).send({ error: "Unauthorized" });
     }
-    const result = await new FollowRequestUseCase(
+    const data = await new FollowRequestUseCase(
       new FollowRequestRepositoryImp()
     ).getRequests(user_id);
+    console.log("result", data);
     reply.code(200).send({
       message: "Follow requests retrieved",
-      result,
+      data,
     });
   } catch (error) {
     console.log(error);

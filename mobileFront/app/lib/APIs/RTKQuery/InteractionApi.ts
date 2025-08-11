@@ -76,6 +76,14 @@ export const InteractionApi = createApi({
       transformResponse: (res: { data: Comment[]; message: string }) =>
         res.data,
       providesTags: (result) => providesList(result, "Comment" as const),
+      // Add error handling
+      async onQueryStarted(arg, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error("getMemoryComments query failed:", error);
+        }
+      },
     }),
     addComment: builder.mutation<Comment, AddCommentInput>({
       query: (body) => ({
@@ -86,7 +94,9 @@ export const InteractionApi = createApi({
       transformResponse: (res: { data: Comment; message: string }) => res.data,
       invalidatesTags: (_res, _err, arg) => [
         { type: "Comment" as const, id: "LIST" },
-        ...(arg.parentCommentId ? [{ type: "Reply" as const, id: "LIST" }] : []),
+        ...(arg.parentCommentId
+          ? [{ type: "Reply" as const, id: "LIST" }]
+          : []),
       ],
     }),
     likeComment: builder.mutation<{ success: boolean }, LikeCommentInput>({
@@ -174,7 +184,7 @@ export const InteractionApi = createApi({
       invalidatesTags: () => [
         { type: "FollowRequest" as const, id: "LIST" },
         { type: "Memory" as const, id: "LIST" },
-        { type: "UserMemory" as const, id: "LIST" }
+        { type: "UserMemory" as const, id: "LIST" },
       ],
     }),
     acceptFollowRequest: builder.mutation<

@@ -2,4 +2,5 @@ import { AddCommentInput, AddCommentResponse } from "../../application/DTO/comme
 
 export interface CommentRepository {
   addComment(input: AddCommentInput): Promise<AddCommentResponse>;
+  getCommentsByMemoryId(memoryId: string): Promise<any[]>;
 }
