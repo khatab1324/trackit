@@ -1,6 +1,6 @@
 import React from "react";
 import { SafeAreaView, Text, TouchableOpacity } from "react-native";
-import { HeaderForCamera } from "./headerForCamera";
+import CameraTopBar from "./CameraTopBar";
 import { useNavigation } from "@react-navigation/native";
 import { useCameraPermissions } from "expo-camera";
 
@@ -10,7 +10,7 @@ export const CameraPremiisionDenied = () => {
 
   return (
     <SafeAreaView className="flex-1 items-center justify-center bg-black">
-      <HeaderForCamera callBackToNavigate={navigation.goBack} />
+      <CameraTopBar onBack={navigation.goBack as any} title="Preview" />
 
       <Text className="mb-6 px-6 text-center text-base text-white">
         We need your permission to show the camera
