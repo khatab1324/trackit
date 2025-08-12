@@ -167,9 +167,17 @@ export class FollowRequestRepositoryImp implements FollowRequestRepository {
   async getFollowRequests(user_id: string): Promise<FollowRequest[]> {
     try {
       const requests = await db
-        .select()
+        .select({
+          id: followRequests.id,
+          requester_id: followRequests.requester_id,
+          target_id: followRequests.target_id,
+          status: followRequests.status,
+          created_at: followRequests.created_at,
+          username: users.username,
+        })
         .from(followRequests)
-        .where(eq(followRequests.target_id, user_id));
+        .innerJoin(users, eq(followRequests.requester_id, users.id))
+        .where(eq(followRequests.target_id, user_id) && eq(followRequests.status, "pending"));
       return requests as FollowRequest[];
     } catch (error) {
       console.error("Error getting follow requests:", error);

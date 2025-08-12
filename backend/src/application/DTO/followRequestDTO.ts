@@ -19,4 +19,5 @@ export interface FollowRequest {
   target_id: string;
   status: 'pending' | 'accepted' | 'rejected';
   created_at: Date;
+  username: string;
 }

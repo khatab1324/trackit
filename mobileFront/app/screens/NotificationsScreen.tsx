@@ -9,113 +9,78 @@ import { NotificationItem } from "../components/notifications/NotificationItem";
 import { NotificationItemData } from "../components/notifications/types";
 import { useGetFollowRequestsQuery } from "../lib/APIs/RTKQuery/InteractionApi";
 
-const MOCK: NotificationItemData[] = [
- 
-  {
-    id: "2",
-    type: "LIKE",
-    actor: { user_id: "u2", username: "ahmad" },
-    memo: { id: "m1", content_url: "https://picsum.photos/200?1" },
-    createdAt: new Date(Date.now() - 50 * 60 * 1000).toISOString(), 
-    is_read: false,
-  },
-  {
-    id: "3",
-    type: "COMMENT",
-    actor: { user_id: "u3", username: "lina" },
-    memo: { id: "m2", content_url: "https://picsum.photos/200?2" },
-    comment_text: "Nice memo!",
-    createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), 
-    is_read: true,
-  },
-  {
-    id: "4",
-    type: "FOLLOW_ACCEPTED",
-    actor: { user_id: "u4", username: "sara" },
-    createdAt: new Date(Date.now() - 26 * 60 * 60 * 1000).toISOString(), 
-    is_read: true,
-  },
-];
-
 export default function NotificationsScreen() {
   const dispatch = useDispatch();
 
   const {
-    data,
-    isLoading,
+    data: notificationsData,
+    isLoading: isLoadingNotifications,
     isError,
     isFetching,
     refetch,
-  } = useGetNotificationsQuery();
-  const { data: followRequests, isLoading: isLoadingFollowRequests } = useGetFollowRequestsQuery();
+  } = useGetNotificationsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+  });
 
-  const items = (() => {
-    let allItems: NotificationItemData[] = [];
-    
-    if (data?.data && data.data.length > 0) {
-      allItems.push(...(data.data as NotificationItemData[]));
+  const {
+    data: followRequests,
+    isLoading: isLoadingFollowRequests,
+    refetch: refetchFollowRequests,
+  } = useGetFollowRequestsQuery();
+
+  const items: NotificationItemData[] = useMemo(() => {
+    const combined: NotificationItemData[] = [];
+
+    // Add normal notifications from API
+    if (notificationsData?.data?.length) {
+      combined.push(...(notificationsData.data as NotificationItemData[]));
     }
-    
-      if (followRequests && followRequests.length > 0) {
-        const followRequestNotifications: NotificationItemData[] = followRequests.map(request => ({
+
+    // Add follow request notifications
+    if (followRequests?.length) {
+      combined.push(
+        ...followRequests.map((request) => ({
           id: `follow-${request.id}`,
           type: "FOLLOW_REQUEST" as const,
-          actor: { 
-            user_id: request.requester_id || 'unknown', 
-            username: request.requester_id ? `User ${request.requester_id.slice(0, 8)}` : 'Unknown User'
+          actor: {
+            user_id: request.requester_id || "unknown",
+            username: request.username
+              ? request.username.slice(0, 10)
+              : "Unknown User",
           },
           createdAt: request.created_at || new Date().toISOString(),
           is_read: false,
           request_id: request.id,
-        }));
-        allItems.push(...followRequestNotifications);
-      }
-    
-    if (allItems.length === 0 && (isError || !data)) {
-      allItems = MOCK;
-      if (followRequests && followRequests.length > 0) {
-        const followRequestNotifications: NotificationItemData[] = followRequests.map(request => ({
-          id: `follow-${request.id}`,
-          type: "FOLLOW_REQUEST" as const,
-          actor: { 
-            user_id: request.requester_id || 'unknown', 
-            username: request.requester_id ? `User ${request.requester_id.slice(0, 8)}` : 'Unknown User'
-          },
-          createdAt: request.created_at || new Date().toISOString(),
-          is_read: false,
-          request_id: request.id,
-        }));
-        allItems.push(...followRequestNotifications);
-      }
+        }))
+      );
     }
-    
-    return allItems.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+
+    // Sort newest first
+    return combined.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-  })();
+  }, [notificationsData?.data, followRequests]);
 
+  // Update unread count in store
   useEffect(() => {
-
-    // TODO: what this shit code
-    const unreadFromApi =
-      typeof data?.unreadCount === "number" ? data.unreadCount : undefined;
-    
     let totalUnread = 0;
-    
-    if (unreadFromApi !== undefined) {
-      totalUnread = unreadFromApi;
-    } else {
-      // Count unread from mock data
-      totalUnread = MOCK.filter((n) => !n.is_read).length;
+
+    if (typeof notificationsData?.unreadCount === "number") {
+      totalUnread += notificationsData.unreadCount;
     }
-    
-    // Add unread follow requests
-    if (followRequests) {
-      totalUnread += followRequests.length; // All follow requests are considered unread initially
+
+    if (followRequests?.length) {
+      totalUnread += followRequests.length; // treat all follow requests as unread
     }
-    
+
     dispatch(setUnreadCount(totalUnread));
-  }, [data?.unreadCount, followRequests, dispatch]);
+  }, [notificationsData?.unreadCount, followRequests, dispatch]);
+
+  const handleRefresh = () => {
+    refetchFollowRequests();
+  };
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-white dark:bg-black">
@@ -125,7 +90,7 @@ export default function NotificationsScreen() {
         </Text>
       </View>
 
-      {(isLoading || isLoadingFollowRequests) && !data ? (
+      {isLoadingNotifications || isLoadingFollowRequests ? (
         <View className="flex-1 items-center justify-center">
           <Text className="text-gray-500 dark:text-gray-300">Loading…</Text>
         </View>
@@ -139,12 +104,12 @@ export default function NotificationsScreen() {
           )}
           contentContainerStyle={{ paddingBottom: 12 }}
           showsVerticalScrollIndicator={false}
-          onRefresh={refetch}
-          refreshing={isFetching}
+          onRefresh={handleRefresh}
+          refreshing={isFetching || isLoadingFollowRequests}
           ListEmptyComponent={
             <View className="py-16 items-center">
               <Text className="text-gray-500 dark:text-gray-300">
-                No notifications at the moment
+                {isError && "No notifications at the moment"}
               </Text>
             </View>
           }

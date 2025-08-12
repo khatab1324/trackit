@@ -56,7 +56,7 @@ export const NotificationContent = ({ item }: Props) => {
         style={{ lineHeight: 20 }} 
         numberOfLines={3}
       >
-        <Text className="font-semibold">{item.actor.username}</Text>{" "}
+        <Text className="font-semibold">{item.actor.username}</Text>
         {getNotificationText()}
         {" · "}
         <TimeAgo iso={item.createdAt} />

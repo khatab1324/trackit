@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { Friend } from "../../../core/types/friends";
 
 type Id = string;
 
@@ -86,7 +87,7 @@ export const InteractionApi = createApi({
       transformResponse: (res: { data: Reply[]; message: string }) => res.data,
       keepUnusedDataFor: 0, // Disable caching
     }),
-    
+
     getMemoryComments: builder.query<Comment[], Id>({
       query: (memoryId) => ({
         url: `/getMemoryComments/${memoryId}`,
@@ -104,7 +105,7 @@ export const InteractionApi = createApi({
         }
       },
     }),
-    
+
     addComment: builder.mutation<Comment, AddCommentInput>({
       query: (body) => ({
         url: "/addComment",
@@ -113,7 +114,7 @@ export const InteractionApi = createApi({
       }),
       transformResponse: (res: { data: Comment; message: string }) => res.data,
     }),
-    
+
     likeComment: builder.mutation<{ success: boolean }, LikeCommentInput>({
       query: (body) => ({
         url: "/likeComment",
@@ -125,7 +126,7 @@ export const InteractionApi = createApi({
         message: string;
       }) => res.data,
     }),
-    
+
     deleteComment: builder.mutation<{ success: boolean }, DeleteCommentInput>({
       query: (body) => ({
         url: "/deleteComment",
@@ -137,7 +138,7 @@ export const InteractionApi = createApi({
         message: string;
       }) => res.data,
     }),
-    
+
     editComment: builder.mutation<Comment, EditCommentInput>({
       query: (body) => ({
         url: "/editComment",
@@ -146,7 +147,7 @@ export const InteractionApi = createApi({
       }),
       transformResponse: (res: { data: Comment; message: string }) => res.data,
     }),
-    
+
     replyComment: builder.mutation<Reply, ReplyCommentInput>({
       query: (body) => ({
         url: "/replyComment",
@@ -165,9 +166,12 @@ export const InteractionApi = createApi({
         method: "POST",
         body,
       }),
-      transformResponse: (res: { data: { success: boolean }; message: string }) => res.data,
+      transformResponse: (res: {
+        data: { success: boolean };
+        message: string;
+      }) => res.data,
     }),
-    
+
     cancelFollowRequest: builder.mutation<
       { success: boolean },
       { target_id: Id }
@@ -182,7 +186,7 @@ export const InteractionApi = createApi({
         message: string;
       }) => res.data,
     }),
-    
+
     acceptFollowRequest: builder.mutation<
       { success: boolean },
       { request_id: Id }
@@ -197,7 +201,7 @@ export const InteractionApi = createApi({
         message: string;
       }) => res.data,
     }),
-    
+
     rejectFollowRequest: builder.mutation<
       { success: boolean },
       { request_id: Id }
@@ -212,7 +216,7 @@ export const InteractionApi = createApi({
         message: string;
       }) => res.data,
     }),
-    
+
     getFollowRequests: builder.query<FollowRequest[], void>({
       query: () => ({
         url: "/getFollowRequests",
@@ -222,17 +226,16 @@ export const InteractionApi = createApi({
       transformResponse: (res: { data: FollowRequest[]; message: string }) =>
         res.data,
     }),
-    
-    getCurrentUserFollowers: builder.query<Follower[], void>({
+
+    getCurrentUserFollowers: builder.query<Friend[], void>({
       query: () => ({
         url: "/getCurrentUserFollowers",
         method: "GET",
       }),
-      transformResponse: (res: { data: Follower[]; message: string }) =>
-        res.data,
+      transformResponse: (res: { data: Friend[]; message: string }) => res.data,
       keepUnusedDataFor: 0, // Disable caching
     }),
-    
+
     toggleMemoryLike: builder.mutation<
       // server returns: { message, result: { isLiked, memory_id, num_likes? } }
       {
@@ -259,15 +262,12 @@ export const InteractionApi = createApi({
         method: "POST",
         body,
       }),
-      transformResponse: (res: { message: string; result: BookmarkResponse }) => res.result,
-      // Invalidate bookmarks cache to refetch data
+      transformResponse: (res: { message: string; result: BookmarkResponse }) =>
+        res.result,
       async onQueryStarted({ memory_id }, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
-          // After successful bookmark toggle, invalidate the bookmarks cache
-          dispatch(
-            InteractionApi.util.invalidateTags(['BookmarkedMemory'])
-          );
+          dispatch(InteractionApi.util.invalidateTags(["BookmarkedMemory"]));
         } catch (error) {
           console.error("Failed to invalidate bookmarks cache:", error);
         }
@@ -279,9 +279,12 @@ export const InteractionApi = createApi({
         url: "/userBookmarks",
         method: "GET",
       }),
-      transformResponse: (res: { bookmarks: BookmarkedMemory[]; message: string }) => res.bookmarks,
+      transformResponse: (res: {
+        bookmarks: BookmarkedMemory[];
+        message: string;
+      }) => res.bookmarks,
       keepUnusedDataFor: 0, // Disable caching - always fetch fresh data
-      providesTags: ['BookmarkedMemory'],
+      providesTags: ["BookmarkedMemory"],
     }),
   }),
 });

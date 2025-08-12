@@ -14,7 +14,7 @@ export type NotificationItem = {
   memo?: { id: string; content_url?: string };
   comment_text?: string;
   is_read: boolean;
-  createdAt: string; // ISO
+  createdAt: string;
 };
 
 export type NotificationsResponse = {
@@ -36,17 +36,21 @@ export const NotificationsApi = createApi({
   endpoints: (builder) => ({
     getNotifications: builder.query<NotificationsResponse, void>({
       query: () => "/notifications",
-      keepUnusedDataFor: 0, // Disable caching - always fetch fresh data
+      keepUnusedDataFor: 0,
     }),
-    
+
     markRead: builder.mutation<{ ok: true }, { ids?: string[] | "all" }>({
-      query: (body) => ({ url: "/notifications/mark-read", method: "POST", body }),
+      query: (body) => ({
+        url: "/notifications/mark-read",
+        method: "POST",
+        body,
+      }),
     }),
-    
+
     acceptFollow: builder.mutation<{ ok: true }, { user_id: string }>({
       query: (body) => ({ url: "/follow/accept", method: "POST", body }),
     }),
-    
+
     rejectFollow: builder.mutation<{ ok: true }, { user_id: string }>({
       query: (body) => ({ url: "/follow/reject", method: "POST", body }),
     }),

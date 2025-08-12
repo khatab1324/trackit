@@ -23,24 +23,30 @@ export function ProfileScreen() {
     useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
 
   // Use query hook (auto-cache, status flags)
-  const { data, isLoading, isError } = useGetCurrentUserMemoriesQuery(
-    undefined,
-    {
+  const { data, isLoading, isError, refetch, isFetching } =
+    useGetCurrentUserMemoriesQuery(undefined, {
       refetchOnFocus: true,
       refetchOnReconnect: true,
-    }
-  );
-  const { data: bookmarks, isLoading: isBookmarksLoading, isError: isBookmarksError } = useGetUserBookmarksQuery(
-    undefined,
-    {
-      refetchOnFocus: true,
-      refetchOnReconnect: true,
-    }
-  );
+    });
+  const {
+    data: bookmarks,
+    isLoading: isBookmarksLoading,
+    isError: isBookmarksError,
+  } = useGetUserBookmarksQuery(undefined, {
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  });
 
   const memories = (data as Memory[]) ?? [];
 
-  let content = <ProfileContent memories={memories} saved={bookmarks } />;
+  let content = (
+    <ProfileContent
+      memories={memories}
+      saved={bookmarks}
+      refetch={refetch}
+      isFetching={isFetching}
+    />
+  );
   if (isLoading) {
     content = (
       <View className="flex-1 justify-center items-center">

@@ -1,37 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
-import { useRoute } from "@react-navigation/native";
-import { useGetUserFriendsMemoriesQuery } from "../lib/APIs/RTKQuery/memoryApi";
-import { MemoListComp } from "../components/MemoList";
-import { HeaderMemo } from "../components/Memo/HeaderMemo";
-
-type RouteParams = { userId: string; username?: string };
+import { FriendsList } from "../components/chat/FriendsList";
+import {
+  useGetCurrentUserFollowersQuery,
+  useGetUserBookmarksQuery,
+} from "../lib/APIs/RTKQuery/InteractionApi";
+import { Friend } from "../core/types/friends";
 
 export default function FriendsMemoScreen() {
-  const route = useRoute();
-  const { userId, username } = (route.params || {}) as RouteParams;
-
-  const { data, isLoading, isError } = useGetUserFriendsMemoriesQuery();
-
+  const {
+    data: friends,
+    isLoading,
+    refetch,
+    isFetching,
+  } = useGetCurrentUserFollowersQuery();
+  const onPressFriend = (friend: Friend) => {
+    console.log("Selected friend:", friend);
+  };
+  console.log("friendss ", friends);
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-black">
-        <ActivityIndicator size="large" color="#fff" />
-      </View>
-    );
-  }
-
-  if (isError || !data) {
-    return (
-      <View className="flex-1 items-center justify-center bg-black px-6">
-        <Text className="text-white text-center">Failed to load memories.</Text>
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-black">
-      <MemoListComp data={data} />
+    <View className="flex-1 bg-white dark:bg-black">
+      <FriendsList
+        friends={friends}
+        onPressFriend={onPressFriend}
+        refetch={refetch}
+        isFetching={isFetching}
+      />
     </View>
   );
 }

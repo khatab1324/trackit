@@ -13,6 +13,8 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { ParamListBase } from "@react-navigation/native";
 import {
   useGetCloudinarySignatureMutation,
+  useGetCurrentUserMemoriesQuery,
+  useGetMemoriesQuery,
   useSaveMemoryMutation,
 } from "../lib/APIs/RTKQuery/memoryApi";
 import { ContentType, Coords, MemoryInput } from "../core/types/memory";
@@ -42,7 +44,7 @@ export default function SaveMemoryPic({
   const [isUploading, setIsUploading] = React.useState(false);
   const [uploadProgress, setUploadProgress] = React.useState(0);
   const user = useSelector((state: RootState) => state.user) as User;
-
+  const { refetch: refetchMemories } = useGetCurrentUserMemoriesQuery();
   const retakePicture = () => {
     navigation.goBack();
   };
@@ -115,6 +117,8 @@ export default function SaveMemoryPic({
         setIsUploading(false);
         setUploadProgress(0);
       }, 500);
+
+      refetchMemories();
     } catch (error) {
       console.error("Upload failed:", error);
       setIsUploading(false);

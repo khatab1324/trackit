@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useToggleMemoryLikeMutation, useToggleBookmarkMutation, useGetUserBookmarksQuery } from "../../lib/APIs/RTKQuery/InteractionApi";
+import {
+  useToggleMemoryLikeMutation,
+  useToggleBookmarkMutation,
+  useGetUserBookmarksQuery,
+} from "../../lib/APIs/RTKQuery/InteractionApi";
 
 type Props = {
   memoryId: string;
@@ -24,10 +28,11 @@ export const InteractionMemo: React.FC<Props> = ({
   const [saved, setSaved] = useState<boolean>(!!isSaved);
   const [likeCount, setLikeCount] = useState<number>(Number(num_likes) || 0);
 
-  const [toggleMemoryLike, { isLoading: isLikeLoading }] = useToggleMemoryLikeMutation();
-  const [toggleBookmark, { isLoading: isSaveLoading }] = useToggleBookmarkMutation();
-  
-  // Get refetch function to refresh bookmarks data
+  const [toggleMemoryLike, { isLoading: isLikeLoading }] =
+    useToggleMemoryLikeMutation();
+  const [toggleBookmark, { isLoading: isSaveLoading }] =
+    useToggleBookmarkMutation();
+
   const { refetch: refetchBookmarks } = useGetUserBookmarksQuery();
 
   const onPressLikeHandler = async () => {
@@ -35,7 +40,9 @@ export const InteractionMemo: React.FC<Props> = ({
     try {
       const result = await toggleMemoryLike({ memoryId }).unwrap();
       setLiked(result.result.isLiked);
-      result.result.isLiked ? setLikeCount(likeCount + 1) : setLikeCount(likeCount - 1);
+      result.result.isLiked
+        ? setLikeCount(likeCount + 1)
+        : setLikeCount(likeCount - 1);
     } catch (e) {
       setLiked(!liked);
       setLikeCount(likeCount);
@@ -48,7 +55,7 @@ export const InteractionMemo: React.FC<Props> = ({
     try {
       const result = await toggleBookmark({ memory_id: memoryId }).unwrap();
       setSaved(result.isBookmarked || false);
-      
+
       // Refetch bookmarks data to update the saved tab
       refetchBookmarks();
     } catch (e) {
@@ -75,9 +82,7 @@ export const InteractionMemo: React.FC<Props> = ({
           size={40}
           color={liked ? "#ff3040" : "white"}
         />
-        <Text className="text-white text-lg mt-1 font-medium">
-          {likeCount}
-        </Text>
+        <Text className="text-white text-lg mt-1 font-medium">{likeCount}</Text>
       </TouchableOpacity>
 
       {/* Comment */}
@@ -86,11 +91,7 @@ export const InteractionMemo: React.FC<Props> = ({
         className="items-center"
         activeOpacity={0.7}
       >
-        <Ionicons
-          name="chatbubble-outline"
-          size={40}
-          color="white"
-        />
+        <Ionicons name="chatbubble-outline" size={40} color="white" />
         <Text className="text-white text-lg mt-1 font-medium">
           {num_comments}
         </Text>

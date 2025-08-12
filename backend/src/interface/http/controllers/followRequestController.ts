@@ -150,9 +150,10 @@ export const getCurrentUserFollowersController = async (
     const result = await new FollowRequestUseCase(
       new FollowRequestRepositoryImp()
     ).getFollowers(user_id);
+
     reply.code(200).send({
       message: "Followers retrieved",
-      followers: result,
+      data: result,
     });
   } catch (error) {
     console.log(error);

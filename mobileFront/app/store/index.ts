@@ -62,7 +62,6 @@ export const store = configureStore({
       .concat(NotificationsApi.middleware),
 });
 
-// Action creator for resetting the store
 export const resetStore = () => ({ type: "RESET_STORE" });
 
 export type RootState = ReturnType<typeof store.getState>;

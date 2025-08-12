@@ -4,6 +4,8 @@ import {
   MemoryInput,
   Memory,
 } from "../../../core/types/memory";
+import { InteractionApi } from "./InteractionApi";
+import { Friend } from "../../../core/types/friends";
 
 export const MemoryApi = createApi({
   reducerPath: "MemoryApi",
@@ -15,6 +17,15 @@ export const MemoryApi = createApi({
       return headers;
     },
   }),
+  tagTypes: [
+    "Comment",
+    "Reply",
+    "FollowRequest",
+    "Follower",
+    "Memory",
+    "UserMemory",
+    "BookmarkedMemory",
+  ] as const,
 
   endpoints: (builder) => ({
     getMemories: builder.query<Memory[], void>({
@@ -23,7 +34,7 @@ export const MemoryApi = createApi({
         method: "GET",
       }),
       transformResponse: (res: { data: Memory[]; message: string }) => res.data,
-      keepUnusedDataFor: 0, // Disable caching
+      keepUnusedDataFor: 0,
     }),
 
     saveMemory: builder.mutation<void, MemoryInput>({
@@ -33,13 +44,21 @@ export const MemoryApi = createApi({
         body,
       }),
     }),
-    
+
     getMemoryById: builder.mutation<Memory, string>({
       query: (id) => ({
         url: `/getMemoryById/${id}`,
         method: "GET",
       }),
       transformResponse: (res: { data: Memory; message: string }) => res.data,
+      onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+          dispatch(InteractionApi.util.invalidateTags(["UserMemory"]));
+        } catch (error) {
+          console.error("getMemoryById query failed:", error);
+        }
+      },
     }),
 
     getCloudinarySignature: builder.mutation<CloudinarySignatureResponse, void>(
@@ -57,9 +76,10 @@ export const MemoryApi = createApi({
         method: "GET",
       }),
       transformResponse: (res: { data: Memory[]; message: string }) => res.data,
-      keepUnusedDataFor: 0, // Disable caching
+      providesTags: ["UserMemory"],
+      keepUnusedDataFor: 0,
     }),
-    
+
     getNearMemory: builder.query<
       Memory[],
       {
@@ -75,7 +95,7 @@ export const MemoryApi = createApi({
         body,
       }),
       transformResponse: (res: { data: Memory[]; message: string }) => res.data,
-      keepUnusedDataFor: 0, // Disable caching
+      keepUnusedDataFor: 0,
     }),
 
     getUserFriendsMemories: builder.query<Memory[], void>({
@@ -84,7 +104,7 @@ export const MemoryApi = createApi({
         method: "GET",
       }),
       transformResponse: (res: { data: Memory[]; message: string }) => res.data,
-      keepUnusedDataFor: 0, // Disable caching
+      keepUnusedDataFor: 0,
     }),
   }),
 });
