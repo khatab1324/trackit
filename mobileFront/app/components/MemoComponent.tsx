@@ -35,7 +35,6 @@ export const MemoComponent: React.FC<Props> = ({
     (currentUser as any)?.id ?? (currentUser as any)?.user_id ?? null;
 
   const isOwner = memory.userInfo?.user_id === currentUserId;
-
   const isPrivate = false;
   const currentCaption = memory.description || "Test Caption";
 

@@ -1,4 +1,3 @@
-// components/MemoryOptionsMenu.tsx
 import React, { useState, useEffect } from "react";
 import {
   Modal,
@@ -32,7 +31,7 @@ export default function MemoryOptionsMenu({
   onUpdateCaption,
   onDelete,
 }: Props) {
-  const [mode, setMode] = useState<"menu" | "edit">("menu");
+  const [mode, setMode] = useState<"menu" | "edit" | "privacy" | "delete">("menu");
   const [caption, setCaption] = useState(currentCaption);
   const slideAnim = useState(new Animated.Value(300))[0];
 
@@ -64,59 +63,55 @@ export default function MemoryOptionsMenu({
     <Modal transparent animationType="fade" visible={visible} onRequestClose={closeMenu}>
       <Pressable style={styles.backdrop} onPress={closeMenu} />
       <Animated.View
-        style={[
-          styles.sheet,
-          {
-            transform: [{ translateY: slideAnim }],
-          },
-        ]}
+        style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}
       >
         <View style={styles.handle} />
 
-        {mode === "menu" ? (
+        {mode === "menu" && (
           <>
-            {/* Make Private / Make Public */}
-            <TouchableOpacity
-              style={styles.row}
-              onPress={() => {
-                onTogglePrivacy(!isPrivate);
-                closeMenu();
-              }}
-            >
-              <Ionicons
-                name={isPrivate ? "lock-open-outline" : "lock-closed-outline"}
-                size={22}
-                color="#111827"
-                style={styles.icon}
-              />
-              <Text style={styles.itemText}>
-                {isPrivate ? "Make Public" : "Make Private"}
-              </Text>
+            {/* Privacy */}
+            <TouchableOpacity style={styles.row} onPress={() => setMode("privacy")}>
+              <Ionicons name="shield-outline" size={22} color="#111827" style={styles.icon} />
+              <Text style={styles.itemText}>Privacy</Text>
             </TouchableOpacity>
 
-            {/* Edit Caption */}
-            <TouchableOpacity
-              style={styles.row}
-              onPress={() => setMode("edit")}
-            >
+            <TouchableOpacity style={styles.row} onPress={() => setMode("edit")}>
               <MaterialIcons name="edit" size={22} color="#111827" style={styles.icon} />
               <Text style={styles.itemText}>Edit Caption</Text>
             </TouchableOpacity>
 
-            {/* Delete */}
             <View style={styles.divider} />
-            <TouchableOpacity
-              style={styles.row}
-              onPress={() => {
-                onDelete();
-                closeMenu();
-              }}
-            >
+            <TouchableOpacity style={styles.row} onPress={() => setMode("delete")}>
               <Feather name="trash-2" size={22} color="#EF4444" style={styles.icon} />
               <Text style={[styles.itemText, { color: "#EF4444" }]}>Delete</Text>
             </TouchableOpacity>
           </>
-        ) : (
+        )}
+
+        {mode === "privacy" && (
+          <>
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => {
+                onTogglePrivacy(false);
+                closeMenu();
+              }}
+            >
+              <Text style={styles.privacyOption}>🌍 Public</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => {
+                onTogglePrivacy(true);
+                closeMenu();
+              }}
+            >
+              <Text style={styles.privacyOption}>🔒 Private</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {mode === "edit" && (
           <>
             <Text style={styles.label}>Edit caption</Text>
             <TextInput
@@ -127,14 +122,41 @@ export default function MemoryOptionsMenu({
               placeholderTextColor="#9CA3AF"
               multiline
             />
+            <View style={{ flexDirection: "row", marginTop: 12 }}>
+              <TouchableOpacity
+                style={[styles.actionBtn, { backgroundColor: "#2563EB", flex: 1, marginRight: 6 }]}
+                onPress={() => {
+                  onUpdateCaption(caption.trim());
+                  closeMenu();
+                }}
+              >
+                <Text style={styles.actionBtnText}>Save</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.actionBtn, { backgroundColor: "#9CA3AF", flex: 1, marginLeft: 6 }]}
+                onPress={closeMenu}
+              >
+                <Text style={styles.actionBtnText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+
+        {mode === "delete" && (
+          <>
             <TouchableOpacity
-              style={styles.saveBtn}
+              style={styles.row}
               onPress={() => {
-                onUpdateCaption(caption.trim());
+                onDelete();
                 closeMenu();
               }}
             >
-              <Text style={styles.saveBtnText}>Save</Text>
+              <Feather name="trash-2" size={22} color="#EF4444" style={styles.icon} />
+              <Text style={[styles.itemText, { color: "#EF4444" }]}>Delete</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.row} onPress={closeMenu}>
+              <Ionicons name="close-circle" size={22} color="#DC2626" style={styles.icon} />
+              <Text style={[styles.itemText, { color: "#111827" }]}>Cancel</Text>
             </TouchableOpacity>
           </>
         )}
@@ -187,12 +209,16 @@ const styles = StyleSheet.create({
     padding: 12,
     color: "#111827",
   },
-  saveBtn: {
-    backgroundColor: "#2563EB",
-    marginTop: 12,
+  actionBtn: {
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: "center",
   },
-  saveBtnText: { color: "#fff", fontWeight: "600", fontSize: 16 },
+  actionBtnText: { color: "#fff", fontWeight: "600", fontSize: 16 },
+  privacyOption: {
+    fontSize: 16,
+    color: "#111827",
+    fontWeight: "500",
+    marginLeft: 4,
+  },
 });
