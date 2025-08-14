@@ -10,8 +10,9 @@ import { ProfileScreen } from "../screens/ProfileScreen";
 import { SettingScreen } from "../screens/SettingScreen";
 import { MapScreen } from "../screens/MapScreen";
 import { CurrentUserMemoScreen } from "../screens/CurrentUserMemoScreen";
-
 import NotificationsScreen from "../screens/NotificationsScreen";
+
+import { withResponsive } from "../components/withResponsive";
 
 export type HomeStackParamList = {
   Map: undefined;
@@ -27,7 +28,7 @@ const Tab = createBottomTabNavigator<HomeStackParamList>();
 
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const avatarUri: string | undefined = undefined;
-  const visibleRoutes = ["Map", "Chat", "Home", "Profile"]; 
+  const visibleRoutes = ["Map", "Chat", "Home", "Profile"];
 
   return (
     <SafeAreaView style={styles.safe} edges={["bottom"]}>
@@ -86,6 +87,8 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
 }
 
 export default function HomeStack() {
+  const RSettings = withResponsive(SettingScreen, { mode: "raw" });
+
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -99,9 +102,10 @@ export default function HomeStack() {
 
       <Tab.Screen
         name="Settings"
-        component={SettingScreen}
+        component={RSettings}
         options={{ tabBarButton: () => null, headerShown: false }}
       />
+
       <Tab.Screen
         name="CurrentUserMemo"
         component={CurrentUserMemoScreen}
