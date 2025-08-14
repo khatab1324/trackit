@@ -1,20 +1,25 @@
 import app from "./app";
 import authRoute from "./interface/http/routers/auth.route";
+import chatRouter from "./interface/http/routers/chat.route";
 import commentRouter from "./interface/http/routers/comment.route";
 import followRouter from "./interface/http/routers/follow.route";
 import helloRouters from "./interface/http/routers/hello.route";
 import memoryRouter from "./interface/http/routers/memory.route";
 import userRouters from "./interface/http/routers/user.route";
+import { attachSocket } from "./interface/socket/socketServer";
 
 async function main() {
   try {
     app.register(helloRouters);
     app.register(userRouters);
     app.register(authRoute);
+    app.register(chatRouter);
     app.register(memoryRouter);
     app.register(followRouter);
     app.register(commentRouter);
-    app.listen({ port: 3000, host: "0.0.0.0" });
+    attachSocket(app);
+
+    app.listen({ port: 3100, host: "0.0.0.0" });
     console.log("Fastify server ready at http://localhost:3000");
   } catch (error) {
     app.log.error(error);

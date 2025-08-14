@@ -9,6 +9,7 @@ import fastifyFormbody from "@fastify/formbody";
 import fastifyMultipart from "@fastify/multipart";
 import qs from "qs";
 import { configDotenv } from "dotenv";
+import cors from "@fastify/cors";
 configDotenv();
 
 const app = fastify({
@@ -17,6 +18,7 @@ const app = fastify({
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 app.register(fastifyFormbody);
+app.register(cors , { origin: true });
 app.register(fastifyMultipart, { attachFieldsToBody: true });
 // TODO : check if we in jwtService we need to pass the secret ?
 app.register(fastifyJwt, {

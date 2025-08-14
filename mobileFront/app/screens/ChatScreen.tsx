@@ -4,6 +4,7 @@ import { FriendsList } from "../components/chat/FriendsList";
 import { useGetCurrentUserFollowersQuery } from "../lib/APIs/RTKQuery/InteractionApi";
 import { Friend } from "../core/types/friends";
 import FriendsSearchBar from "../components/chat/FriendsSearchBar";
+import { useChatWithFriend } from "../hooks/useChatWithFriend";
 
 export const ChatScreen = () => {
   const {
@@ -12,14 +13,29 @@ export const ChatScreen = () => {
     refetch,
     isFetching,
   } = useGetCurrentUserFollowersQuery();
-  const onPressFriend = (friend: Friend) => {
-    console.log("Selected friend:", friend);
-  };
-  console.log("Friends data:", friends);
+
+  const {
+    selectedFriend,
+    chatData,
+    isChatLoading,
+    isConnected,
+    onPressFriend,
+    sendMessage,
+    disconnectFromChat,
+  } = useChatWithFriend();
 
   if (isLoading) {
     return (
       <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (isChatLoading && selectedFriend) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-lg mb-4">Connecting to chat...</Text>
         <ActivityIndicator size="large" />
       </View>
     );

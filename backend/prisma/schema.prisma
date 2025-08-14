@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("CHAT_DATABASE_URL")
+}
+
+model Chat {
+  id           String            @id @default(cuid())
+  create_at    DateTime          @default(now())
+  messages     ChatMessage[]
+  participants ChatParticipant[]
+}
+
+model GroupChat {
+  id           String             @id @default(cuid())
+  group_name   String
+  img_url      String?
+  creator_id   String
+  create_at    DateTime           @default(now())
+  messages     GroupChatMessage[]
+  participants GroupParticipant[]
+}
+
+model ChatMessage {
+  id         String   @id @default(cuid())
+  message    String
+  sender_id  String
+  create_at  DateTime @default(now())
+  media_link String?
+  chat_id    String
+  chat       Chat     @relation(fields: [chat_id], references: [id])
+}
+
+model GroupChatMessage {
+  id         String    @id @default(cuid())
+  message    String
+  sender_id  String
+  create_at  DateTime  @default(now())
+  media_link String?
+  group_id   String
+  group      GroupChat @relation(fields: [group_id], references: [id])
+}
+
+model GroupParticipant {
+  id        String    @id @default(cuid())
+  user_id   String
+  joined_at DateTime  @default(now())
+  group_id  String
+  group     GroupChat @relation(fields: [group_id], references: [id])
+}
+
+model ChatParticipant {
+  id      String @id @default(cuid())
+  chat_id String
+  user_id String
+  chat    Chat   @relation(fields: [chat_id], references: [id])
+
+  @@unique([chat_id, user_id])
+} 

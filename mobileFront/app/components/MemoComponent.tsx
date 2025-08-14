@@ -60,7 +60,7 @@ export const MemoComponent: React.FC<Props> = ({
           currentUserId={(currentUser as any).id}
         />
       )}
-
+      
       <CommentSection
         memoryId={memory.id}
         isVisible={isCommentSectionVisible}

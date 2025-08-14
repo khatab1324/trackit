@@ -1,229 +1,92 @@
-import { createServer } from "http";
-import express from "express";
-import { Server } from "socket.io";
-// import {
-//   addMessageToChat,
-//   addMessageToGroup,
-//   deleteChatMessageFromDatabase,
-//   deleteGroupMessageFromDatabase,
-//   edit1GroupMessageFromDatabase,
-//   editChatMessageFromDatabase,
-// } from "./lib/action/Message";
-const dev = process.env.NODE_ENV !== "production";
-const hostname = "localhost";
-const port = 3000;
-const app = express();
-const handler = app.getRequestHandler();
+import type { FastifyInstance } from "fastify";
+import { Server as IOServer } from "socket.io";
+import { ChatRepositoryImp } from "../../infrastructure/repositories/chatRepo";
+import { AddMessageToChatUseCase } from "../../application/useCase/chat/addMessageToChatUseCase";
+import { AddMessageToGroupUseCase } from "../../application/useCase/chat/addMessageToGroupUseCase";
+import { EditMessageUseCase } from "../../application/useCase/chat/editMessageUseCase";
+import { DeleteMessageUseCase } from "../../application/useCase/chat/deleteMessageUseCase";
 
-app.prepare().then(() => {
-  const httpServer = createServer(handler);
-  const io = new Server(httpServer);
+export function attachSocket(app: FastifyInstance) {
+  const io = new IOServer(app.server, {
+    cors: { origin: true, methods: ["GET", "POST"] },
+    transports: ["websocket"], // better for mobile
+  });
 
-  io.on("connection", async (socket) => {
-    let ids: string;
 
-    console.log("New client connected");
-    socket.emit("welcome", { d: "Welcome to the server!" });
-
-    socket.on("join-chat", (id: string) => {
-      console.log("id:==================", id);
-      socket.join(id);
+  io.on("connection", (socket) => {
+    app.log.info({ sid: socket.id }, "socket connected");
+    console.log("socket connected");
+    socket.on("join-chat", (roomId: string) => {
+      socket.join(roomId);
+      app.log.info({ roomId }, "joined chat room");
     });
+    
+    socket.on("authenticate", (userId: string) => {
+      console.log("Authenticating user:", userId);
+      (socket as any).userId = userId;
+    });
+  
 
     socket.on(
       "room message",
-      async ({ chat_id, sender_id, message, media_link }) => {
+      async (
+        payload: { chat_id: string; message: string; media_link?: string | null; isGroup?: boolean },
+        ack?: (res: any) => void
+      ) => {
         try {
-          console.log(chat_id, "user id", sender_id);
-          // const addmessaeg = await addMessageToChat(
-          //   message,
-          //   sender_id,
-          //   chat_id,
-          //   media_link
-          // );
-          // console.log("addmessaeg", addmessaeg);
-          
-          // Mock response for testing without database
-          const mockMessage = {
-            id: Date.now().toString(),
-            message,
-            sender_id,
-            chat_id,
-            media_link,
-            timestamp: new Date().toISOString()
-          };
+          const { chat_id, message, media_link, isGroup } = payload;
+          const sender_id = (socket as any).userId; 
+          console.log("sender_id", sender_id);
+          if (!sender_id) {
+            ack?.({ ok: false, error: "User not authenticated" });
+            return;
+          }
+          console.log("sender_id", sender_id, "chat_id", chat_id, "message", message, "media_link", media_link, "isGroup", isGroup);
+          let saved;
+          if (isGroup) {
+            const chatRepository = new ChatRepositoryImp();
+            const addMessageToGroupUseCase = new AddMessageToGroupUseCase(chatRepository);
+            saved = await addMessageToGroupUseCase.execute(message, sender_id, chat_id, media_link);
+          } else {
+            const chatRepository = new ChatRepositoryImp();
+            const addMessageToChatUseCase = new AddMessageToChatUseCase(chatRepository);
+            saved = await addMessageToChatUseCase.execute(message, sender_id, chat_id, media_link);
+          }
 
-          io.to(chat_id).emit("room message", mockMessage);
-        } catch (error) {
-          io.to(chat_id).emit("room message", { error });
-          console.error("Error handling room message:", error);
+          io.to(chat_id).emit("room message", saved);
+          ack?.({ ok: true, id: saved.id, ts: saved.create_at });
+        } catch (e: any) {
+          ack?.({ ok: false, error: e?.message || "Failed to send" });
         }
       }
     );
-    socket.on(
-      "group message",
-      async ({ group_chat_id, sender_id, message, media_link }) => {
-        try {
-          console.log(group_chat_id, "user id", sender_id);
-          console.log("helooooooooooooo in groupppppppp");
-          // const addmessage = await addMessageToGroup(
-          //   message,
-          //   sender_id,
-          //   group_chat_id,
-          //   media_link
-          // );
-          // console.log("====================================");
-          // console.log("addmessage", addmessage);
-          // console.log("====================================");
-          
-          // Mock response for testing without database
-          const mockMessage = {
-            id: Date.now().toString(),
-            message,
-            sender_id,
-            group_chat_id,
-            media_link,
-            timestamp: new Date().toISOString()
-          };
-          
-          io.to(group_chat_id).emit("room message", mockMessage);
-        } catch (error) {
-          io.to(group_chat_id).emit("room message", { error });
-          console.error("Error handling room message:", error);
-        }
+
+    socket.on("room editMessage", async ({ chatId, messageId, textMessage }) => {
+      try {
+        const chatRepository = new ChatRepositoryImp();
+        const editMessageUseCase = new EditMessageUseCase(chatRepository);
+        const updated = await editMessageUseCase.execute(messageId, textMessage);
+        io.to(chatId).emit("room editMessage", updated);
+      } catch (error) {
+        console.error("Error editing message:", error);
       }
-    );
+    });
+
     socket.on("room deleteMessage", async ({ chatId, messageId }) => {
       try {
-        if (chatId && messageId) {
-          // const deleteMessage = await deleteChatMessageFromDatabase(messageId);
-          // io.to(chatId).emit("room deleteMessage", deleteMessage);
-          
-          // Mock response for testing without database
-          const mockDeleteResponse = {
-            id: messageId,
-            deleted: true,
-            timestamp: new Date().toISOString()
-          };
-          io.to(chatId).emit("room deleteMessage", mockDeleteResponse);
-        } else {
-          io.to(chatId).emit("room message", {
-            error: "chat id or message id is null",
-          });
-          console.error(
-            "Error handling room message:",
-            "group id or message id is null"
-          );
-        }
+        const chatRepository = new ChatRepositoryImp();
+        const deleteMessageUseCase = new DeleteMessageUseCase(chatRepository);
+        const deleted = await deleteMessageUseCase.execute(messageId);
+        io.to(chatId).emit("room deleteMessage", { id: messageId, deleted: true, data: deleted });
       } catch (error) {
-        io.to(chatId).emit("room message", { error });
-        console.error("Error handling room message:", error);
+        console.error("Error deleting message:", error);
       }
     });
-    socket.on("group deleteMessage", async ({ groupChatId, messageId }) => {
-      try {
-        if (groupChatId && messageId) {
-          // const deleteMessage = await deleteGroupMessageFromDatabase(messageId);
-          // io.to(groupChatId).emit("room deleteMessage", deleteMessage);
-          
-          // Mock response for testing without database
-          const mockDeleteResponse = {
-            id: messageId,
-            deleted: true,
-            timestamp: new Date().toISOString()
-          };
-          io.to(groupChatId).emit("room deleteMessage", mockDeleteResponse);
-        } else {
-          io.to(groupChatId).emit("room message", {
-            error: "group id or message id is null",
-          });
-          console.error(
-            "Error handling room message:",
-            "group id or message id is null"
-          );
-        }
-      } catch (error) {
-        io.to(groupChatId).emit("room message", { error });
-        console.error("Error handling room message:", error);
-      }
-    });
-    socket.on(
-      "room editMessage",
-      async ({ chatId, messageId, textMessage }) => {
-        try {
-          if (chatId && messageId) {
-            // const deleteMessage = await editChatMessageFromDatabase(
-            //   messageId,
-            //   textMessage
-            // );
-            // io.to(chatId).emit("room editMessage", deleteMessage);
-            
-            // Mock response for testing without database
-            const mockEditResponse = {
-              id: messageId,
-              message: textMessage,
-              edited: true,
-              timestamp: new Date().toISOString()
-            };
-            io.to(chatId).emit("room editMessage", mockEditResponse);
-          } else {
-            io.to(chatId).emit("room message", {
-              error: "chat id or message id is null",
-            });
-            console.error(
-              "Error handling room message:",
-              "chat id or message id is null"
-            );
-          }
-        } catch (error) {
-          // io.to(groupChatId).emit("room message", { error });
-          // console.error("Error handling room message:", error);
-        }
-      }
-    );
 
-    socket.on(
-      "group editMessage",
-      async ({ groupChatId, messageId, textMessage }) => {
-        try {
-          if (groupChatId && messageId) {
-            // const deleteMessage = await edit1GroupMessageFromDatabase(
-            //   messageId,
-            //   textMessage
-            // );
-            // io.to(groupChatId).emit("room editMessage", deleteMessage);
-            
-            // Mock response for testing without database
-            const mockEditResponse = {
-              id: messageId,
-              message: textMessage,
-              edited: true,
-              timestamp: new Date().toISOString()
-            };
-            io.to(groupChatId).emit("room editMessage", mockEditResponse);
-          } else {
-            io.to(groupChatId).emit("room message", {
-              error: "group id or message id is null",
-            });
-            console.error(
-              "Error handling room message:",
-              "group id or message id is null"
-            );
-          }
-        } catch (error) {
-          io.to(groupChatId).emit("room message", { error });
-          console.error("Error handling room message:", error);
-        }
-      }
-    );
+    socket.on("disconnect", (reason) => {
+      app.log.info({ sid: socket.id, reason }, "socket disconnected");
+    });
   });
 
-  httpServer
-    .once("error", (err) => {
-      console.error(err);
-      process.exit(1);
-    })
-    .listen(port, () => {
-      console.log(`> Ready on http://${hostname}:${port}`);
-    });
-});
+  (app as any).io = io;
+}

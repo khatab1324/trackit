@@ -47,7 +47,6 @@ export type Coords = { lang: number; long: number };
 export type BookmarkedMemory = {
   id: string;
   memory_id: string;
-  saved_at: string;
 
     title: string;
     description?: string;

@@ -13,7 +13,7 @@ export interface BookmarkedMemory {
   id: string;
   memory_id: string;
   saved_at: Date;
-
+  
     
     title: string;
     description?: string;

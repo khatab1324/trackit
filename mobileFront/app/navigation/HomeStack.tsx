@@ -5,7 +5,7 @@ import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { HomeScreen } from "../screens/HomeScreen";
-import { ChatScreen } from "../screens/ChatScreen";
+import ChatStack from "./ChatStack";
 import { ProfileScreen } from "../screens/ProfileScreen";
 import { SettingScreen } from "../screens/SettingScreen";
 import { MapScreen } from "../screens/MapScreen";
@@ -93,7 +93,7 @@ export default function HomeStack() {
       tabBar={(props) => <CustomTabBar {...props} />}
     >
       <Tab.Screen name="Map" component={MapScreen} />
-      <Tab.Screen name="Chat" component={ChatScreen} />
+      <Tab.Screen name="Chat" component={ChatStack} />
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
 

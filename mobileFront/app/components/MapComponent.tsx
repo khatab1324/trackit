@@ -19,7 +19,7 @@ export const MapComponent = () => {
           longitudeDelta: 0.0421,
         }}
       >
-        <RenderMemoryOnMap />
+        {/* <RenderMemoryOnMap /> */}
       </MapView>
     </View>
   );
