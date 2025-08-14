@@ -21,6 +21,10 @@ export type Memory = {
   is_saved: boolean;
   is_liked: boolean;
   is_requested: boolean;
+
+  is_private?: boolean; 
+  isPrivate?: boolean;  
+  isPublic?: boolean;   
   lang: number;
   long: number;
   num_comments: string;

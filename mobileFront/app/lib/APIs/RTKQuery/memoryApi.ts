@@ -5,7 +5,6 @@ import {
   Memory,
 } from "../../../core/types/memory";
 import { InteractionApi } from "./InteractionApi";
-import { Friend } from "../../../core/types/friends";
 
 export const MemoryApi = createApi({
   reducerPath: "MemoryApi",
@@ -106,6 +105,32 @@ export const MemoryApi = createApi({
       transformResponse: (res: { data: Memory[]; message: string }) => res.data,
       keepUnusedDataFor: 0,
     }),
+
+    makeMemoryPrivate: builder.mutation<{ message: string }, { id: string; isPrivate: boolean }>({
+      query: ({ id, isPrivate }) => ({
+        url: `/memory/${id}/privacy`,
+        method: "PATCH",
+        body: { is_private: isPrivate },
+      }),
+      invalidatesTags: ["UserMemory", "Memory"],
+    }),
+
+    updateMemoryCaption: builder.mutation<{ message: string }, { id: string; caption: string }>({
+      query: ({ id, caption }) => ({
+        url: `/memory/${id}/caption`,
+        method: "PATCH",
+        body: { description: caption },
+      }),
+      invalidatesTags: ["UserMemory", "Memory"],
+    }),
+
+    deleteMemory: builder.mutation<{ message: string }, { id: string }>({
+      query: ({ id }) => ({
+        url: `/memory/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["UserMemory", "Memory"],
+    }),
   }),
 });
 
@@ -117,4 +142,7 @@ export const {
   useGetCurrentUserMemoriesQuery,
   useGetNearMemoryQuery,
   useGetUserFriendsMemoriesQuery,
+  useMakeMemoryPrivateMutation,
+  useUpdateMemoryCaptionMutation,
+  useDeleteMemoryMutation,
 } = MemoryApi;
