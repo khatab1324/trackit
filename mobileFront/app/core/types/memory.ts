@@ -21,6 +21,10 @@ export type Memory = {
   is_saved: boolean;
   is_liked: boolean;
   is_requested: boolean;
+
+  is_private?: boolean; 
+  isPrivate?: boolean;  
+  isPublic?: boolean;   
   lang: number;
   long: number;
   num_comments: string;
@@ -48,15 +52,14 @@ export type BookmarkedMemory = {
   id: string;
   memory_id: string;
   saved_at: string;
-
-    title: string;
-    description?: string;
-    content_url: string;
-    content_type: string;
-    latitude: number;
-    longitude: number;
-    isPublic: boolean;
-    created_at: string;
+  title: string;
+  description?: string;
+  content_url: string;
+  content_type: string;
+  latitude: number;
+  longitude: number;
+  isPublic: boolean;
+  created_at: string;
   user: {
     user_id: string;
     username: string;
