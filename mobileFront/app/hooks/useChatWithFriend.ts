@@ -62,7 +62,6 @@ export const useChatWithFriend = (friendId?: string) => {
         }
       };
 
-      // Handle deleted messages
       const handleDeleteMessage = (message: any) => {
         if (message) {
           setMessages((prevMessages) => 
@@ -73,7 +72,6 @@ export const useChatWithFriend = (friendId?: string) => {
         }
       };
 
-      // Handle edited messages
       const handleEditMessage = (message: any) => {
         if (message) {
           setMessages((prevMessages) =>
@@ -130,10 +128,8 @@ export const useChatWithFriend = (friendId?: string) => {
     }
   };
 
-  // Effect that triggers when messages change
   useEffect(() => {
     console.log("Messages updated:", messages);
-    // This will trigger whenever messages change
   }, [messages]);
 
   return {

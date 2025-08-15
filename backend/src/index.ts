@@ -19,7 +19,7 @@ async function main() {
     app.register(commentRouter);
     attachSocket(app);
 
-    app.listen({ port: 3100, host: "0.0.0.0" });
+    app.listen({ port: 3000, host: "0.0.0.0" });
     console.log("Fastify server ready at http://localhost:3000");
   } catch (error) {
     app.log.error(error);
