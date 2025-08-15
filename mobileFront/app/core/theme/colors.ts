@@ -24,7 +24,7 @@ export const colors = {
     black: "#000",
     primary: "#34D399",
     secondary: "#334155",
-    background: "#0F172A",
+    background: "#000000", // أسود صافي بدل الكحلي
     text: "#F1F5F9",
     secondaryText: "#94A3B8",
     border: "#475569",

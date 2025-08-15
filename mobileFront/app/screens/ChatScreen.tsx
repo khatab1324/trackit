@@ -1,48 +1,70 @@
-import React from "react";
-import { View, Text, ActivityIndicator } from "react-native";
-import { FriendsList } from "../components/chat/FriendsList";
-import { useGetCurrentUserFollowersQuery } from "../lib/APIs/RTKQuery/InteractionApi";
-import { Friend } from "../core/types/friends";
-import FriendsSearchBar from "../components/chat/FriendsSearchBar";
+import React, { useState } from "react";
+import { View, Text, TextInput, FlatList, TouchableOpacity } from "react-native";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
+import { colors } from "../core/theme/colors";
 
 export const ChatScreen = () => {
-  const {
-    data: friends,
-    isLoading,
-    refetch,
-    isFetching,
-  } = useGetCurrentUserFollowersQuery();
-  const onPressFriend = (friend: Friend) => {
-    console.log("Selected friend:", friend);
-  };
-  console.log("Friends data:", friends);
+  const isDark = useSelector((s: RootState) => s.sheardDataThrowApp.darkMode);
+  const colorScheme = isDark ? colors.dark : colors.light;
 
-  if (isLoading) {
-    return (
-      <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+  const [messages, setMessages] = useState<{ id: string; text: string }[]>([]);
+  const [input, setInput] = useState("");
+
+  const sendMessage = () => {
+    if (!input.trim()) return;
+    setMessages((prev) => [...prev, { id: Date.now().toString(), text: input }]);
+    setInput("");
+  };
 
   return (
-    <View className="flex-1">
-      <View className="absolute inset-0 bg-gradient-to-b from-indigo-500/10 to-transparent dark:from-indigo-900/30" />
-      <View className="flex-1 pt-4">
-        <View className="px-5">
-          <View className="mt-4">
-            <FriendsSearchBar />
+    <View className="flex-1" style={{ backgroundColor: colorScheme.background }}>
+      <FlatList
+        data={messages}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={{ padding: 8 }}>
+            <Text style={{ color: colorScheme.text }}>{item.text}</Text>
           </View>
-        </View>
+        )}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "flex-end" }}
+      />
 
-        <View className="flex-1 mt-4 rounded-t-3xl bg-white dark:bg-neutral-950 pt-2">
-          <FriendsList
-            friends={friends}
-            onPressFriend={onPressFriend}
-            refetch={refetch}
-            isFetching={isFetching}
-          />{" "}
-        </View>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          padding: 8,
+          borderTopWidth: 1,
+          borderColor: colorScheme.border,
+          backgroundColor: colorScheme.secondary,
+        }}
+      >
+        <TextInput
+          value={input}
+          onChangeText={setInput}
+          placeholder="Type a message..."
+          placeholderTextColor={colorScheme.secondaryText}
+          style={{
+            flex: 1,
+            padding: 10,
+            backgroundColor: isDark ? "#1E293B" : "#F1F5F9",
+            color: colorScheme.text,
+            borderRadius: 20,
+          }}
+        />
+        <TouchableOpacity
+          onPress={sendMessage}
+          style={{
+            marginLeft: 8,
+            paddingVertical: 8,
+            paddingHorizontal: 16,
+            backgroundColor: colorScheme.primary,
+            borderRadius: 20,
+          }}
+        >
+          <Text style={{ color: colorScheme.white }}>Send</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

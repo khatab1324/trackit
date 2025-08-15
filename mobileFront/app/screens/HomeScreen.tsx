@@ -13,6 +13,7 @@ import { MainStackParamList } from "../../App";
 import { RootState } from "../store";
 import { useGetNearMemoryQuery } from "../lib/APIs/RTKQuery/memoryApi";
 import { MemoListComp } from "../components/MemoList";
+import { colors } from "../core/theme/colors";
 
 export const HomeScreen = () => {
   const navigation =
@@ -22,6 +23,8 @@ export const HomeScreen = () => {
   const jwt = useSelector((s: RootState) => s.auth.token);
   const user = useSelector((s: RootState) => s.user);
   const coords = useSelector((s: RootState) => s.sheardDataThrowApp.location);
+  const isDark = useSelector((s: RootState) => s.sheardDataThrowApp.darkMode);
+  const colorScheme = isDark ? colors.dark : colors.light;
 
   useEffect(() => {
     let mounted = true;
@@ -53,12 +56,6 @@ export const HomeScreen = () => {
     coords ? { location: coords } : (skipToken as any)
   );
 
-  useEffect(() => {
-    console.log("JWT:", jwt);
-    console.log("user:", user);
-    console.log("memories:", data?.length ?? 0);
-  }, [user, jwt, data]);
-
   const pan = Gesture.Pan()
     .activeOffsetY([-40, 40])
     .activeOffsetX(20)
@@ -73,12 +70,19 @@ export const HomeScreen = () => {
 
   return (
     <GestureDetector gesture={pan}>
-      <View className="flex-1 bg-black">
-        {isLoading && <Text className="text-white">Loading...</Text>}
-        {isError && <Text className="text-white">Failed to load.</Text>}
+      <View
+        className="flex-1"
+        style={{ backgroundColor: colorScheme.background }}
+      >
+        {isLoading && (
+          <Text style={{ color: colorScheme.text }}>Loading...</Text>
+        )}
+        {isError && (
+          <Text style={{ color: colorScheme.text }}>Failed to load.</Text>
+        )}
         {data && <MemoListComp data={data} />}
         {!coords && !isLoading && !isError && (
-          <Text className="text-white px-4 mt-4">
+          <Text style={{ color: colorScheme.text, paddingHorizontal: 16, marginTop: 16 }}>
             Waiting for location permission...
           </Text>
         )}
