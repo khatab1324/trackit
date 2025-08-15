@@ -19,7 +19,6 @@ type FriendsSearchBarProps = {
   onSelect?: (friend: Friend) => void;
   placeholder?: string;
   autoFocus?: boolean;
-  className?: string;
   emptyText?: string;
   loadingText?: string;
 };

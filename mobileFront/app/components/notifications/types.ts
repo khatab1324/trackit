@@ -14,4 +14,4 @@ export type NotificationItemData = {
   is_read?: boolean;
   request_id?: string;
   username?: string;
-}; 
+};

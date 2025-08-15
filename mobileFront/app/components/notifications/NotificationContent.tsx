@@ -16,7 +16,6 @@ export const NotificationContent = ({ item }: Props) => {
   const handleAcceptFollowRequest = async () => {
     if (item.request_id) {
       try {
-        console.log("acceptFollowRequest", item.request_id);
         await acceptFollowRequest({ request_id: item.request_id }).unwrap();
       } catch (error) {
         console.error("Failed to accept follow request:", error);
@@ -37,13 +36,13 @@ export const NotificationContent = ({ item }: Props) => {
   const getNotificationText = () => {
     switch (item.type) {
       case "COMMENT":
-        return `commented: ${item.comment_text ?? ""}`;
+        return ` commented: ${item.comment_text ?? ""}`;
       case "LIKE":
-        return "liked your memory";
+        return " liked your memory";
       case "FOLLOW_REQUEST":
-        return "requested to follow you";
+        return " requested to follow you";
       case "FOLLOW_ACCEPTED":
-        return "accepted your follow request";
+        return " accepted your follow request";
       default:
         return "";
     }
@@ -72,4 +71,4 @@ export const NotificationContent = ({ item }: Props) => {
       )}
     </View>
   );
-}; 
+};

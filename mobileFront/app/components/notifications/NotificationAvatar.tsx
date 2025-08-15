@@ -26,4 +26,4 @@ export const NotificationAvatar = ({ avatar, userId }: Props) => {
       )}
     </TouchableOpacity>
   );
-}; 
+};
