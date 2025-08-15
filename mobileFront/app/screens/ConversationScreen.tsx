@@ -1,9 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, KeyboardAvoidingView, Platform, SafeAreaView, Keyboard } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import { useChatWithFriend } from '../hooks/useChatWithFriend';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store/index';
+import React, { useState, useRef, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+} from "react-native";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import { useChatWithFriend } from "../hooks/useChatWithFriend";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
+import { colors } from "../core/theme/colors";
 
 type RouteParams = {
   friendId: string;
@@ -23,15 +34,16 @@ export const ConversationScreen = () => {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
   const { friendId, friendName } = route.params as RouteParams;
-  
-  const [newMessage, setNewMessage] = useState('');
-  const flatListRef = useRef<FlatList>(null);
-  
-  // Get current user ID from Redux store
-  const currentUser = useSelector((state: RootState) => state.user);
-  const currentUserId = currentUser && 'id' in currentUser ? currentUser.id : undefined;
 
-  // Use the custom hook with friendId
+  const isDark = useSelector((state: RootState) => state.sheardDataThrowApp.darkMode);
+  const themeColors = isDark ? colors.dark : colors.light;
+
+  const [newMessage, setNewMessage] = useState("");
+  const flatListRef = useRef<FlatList>(null);
+
+  const currentUser = useSelector((state: RootState) => state.user);
+  const currentUserId = currentUser && "id" in currentUser ? currentUser.id : undefined;
+
   const {
     chatData,
     isChatLoading,
@@ -40,7 +52,6 @@ export const ConversationScreen = () => {
     sendMessage: sendMessageHook,
   } = useChatWithFriend(friendId);
 
-  // Auto-scroll to bottom when messages change or chat opens
   useEffect(() => {
     if (messages.length > 0 && !isChatLoading) {
       setTimeout(() => {
@@ -52,8 +63,7 @@ export const ConversationScreen = () => {
   const sendMessage = () => {
     if (newMessage.trim() && chatData && isConnected) {
       sendMessageHook(newMessage.trim());
-      setNewMessage('');
-      // Scroll to bottom after sending message
+      setNewMessage("");
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, 100);
@@ -62,30 +72,31 @@ export const ConversationScreen = () => {
 
   const renderMessage = ({ item }: { item: Message }) => {
     const isOwnMessage = item.sender_id === currentUserId;
-    
     return (
-      <View className={`mb-3 ${isOwnMessage ? 'items-end' : 'items-start'}`}>
-        <View className={`max-w-[80%] px-4 py-3 rounded-2xl ${
-          isOwnMessage 
-            ? 'bg-blue-600 dark:bg-blue-700 rounded-br-md' 
-            : 'bg-gray-200 dark:bg-gray-700 rounded-bl-md'
-        }`}>
-          <Text className={`text-sm ${
-            isOwnMessage ? 'text-white' : 'text-gray-800 dark:text-gray-200'
-          }`}>
+      <View style={{ marginBottom: 8, alignItems: isOwnMessage ? "flex-end" : "flex-start" }}>
+        <View
+          style={{
+            maxWidth: "80%",
+            paddingHorizontal: 14,
+            paddingVertical: 10,
+            borderRadius: 16,
+            backgroundColor: isOwnMessage
+              ? themeColors.primary
+              : themeColors.secondary,
+            borderBottomRightRadius: isOwnMessage ? 4 : 16,
+            borderBottomLeftRadius: isOwnMessage ? 16 : 4,
+          }}
+        >
+          <Text style={{ fontSize: 14, color: isOwnMessage ? themeColors.white : themeColors.text }}>
             {item.message}
           </Text>
           {item.media_link && (
-            <Text className={`text-xs mt-1 ${
-              isOwnMessage ? 'text-blue-100' : 'text-blue-400'
-            }`}>
+            <Text style={{ fontSize: 12, marginTop: 4, color: themeColors.icon.primary }}>
               📎 Media attached
             </Text>
           )}
         </View>
-        <Text className={`text-xs mt-1 ${
-          isOwnMessage ? 'text-gray-400' : 'text-gray-500'
-        }`}>
+        <Text style={{ fontSize: 10, marginTop: 4, color: themeColors.secondaryText }}>
           {new Date(item.create_at).toLocaleTimeString()}
         </Text>
       </View>
@@ -94,24 +105,32 @@ export const ConversationScreen = () => {
 
   if (isChatLoading) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center bg-white dark:bg-neutral-900">
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text className="mt-4 text-gray-600 dark:text-gray-400">Loading conversation...</Text>
+      <SafeAreaView style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: themeColors.background }}>
+        <ActivityIndicator size="large" color={themeColors.primary} />
+        <Text style={{ marginTop: 16, color: themeColors.secondaryText }}>Loading conversation...</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-neutral-900">
+    <SafeAreaView style={{ flex: 1, backgroundColor: themeColors.background }}>
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+      <View style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderColor: themeColors.border,
+      }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text className="text-blue-500 text-lg">← Back</Text>
+          <Text style={{ color: themeColors.primary, fontSize: 16 }}>← Back</Text>
         </TouchableOpacity>
-        <Text className="text-lg font-semibold text-gray-800 dark:text-white">
+        <Text style={{ fontSize: 16, fontWeight: "600", color: themeColors.text }}>
           {friendName || `Chat with ${friendId}`}
         </Text>
-        <View className="w-8" />
+        <View style={{ width: 32 }} />
       </View>
 
       {/* Messages */}
@@ -120,8 +139,7 @@ export const ConversationScreen = () => {
         data={messages}
         renderItem={renderMessage}
         keyExtractor={(item) => item.id}
-        className="flex-1 px-4 pt-4"
-        inverted={false}
+        style={{ flex: 1, paddingHorizontal: 16, paddingTop: 16 }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
         onContentSizeChange={() => {
@@ -137,42 +155,50 @@ export const ConversationScreen = () => {
       />
 
       {/* Message Input */}
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-        style={{ backgroundColor: 'transparent' }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
-        <View className="flex-row items-center px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-900">
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          borderTopWidth: 1,
+          borderColor: themeColors.border,
+          backgroundColor: themeColors.background,
+        }}>
           <TextInput
             value={newMessage}
             onChangeText={setNewMessage}
             placeholder="Type a message..."
-            placeholderTextColor="#9CA3AF"
-            className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-3 text-gray-800 dark:text-white"
+            placeholderTextColor={themeColors.secondaryText}
+            style={{
+              flex: 1,
+              backgroundColor: themeColors.secondary,
+              color: themeColors.text,
+              borderRadius: 24,
+              paddingHorizontal: 16,
+              paddingVertical: 10,
+            }}
             multiline
             maxLength={500}
             textAlignVertical="center"
-            onFocus={() => {
-              // Scroll to bottom when input is focused
-              setTimeout(() => {
-                flatListRef.current?.scrollToEnd({ animated: true });
-              }, 300);
-            }}
           />
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={sendMessage}
             disabled={!newMessage.trim() || !isConnected}
-            className={`ml-3 px-6 py-3 rounded-full ${
-              newMessage.trim() && isConnected 
-                ? 'bg-blue-500' 
-                : 'bg-gray-300 dark:bg-gray-600'
-            }`}
+            style={{
+              marginLeft: 8,
+              paddingHorizontal: 16,
+              paddingVertical: 10,
+              borderRadius: 24,
+              backgroundColor: newMessage.trim() && isConnected
+                ? themeColors.primary
+                : themeColors.border,
+            }}
           >
-            <Text className={`font-semibold ${
-              newMessage.trim() && isConnected 
-                ? 'text-white' 
-                : 'text-gray-500'
-            }`}>
+            <Text style={{ color: newMessage.trim() && isConnected ? themeColors.white : themeColors.secondaryText }}>
               Send
             </Text>
           </TouchableOpacity>
@@ -181,12 +207,21 @@ export const ConversationScreen = () => {
 
       {/* Connection Status */}
       {!isConnected && (
-        <View className="absolute top-20 left-4 right-4 bg-yellow-100 dark:bg-yellow-900 px-4 py-2 rounded-lg">
-          <Text className="text-yellow-800 dark:text-yellow-200 text-center">
+        <View style={{
+          position: "absolute",
+          top: 80,
+          left: 16,
+          right: 16,
+          backgroundColor: isDark ? "#854d0e" : "#fef9c3",
+          paddingHorizontal: 12,
+          paddingVertical: 8,
+          borderRadius: 8,
+        }}>
+          <Text style={{ color: isDark ? "#fde68a" : "#92400e", textAlign: "center" }}>
             Connecting to chat...
           </Text>
         </View>
       )}
     </SafeAreaView>
   );
-}; 
+};
