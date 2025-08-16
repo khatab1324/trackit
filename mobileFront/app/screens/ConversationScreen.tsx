@@ -18,7 +18,6 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useChatWithFriend } from "../hooks/useChatWithFriend";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/index";
-import { connectSocket } from "../services/socket";
 
 type RouteParams = {
   friendId: string;

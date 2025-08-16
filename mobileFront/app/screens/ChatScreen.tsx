@@ -5,6 +5,7 @@ import { useGetCurrentUserFollowersQuery } from "../lib/APIs/RTKQuery/Interactio
 import { Friend } from "../core/types/friends";
 import FriendsSearchBar from "../components/chat/FriendsSearchBar";
 import { useChatWithFriend } from "../hooks/useChatWithFriend";
+import { colors } from "../core/theme/colors";
 
 export const ChatScreen = () => {
   const {
@@ -52,10 +53,11 @@ export const ChatScreen = () => {
 
         <View className="flex-1 mt-4 rounded-t-3xl bg-white dark:bg-neutral-950 pt-2">
           <FriendsList
-            friends={friends}
+            friends={friends ?? []}
             onPressFriend={onPressFriend}
             refetch={refetch}
             isFetching={isFetching}
+            themeColors={colors.light}
           />{" "}
         </View>
       </View>

@@ -1,7 +1,8 @@
 import React from "react";
 import { FlatList, TouchableOpacity, View, Text, Image } from "react-native";
-import { Friend, FriendsListProps } from "../../core/types/friends";
+import { Friend } from "../../core/types/friends";
 import { imgRegistry } from "../../core/utils/assetsRegistry";
+import { colors } from "../../core/theme/colors";
 
 const getStatusLabel = (status?: Friend["status"]) => {
   switch (status) {
@@ -19,15 +20,25 @@ const getStatusLabel = (status?: Friend["status"]) => {
 const FriendItem = ({
   item,
   onPress,
+  themeColors,
 }: {
   item: Friend;
   onPress: (f: Friend) => void;
+  themeColors: typeof colors.light;
 }) => {
   const statusLabel = getStatusLabel(item.status);
   return (
     <TouchableOpacity
-      className="flex-row items-center px-4 py-3 border-b"
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: themeColors.border,
+      }}
       onPress={() => onPress(item)}
+      activeOpacity={0.8}
     >
       <Image
         source={
@@ -35,36 +46,65 @@ const FriendItem = ({
             ? { uri: item.avatar }
             : { uri: imgRegistry.defaultProfileIcon }
         }
-        className="w-12 h-12 rounded-full"
+        style={{ width: 48, height: 48, borderRadius: 24 }}
       />
-      <View className="ml-3 flex-1">
-        <Text className="text-base font-medium">{item.username}</Text>
-        {!!statusLabel && <Text className="text-sm">{statusLabel}</Text>}
+      <View style={{ marginLeft: 12, flex: 1 }}>
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: "500",
+            color: themeColors.text,
+          }}
+        >
+          {item.username}
+        </Text>
+        {!!statusLabel && (
+          <Text style={{ fontSize: 14, color: themeColors.secondaryText }}>
+            {statusLabel}
+          </Text>
+        )}
       </View>
       {item.status === "online" && (
-        <View className="w-3 h-3 rounded-full bg-green-500" />
+        <View
+          style={{
+            width: 12,
+            height: 12,
+            borderRadius: 6,
+            backgroundColor: "green",
+          }}
+        />
       )}
     </TouchableOpacity>
   );
 };
 
-export const FriendsList: React.FC<FriendsListProps> = ({
-  friends = [],
-  onPressFriend,
-  refetch,
-  isFetching,
-}) => {
+export const FriendsList: React.FC<{
+  friends: Friend[];
+  onPressFriend: (friend: Friend) => void;
+  refetch: () => void;
+  isFetching: boolean;
+  themeColors: typeof colors.light;
+}> = ({ friends = [], onPressFriend, refetch, isFetching, themeColors }) => {
   return (
-    <View className="flex-1">
+    <View style={{ flex: 1, backgroundColor: themeColors.background }}>
       <FlatList
         data={friends}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <FriendItem item={item} onPress={onPressFriend} />
+          <FriendItem item={item} onPress={onPressFriend} themeColors={themeColors} />
         )}
         ListEmptyComponent={
-          <View className="flex-1 justify-center items-center py-10">
-            <Text>No friends found</Text>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              paddingVertical: 40,
+            }}
+          >
+            <Text style={{ color: themeColors.secondaryText }}>
+              No friends found
+            </Text>
           </View>
         }
         onRefresh={refetch}

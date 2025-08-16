@@ -13,12 +13,12 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useGetCurrentUserFollowersQuery } from "../../lib/APIs/RTKQuery/InteractionApi";
 import { Friend } from "../../core/types/friends";
+import { colors } from "../../core/theme/colors";
 
 type FriendsSearchBarProps = {
   onSelect?: (friend: Friend) => void;
   placeholder?: string;
   autoFocus?: boolean;
-  className?: string;
   emptyText?: string;
   loadingText?: string;
 };
@@ -27,16 +27,16 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
   onSelect,
   placeholder = "Search friends...",
   autoFocus = false,
-  className = "",
   emptyText = "No friends found",
   loadingText = "Loading friends...",
 }) => {
   const isDark = useSelector((s: RootState) => s.sheardDataThrowApp.darkMode);
+  const colorScheme = isDark ? colors.dark : colors.light;
+
   const { data: followers, isLoading } = useGetCurrentUserFollowersQuery();
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
 
-  //TODO: make hook for debounce
   const [debounced, setDebounced] = useState(query);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
@@ -44,75 +44,98 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
     debounceRef.current = setTimeout(() => setDebounced(query), 250);
   }, [query]);
 
+  const filteredFollowers = useMemo(() => {
+    if (!debounced.trim()) return followers || [];
+    return (followers || []).filter((f) =>
+      f.username?.toLowerCase().includes(debounced.toLowerCase())
+    );
+  }, [debounced, followers]);
+
   const renderItem = ({ item }: { item: Friend }) => (
     <TouchableOpacity
-      className="px-3 py-2"
+      style={{ paddingHorizontal: 12, paddingVertical: 8 }}
       onPress={() => {
         onSelect?.(item);
         Keyboard.dismiss();
         setFocused(false);
       }}
     >
-      <Text className={`text-sm font-medium `}>
+      <Text style={{ color: colorScheme.text, fontSize: 14, fontWeight: "500" }}>
         {item.username || "Unknown"}
       </Text>
     </TouchableOpacity>
   );
 
   return (
-    <View className={`w-full ${className}`}>
-      <View className={`flex-row items-center rounded-xl px-3 h-12`}>
-        <Ionicons
-          name="search"
-          size={18}
-          color={isDark ? "#9CA3AF" : "#6B7280"}
-        />
+    <View style={{ width: "100%" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          borderRadius: 12,
+          paddingHorizontal: 12,
+          height: 48,
+          backgroundColor: colorScheme.secondary,
+        }}
+      >
+        <Ionicons name="search" size={18} color={colorScheme.secondaryText} />
         <TextInput
-          className={`flex-1 ml-2 text-base `}
+          style={{
+            flex: 1,
+            marginLeft: 8,
+            fontSize: 16,
+            color: colorScheme.text,
+          }}
           value={query}
           onChangeText={setQuery}
           placeholder={placeholder}
-          placeholderTextColor={isDark ? "#6B7280" : "#9CA3AF"}
+          placeholderTextColor={colorScheme.secondaryText}
           autoFocus={autoFocus}
           onFocus={() => setFocused(true)}
-          onBlur={() => {
-            setTimeout(() => setFocused(false), 120);
-          }}
+          onBlur={() => setTimeout(() => setFocused(false), 120)}
           returnKeyType="search"
           autoCorrect={false}
         />
         {query.length > 0 && (
           <TouchableOpacity onPress={() => setQuery("")} hitSlop={10}>
-            <Ionicons
-              name="close"
-              size={18}
-              color={isDark ? "#9CA3AF" : "#6B7280"}
-            />
+            <Ionicons name="close" size={18} color={colorScheme.secondaryText} />
           </TouchableOpacity>
         )}
       </View>
 
       {focused && (
-        <View className={`mt-1 rounded-xl  border  max-h-72 overflow-hidden`}>
+        <View
+          style={{
+            marginTop: 4,
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: colorScheme.border,
+            backgroundColor: colorScheme.background,
+            maxHeight: 288,
+            overflow: "hidden",
+          }}
+        >
           {isLoading ? (
-            <View className="py-6 items-center">
-              <ActivityIndicator />
-              <Text className={`mt-2 text-xs `}>{loadingText}</Text>
+            <View style={{ paddingVertical: 20, alignItems: "center" }}>
+              <ActivityIndicator color={colorScheme.text} />
+              <Text style={{ color: colorScheme.secondaryText, marginTop: 8, fontSize: 12 }}>
+                {loadingText}
+              </Text>
             </View>
-          ) : !followers || followers.length === 0 ? (
-            <View className="py-6 items-center">
-              <Text className={`text-xs `}>{emptyText}</Text>
+          ) : filteredFollowers.length === 0 ? (
+            <View style={{ paddingVertical: 20, alignItems: "center" }}>
+              <Text style={{ color: colorScheme.secondaryText, fontSize: 12 }}>
+                {emptyText}
+              </Text>
             </View>
           ) : (
             <FlatList
-              data={followers}
+              data={filteredFollowers}
               keyExtractor={(f) => f.id}
               renderItem={renderItem}
               keyboardShouldPersistTaps="handled"
               ItemSeparatorComponent={() => (
-                <View
-                  className={`h-px ${isDark ? "bg-gray-700" : "bg-gray-200"}`}
-                />
+                <View style={{ height: 1, backgroundColor: colorScheme.border }} />
               )}
               style={{ maxHeight: 288 }}
             />
