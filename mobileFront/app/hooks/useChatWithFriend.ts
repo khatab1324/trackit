@@ -124,6 +124,25 @@ export const useChatWithFriend = (friendId?: string) => {
     }
   };
 
+  const editMessage = (messageId: string, newMessage: string) => {
+    if (socket && chatData && isConnected) {
+      socket.emit("room editMessage", {
+        messageId,  
+        textMessage: newMessage,
+        chatId: chatData.data.chat.id,
+      });
+    }
+  };
+
+  const deleteMessage = (messageId: string) => {
+    if (socket && chatData && isConnected) {
+      socket.emit("room deleteMessage", {
+         messageId,
+        chatId: chatData.data.chat.id,
+      });
+    }
+  };
+
   useEffect(() => {
     console.log("Messages updated:", messages);
   }, [messages]);
@@ -136,6 +155,8 @@ export const useChatWithFriend = (friendId?: string) => {
     messages,
     onPressFriend,
     sendMessage,
+    editMessage,
+    deleteMessage,
     refetchChat,
   };
 };
