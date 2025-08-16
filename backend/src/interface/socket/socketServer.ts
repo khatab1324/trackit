@@ -5,6 +5,7 @@ import { AddMessageToChatUseCase } from "../../application/useCase/chat/addMessa
 import { AddMessageToGroupUseCase } from "../../application/useCase/chat/addMessageToGroupUseCase";
 import { EditMessageUseCase } from "../../application/useCase/chat/editMessageUseCase";
 import { DeleteMessageUseCase } from "../../application/useCase/chat/deleteMessageUseCase";
+import { error } from "console";
 
 export function attachSocket(app: FastifyInstance) {
   const io = new IOServer(app.server, {
@@ -41,8 +42,10 @@ export function attachSocket(app: FastifyInstance) {
             ack?.({ ok: false, error: "User not authenticated" });
             return;
           }
+          
           console.log("sender_id", sender_id, "chat_id", chat_id, "message", message, "media_link", media_link, "isGroup", isGroup);
           let saved;
+
           if (isGroup) {
             const chatRepository = new ChatRepositoryImp();
             const addMessageToGroupUseCase = new AddMessageToGroupUseCase(chatRepository);
@@ -56,6 +59,7 @@ export function attachSocket(app: FastifyInstance) {
           io.to(chat_id).emit("room message", saved);
           ack?.({ ok: true, id: saved.id, ts: saved.create_at });
         } catch (e: any) {
+          console.error("Error handling room message:", e);
           ack?.({ ok: false, error: e?.message || "Failed to send" });
         }
       }

@@ -24,6 +24,7 @@ type ChatResponse = {
 };
 export const chatApi = createApi({
   reducerPath: "chatApi",
+  tagTypes: ['Chat'],
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.EXPO_PUBLIC_API_URL,
     prepareHeaders: (headers, { getState }) => {
@@ -40,6 +41,7 @@ export const chatApi = createApi({
         method: "GET",
       }),
       transformResponse: (response: ChatResponse) => response,
+      providesTags: (res, err, arg) => [{ type: 'Chat', id: arg }],
 
     }),
   }),

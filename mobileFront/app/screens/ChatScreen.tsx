@@ -21,7 +21,6 @@ export const ChatScreen = () => {
     isConnected,
     onPressFriend,
     sendMessage,
-    disconnectFromChat,
   } = useChatWithFriend();
 
   if (isLoading) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useGetFriendChatQuery } from "../lib/APIs/RTKQuery/chatApi";
-import { connectSocket } from "../services/socket";
+import { socket } from "../services/socket";
 import { Socket } from "socket.io-client";
 import { Friend } from "../core/types/friends";
 import { useNavigation } from "@react-navigation/native";
@@ -11,7 +11,6 @@ import { User } from "../core/types/user";
 export const useChatWithFriend = (friendId?: string) => {
   const navigation = useNavigation<any>();
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
-  const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
   const user = useSelector((s: RootState) => s.user as User);
@@ -30,20 +29,20 @@ export const useChatWithFriend = (friendId?: string) => {
   }, [friendId, selectedFriend]);
 
   useEffect(() => {
-    const newSocket = connectSocket();
-    setSocket(newSocket);
-    newSocket.emit("authenticate", user?.id);
-    console.log("Authenticated user:", user.id);
-    return () => {
-      newSocket?.disconnect();
-    };
-  }, []);
+    if (!socket.connected) {
+      socket.connect();
+      socket.emit("authenticate", user?.id);
+      console.log("Authenticated user:", user.id);
+    } else {
+      socket.emit("authenticate", user?.id);
+      console.log("Authenticated user:", user.id);
+    }
+  }, [user?.id]);
 
   useEffect(() => {
     if (chatData && socket && selectedFriend) {
       const { chat, isNew, conversation } = chatData.data;
 
-      // Set initial messages
       setMessages(conversation || []);
 
       socket.emit("join-chat", chat.id);
@@ -53,7 +52,6 @@ export const useChatWithFriend = (friendId?: string) => {
         `Joined chat room: ${chat.id} (${isNew ? "new" : "existing"} chat)`
       );
 
-      // Handle new messages
       const handleMessage = (message: any) => {
         if (message) {
           setMessages((prevMessages) => [...prevMessages, message]);
@@ -100,6 +98,9 @@ export const useChatWithFriend = (friendId?: string) => {
   }, [chatData, selectedFriend]);
 
   const onPressFriend = (friend: Friend) => {
+    setSelectedFriend(null);
+    socket.emit("join-chat", chatData?.data.chat.id);
+
     console.log("Selected friend:", friend);
     setSelectedFriend(friend);
     navigation.navigate("Conversation", {
@@ -109,22 +110,14 @@ export const useChatWithFriend = (friendId?: string) => {
   };
 
   const sendMessage = (message: string, media_link?: string) => {
+    console.log("Sending message2:", message, "media_link", media_link , "chatData", chatData?.data.chat.id, "isConnected", isConnected);
     if (socket && chatData && isConnected) {
-      console.log("Sending message:", message, "media_link", media_link);
       socket.emit("room message", {
         chat_id: chatData.data.chat.id,
         message,
         media_link,
         isGroup: false,
       });
-    }
-  };
-
-  const disconnectFromChat = () => {
-    if (socket && chatData && isConnected) {
-      socket.emit("leave-chat", chatData.data.chat.id);
-      setIsConnected(false);
-      setSelectedFriend(null);
     }
   };
 
@@ -140,7 +133,6 @@ export const useChatWithFriend = (friendId?: string) => {
     messages,
     onPressFriend,
     sendMessage,
-    disconnectFromChat,
     refetchChat,
   };
 };
