@@ -29,6 +29,12 @@ export const useChatWithFriend = (friendId?: string) => {
   }, [friendId, selectedFriend]);
 
   useEffect(() => {
+    if (selectedFriend?.id) {
+      refetchChat();
+    }
+  }, [selectedFriend?.id, refetchChat]);
+
+  useEffect(() => {
     if (!socket.connected) {
       socket.connect();
       socket.emit("authenticate", user?.id);
@@ -98,9 +104,6 @@ export const useChatWithFriend = (friendId?: string) => {
   }, [chatData, selectedFriend]);
 
   const onPressFriend = (friend: Friend) => {
-    setSelectedFriend(null);
-    socket.emit("join-chat", chatData?.data.chat.id);
-
     console.log("Selected friend:", friend);
     setSelectedFriend(friend);
     navigation.navigate("Conversation", {
