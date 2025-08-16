@@ -24,10 +24,10 @@ export const colors = {
     black: "#000",
     primary: "#34D399",
     secondary: "#334155",
-    background: "#0F172A",
+    background: "#000000", // ✅ صار أسود كامل
     text: "#F1F5F9",
     secondaryText: "#94A3B8",
-    border: "#475569",
+    border: "#2E2E2E", // أغمق عشان يناسب الأسود
     buttonBackground: "#10B981",
     error: "#F87171",
 
