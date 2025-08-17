@@ -2,10 +2,10 @@ import React from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import { FriendsList } from "../components/chat/FriendsList";
 import { useGetCurrentUserFollowersQuery } from "../lib/APIs/RTKQuery/InteractionApi";
-import { Friend } from "../core/types/friends";
 import FriendsSearchBar from "../components/chat/FriendsSearchBar";
 import { useChatWithFriend } from "../hooks/useChatWithFriend";
 import { colors } from "../core/theme/colors";
+import { useNavigation } from "@react-navigation/native";
 
 export const ChatScreen = () => {
   const {
@@ -23,6 +23,8 @@ export const ChatScreen = () => {
     onPressFriend,
     sendMessage,
   } = useChatWithFriend();
+
+  const navigation = useNavigation<any>();
 
   if (isLoading) {
     return (
@@ -54,7 +56,15 @@ export const ChatScreen = () => {
         <View className="flex-1 mt-4 rounded-t-3xl bg-white dark:bg-neutral-950 pt-2">
           <FriendsList
             friends={friends ?? []}
-            onPressFriend={onPressFriend}
+            onPressFriend={(friend) => {
+
+              navigation.navigate("Conversation", {
+                friendId: friend.id,
+                friendName: friend.username || friend.username || "User",
+              });
+              onPressFriend(friend); 
+
+            }}
             refetch={refetch}
             isFetching={isFetching}
             themeColors={colors.light}

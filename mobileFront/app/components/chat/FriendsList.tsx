@@ -34,8 +34,7 @@ const FriendItem = ({
         alignItems: "center",
         paddingHorizontal: 16,
         paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: themeColors.border,
+        // 🔴 شيلنا الخطوط (ما في borderBottom)
       }}
       onPress={() => onPress(item)}
       activeOpacity={0.8}
