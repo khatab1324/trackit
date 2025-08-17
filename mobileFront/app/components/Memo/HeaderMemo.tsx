@@ -16,8 +16,8 @@ export const HeaderMemo = () => {
   const unread = useSelector((s: RootState) => s.notifications.unreadCount);
 
   const isHomeScreen = useNavigationState(
-    (state) => state.routes[state.index].name === "Home"
-  );
+    (state) =>
+      state.routes[state.index].name === "Home"   );
   const isFriendsScreen = useNavigationState(
     (state) => state.routes[state.index].name === "FriendsMemo"
   );
@@ -47,7 +47,7 @@ export const HeaderMemo = () => {
 
             <TouchableOpacity
               className="items-center gap-2"
-              onPress={() => (navigation as any).navigate("NearMemories")}
+              onPress={() => (navigation as any).navigate("Home")}
             >
               <Text
                 className={clsx(

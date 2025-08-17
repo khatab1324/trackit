@@ -18,7 +18,7 @@ export type HomeStackParamList = {
   Map: undefined;
   Home: undefined;
   Chat: undefined;
-  Profile: undefined;
+  Profile: { userId?: string };
   Settings: undefined;
   CurrentUserMemo: undefined;
   Notifications: undefined;

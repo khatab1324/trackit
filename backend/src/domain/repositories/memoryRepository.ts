@@ -18,6 +18,7 @@ export interface MemoryRepository {
     memoryId: string
   ): Promise<MemoryMemo>;
   getUserMemoryMemo(currentUserId: string): Promise<MemoryMemo[]>;
+  getUserMemoriesById(targetUserId: string, currentUserId: string): Promise<MemoryMemo[]>;
   getUserMemoryIds(
     userId: string
   ): Promise<{ id: string; content_url: string }[]>;

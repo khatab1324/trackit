@@ -10,14 +10,15 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../../App";
 
-export default function MemoryThumbnail({ item }: { item: Memory }) {
+export default function MemoryThumbnail({ item,nameTap }: { item: Memory,nameTap:string }) {
   const isDark = useSelector(
     (state: RootState) => state.sheardDataThrowApp.darkMode
   );
   const colorScheme = isDark ? colors.dark : colors.light;
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
-
+  
+  console.log("nameTap",nameTap);
   return (
     <TouchableOpacity
       style={{
@@ -28,7 +29,12 @@ export default function MemoryThumbnail({ item }: { item: Memory }) {
         borderRadius: 9,
         overflow: "hidden",
       }}
-      onPress={() => navigation.navigate("NearMemories")}
+      onPress={() =>
+        navigation.navigate("MemoDetails",{
+          tabComingFrom:nameTap,
+          memoId:item.id
+        })
+      }
     >
       <Image
         source={{ uri: item.content_url }}

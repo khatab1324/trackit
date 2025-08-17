@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "./app/store";
 import { CurrentUserMemoScreen } from "./app/screens/CurrentUserMemoScreen";
 import FriendsMemoScreen from "./app/screens/FriendsMemoScreen";
+import { HomeScreen } from "./app/screens/HomeScreen";
 
 export type MainStackParamList = {
   Home: undefined;
@@ -23,6 +24,10 @@ export type MainStackParamList = {
   CreateMemory: undefined;
   NearMemories: undefined;
   FriendsMemo: undefined;
+  MemoDetails: {
+    tabComingFrom: string;
+    memoId: string;
+  };
 };
 
 const RootStack = createNativeStackNavigator<MainStackParamList>();
@@ -48,9 +53,13 @@ function MainAppNavigator() {
             />
             <RootStack.Screen
               name="NearMemories"
-              // TODO: change this to NearMemoScreen
+              component={HomeScreen}
+            />
+            <RootStack.Screen
+              name="MemoDetails" 
               component={CurrentUserMemoScreen}
             />
+                        
             <RootStack.Screen
               name="FriendsMemo"
               component={FriendsMemoScreen}

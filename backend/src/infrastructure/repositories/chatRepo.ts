@@ -40,7 +40,6 @@ export class ChatRepositoryImp implements ChatRepository {
       return { chat: existingChat as any, isNew: false };
     }
 
-    // If no chat exists, create a new one
     const newChat = await prisma.chat.create({
       data: {},
       include: {
@@ -48,7 +47,6 @@ export class ChatRepositoryImp implements ChatRepository {
       }
     });
 
-    // Add both users as participants
     await prisma.chatParticipant.createMany({
       data: [
         { chat_id: newChat.id, user_id: userId1 },
@@ -56,7 +54,6 @@ export class ChatRepositoryImp implements ChatRepository {
       ]
     });
 
-    // Fetch the created chat with participants
     const createdChat = await prisma.chat.findUnique({
       where: { id: newChat.id },
       include: {
@@ -126,12 +123,10 @@ export class ChatRepositoryImp implements ChatRepository {
       },
     });
 
-    // Get all user IDs from group participants
     const allUserIds = groupChats.flatMap(groupChat => 
       groupChat.participants.map(p => p.user_id)
     );
 
-    // Get user details from Drizzle database
     const userDetails = await db
       .select({
         id: users.id,

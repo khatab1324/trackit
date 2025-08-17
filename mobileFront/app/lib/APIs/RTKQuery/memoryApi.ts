@@ -79,6 +79,16 @@ export const MemoryApi = createApi({
       keepUnusedDataFor: 0,
     }),
 
+    getUserMemo: builder.query<Memory[], string>({
+      query: (userId) => ({
+        url: `/getUserMemo/${userId}`,
+        method: "GET",
+      }),
+      transformResponse: (res: { data: Memory[]; message: string }) => res.data,
+      providesTags: ["UserMemory"],
+      keepUnusedDataFor: 0,
+    }),
+
     getNearMemory: builder.query<
       Memory[],
       {
@@ -98,8 +108,8 @@ export const MemoryApi = createApi({
     }),
 
     getUserFriendsMemories: builder.query<Memory[], void>({
-      query: (userId) => ({
-        url: `/getUserFriendsMemories/`,
+      query: () => ({
+        url: `/getUserFriendsMemories`,
         method: "GET",
       }),
       transformResponse: (res: { data: Memory[]; message: string }) => res.data,
@@ -140,6 +150,7 @@ export const {
   useGetMemoryByIdMutation,
   useGetCloudinarySignatureMutation,
   useGetCurrentUserMemoriesQuery,
+  useGetUserMemoQuery,
   useGetNearMemoryQuery,
   useGetUserFriendsMemoriesQuery,
   useMakeMemoryPrivateMutation,

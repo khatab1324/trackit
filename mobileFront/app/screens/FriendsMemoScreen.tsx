@@ -1,23 +1,15 @@
-import React, { useState } from "react";
-import { View, Text, ActivityIndicator } from "react-native";
-import { FriendsList } from "../components/chat/FriendsList";
-import {
-  useGetCurrentUserFollowersQuery,
-  useGetUserBookmarksQuery,
-} from "../lib/APIs/RTKQuery/InteractionApi";
-import { Friend } from "../core/types/friends";
+import React from "react";
+import { View, ActivityIndicator } from "react-native";
+import { useGetUserFriendsMemoriesQuery } from "../lib/APIs/RTKQuery/memoryApi";
+import { MemoListComp } from "../components/MemoList";
 
 export default function FriendsMemoScreen() {
   const {
-    data: friends,
+    data,
     isLoading,
-    refetch,
-    isFetching,
-  } = useGetCurrentUserFollowersQuery();
-  const onPressFriend = (friend: Friend) => {
-    console.log("Selected friend:", friend);
-  };
-  console.log("friendss ", friends);
+  } = useGetUserFriendsMemoriesQuery();
+
+  console.log("friendss ", data);
   if (isLoading) {
     return (
       <View className="flex-1 justify-center items-center">
@@ -28,12 +20,7 @@ export default function FriendsMemoScreen() {
 
   return (
     <View className="flex-1 bg-white dark:bg-black">
-      <FriendsList
-        friends={friends}
-        onPressFriend={onPressFriend}
-        refetch={refetch}
-        isFetching={isFetching}
-      />
+      {data && <MemoListComp data={data} />}
     </View>
   );
 }

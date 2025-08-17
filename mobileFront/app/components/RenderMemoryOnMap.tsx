@@ -4,9 +4,14 @@ import {
   useGetMemoriesQuery,
   useGetMemoryByIdMutation,
 } from "../lib/APIs/RTKQuery/memoryApi";
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
+import type { Memory } from "../core/types/memory";
 
-export const RenderMemoryOnMap = () => {
+type Props = {
+  onMemorySelect: (memory: Memory) => void;
+};
+
+export const RenderMemoryOnMap: React.FC<Props> = ({ onMemorySelect }) => {
   const { data = [], isLoading, isSuccess } = useGetMemoriesQuery();
   const [getMemoryById] = useGetMemoryByIdMutation();
 
@@ -19,10 +24,13 @@ export const RenderMemoryOnMap = () => {
     console.log("No memories to display");
     return null;
   }
+
   const onPressMemory = async (memoryId: string) => {
     try {
       const memory = await getMemoryById(memoryId).unwrap();
       console.log("Memory details:", memory);
+      // Call the onMemorySelect callback with the fetched memory
+      onMemorySelect(memory);
     } catch (error) {
       console.error("Failed to fetch memory by ID:", error);
     }

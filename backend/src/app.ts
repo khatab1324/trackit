@@ -1,4 +1,4 @@
-import fastify, { FastifyReply, FastifyRequest } from "fastify";
+import fastify from "fastify";
 import {
   serializerCompiler,
   validatorCompiler,
@@ -7,7 +7,6 @@ import {
 import fastifyJwt from "@fastify/jwt";
 import fastifyFormbody from "@fastify/formbody";
 import fastifyMultipart from "@fastify/multipart";
-import qs from "qs";
 import { configDotenv } from "dotenv";
 import cors from "@fastify/cors";
 configDotenv();

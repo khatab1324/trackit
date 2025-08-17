@@ -22,11 +22,8 @@ export const MemoComponent: React.FC<Props> = ({
   screenHeight,
   screenWidth,
 }) => {
-  const navigation = useNavigation();
   const currentUser = useSelector((state: RootState) => state.user);
-  const isHomeScreen = useNavigationState(
-    (state) => state.routes[state.index].name === "Home"
-  );
+
 
   const [isCommentSectionVisible, setIsCommentSectionVisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);

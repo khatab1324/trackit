@@ -6,3 +6,9 @@ export type publicUser = {
   bio: string | null;
   created_at: Date;
 };
+
+export type publicUserWithFollowStatus = publicUser & {
+  is_followed: boolean;
+  is_requested: boolean;
+};
+

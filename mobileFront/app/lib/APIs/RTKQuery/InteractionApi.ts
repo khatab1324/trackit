@@ -222,7 +222,7 @@ export const InteractionApi = createApi({
         url: "/getFollowRequests",
         method: "GET",
       }),
-      keepUnusedDataFor: 0, // Disable caching - always fetch fresh data
+      keepUnusedDataFor: 0, 
       transformResponse: (res: { data: FollowRequest[]; message: string }) =>
         res.data,
     }),
@@ -233,11 +233,10 @@ export const InteractionApi = createApi({
         method: "GET",
       }),
       transformResponse: (res: { data: Friend[]; message: string }) => res.data,
-      keepUnusedDataFor: 0, // Disable caching
+      keepUnusedDataFor: 0, 
     }),
 
     toggleMemoryLike: builder.mutation<
-      // server returns: { message, result: { isLiked, memory_id, num_likes? } }
       {
         message: string;
         result: { isLiked: boolean; memory_id: string; num_likes?: number };
@@ -255,7 +254,6 @@ export const InteractionApi = createApi({
       }) => res,
     }),
 
-    // Bookmark functionality
     toggleBookmark: builder.mutation<BookmarkResponse, { memory_id: string }>({
       query: (body) => ({
         url: "/memorySave",
@@ -283,14 +281,14 @@ export const InteractionApi = createApi({
         bookmarks: BookmarkedMemory[];
         message: string;
       }) => res.bookmarks,
-      keepUnusedDataFor: 0, // Disable caching - always fetch fresh data
+      keepUnusedDataFor: 0,
       providesTags: ["BookmarkedMemory"],
     }),
   }),
 });
 
 export const {
-  // tis for comments
+
   useGetRepliesByCommentIdQuery,
   useGetMemoryCommentsQuery,
   useAddCommentMutation,
@@ -298,7 +296,7 @@ export const {
   useDeleteCommentMutation,
   useEditCommentMutation,
   useReplyCommentMutation,
-  // thes for follows
+
   useMakeFollowRequestMutation,
   useAcceptFollowRequestMutation,
   useRejectFollowRequestMutation,
@@ -306,7 +304,7 @@ export const {
   useGetCurrentUserFollowersQuery,
   useToggleMemoryLikeMutation,
   useCancelFollowRequestMutation,
-  // bookmark
+
   useToggleBookmarkMutation,
   useGetUserBookmarksQuery,
 } = InteractionApi;

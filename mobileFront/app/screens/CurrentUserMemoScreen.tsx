@@ -2,12 +2,126 @@ import React from "react";
 import { Text, View } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
-import { useGetCurrentUserMemoriesQuery } from "../lib/APIs/RTKQuery/memoryApi";
+import { useGetCurrentUserMemoriesQuery, useGetUserMemoQuery } from "../lib/APIs/RTKQuery/memoryApi";
 import { MemoListComp } from "../components/MemoList";
+import { useGetUserBookmarksQuery } from "../lib/APIs/RTKQuery/InteractionApi";
+import type { Memory } from "../core/types/memory";
+import { useRoute } from "@react-navigation/native";
+import { RouteProp } from "@react-navigation/native";
+import { MainStackParamList } from "../../App";
+
+// Utility function to transform BookmarkedMemory to Memory format
+const transformBookmarkedMemoryToMemory = (bookmarkedMemory: any): Memory => {
+  return {
+    id: bookmarkedMemory.memory_id, // Use memory_id from the flattened structure
+    content_type: bookmarkedMemory.content_type,
+    content_url: bookmarkedMemory.content_url,
+    count: "0", // Default value since BookmarkedMemory doesn't have count
+    description: bookmarkedMemory.description,
+    isFollowed: false, // Default value since BookmarkedMemory doesn't have this
+    is_saved: true, // Bookmarked memories are always saved
+    is_liked: false, // Default value since BookmarkedMemory doesn't have this
+    is_requested: false, // Default value since BookmarkedMemory doesn't have this
+    isPublic: bookmarkedMemory.isPublic,
+    lang: bookmarkedMemory.latitude, // Map latitude to lang
+    long: bookmarkedMemory.longitude, // Map longitude to long
+    num_comments: "0", // Default value since BookmarkedMemory doesn't have this
+    num_likes: "0", // Default value since BookmarkedMemory doesn't have this
+    userInfo: {
+      user_id: bookmarkedMemory.user.id,
+      username: bookmarkedMemory.user.username,
+    },
+  };
+};
 
 export const CurrentUserMemoScreen = () => {
-  const { data } = useGetCurrentUserMemoriesQuery();
+  const route = useRoute<RouteProp<MainStackParamList, 'MemoDetails'>>();
+  const { tabComingFrom, memoId } = route.params;
+
+  
+  const { data: currentUserMemories, isLoading: isLoadingMemories, error: memoriesError } = useGetCurrentUserMemoriesQuery();
+  const {data: bookmarks, isLoading: isLoadingBookmarks, error: bookmarksError } = useGetUserBookmarksQuery();
+  const {data: userMemo, isLoading: isLoadingUserMemo, error: userMemoError } = useGetUserMemoQuery(memoId,{
+    
+  });
+
+  console.log("tabComingFrom",tabComingFrom);
+  console.log("memoId",memoId);
+  const getDataToDisplay = (): Memory[] | undefined => {
+    switch (tabComingFrom) {
+      case 'memories':
+        return currentUserMemories;
+      case 'saved':
+        // Transform BookmarkedMemory to Memory format
+        return bookmarks?.map(transformBookmarkedMemoryToMemory);
+      case 'friend':
+        return userMemo;
+      default:
+        return currentUserMemories;
+    }
+  };
+
+  const getLoadingState = () => {
+    switch (tabComingFrom) {
+      case 'memories':
+        return isLoadingMemories;
+      case 'saved':
+        return isLoadingBookmarks;
+      case 'friend':
+        return isLoadingUserMemo;
+      default:
+        return isLoadingMemories;
+    }
+  };
+
+  const getErrorState = () => {
+    switch (tabComingFrom) {
+      case 'memories':
+        return memoriesError;
+      case 'saved':
+        return bookmarksError;
+      case 'friend':
+        return userMemoError;
+      default:
+        return memoriesError;
+    }
+  };
+
+  const dataToDisplay = getDataToDisplay();
+  const isLoading = getLoadingState();
+  const error = getErrorState();
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-white text-lg">Loading...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-red-500 text-lg">Error loading data</Text>
+      </View>
+    );
+  }
+
+  if (!dataToDisplay || dataToDisplay.length === 0) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-gray-400 text-lg">
+          {tabComingFrom === 'saved' ? 'No saved memories yet' : 
+           tabComingFrom === 'friend' ? 'No memories from this friend' : 
+           'No memories yet'}
+        </Text>
+      </View>
+    );
+  }
+
   return (
-    <View>{data ? <MemoListComp data={data} /> : <Text>Loading...</Text>}</View>
+    <View className="flex-1">
+      <MemoListComp data={dataToDisplay} />
+    </View>
   );
 };

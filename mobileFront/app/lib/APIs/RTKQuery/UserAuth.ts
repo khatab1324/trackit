@@ -15,7 +15,17 @@ export const UserApi = createApi({
         body: { token: token.token },
       }),
     }),
+    getUserById: builder.query<{ user: User }, { userId: string; token: string }>({
+      query: ({ userId, token }) => ({
+        url: `/getUserById/${userId}`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    }),
+    
   }),
 });
 
-export const { useGetUserByTokenMutation } = UserApi;
+export const { useGetUserByTokenMutation, useGetUserByIdQuery } = UserApi;

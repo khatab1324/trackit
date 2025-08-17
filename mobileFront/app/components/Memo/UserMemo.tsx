@@ -3,6 +3,9 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useMakeFollowRequestMutation, useCancelFollowRequestMutation } from "../../lib/APIs/RTKQuery/InteractionApi";
 import {  useMarkFollowRequested } from "../../core/hooks/useFollowRequest";
+import { useNavigation } from "@react-navigation/native";
+import { HomeStackParamList } from "../../navigation/HomeStack";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export const UserMemo = ({
   username,
@@ -25,7 +28,7 @@ export const UserMemo = ({
   const [localRequested, setLocalRequested] = useState(isRequested);
   const [localFollowed, setLocalFollowed] = useState(isFollowed);
   const markRequested = useMarkFollowRequested();
-
+  const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
   const onPressFollowHandler = async () => {
     if (isMakingRequest || localRequested || localFollowed) return;
     try {
@@ -57,7 +60,7 @@ export const UserMemo = ({
   return (
     <View className="absolute left-3 right-20 bottom-24">
       <View className="flex-row items-center gap-2 pb-2">
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={() => navigation.navigate("Profile", { userId })}>
           <Text className="text-white font-semibold">@{username}</Text>
         </TouchableOpacity>
 
