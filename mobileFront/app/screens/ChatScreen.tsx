@@ -46,7 +46,7 @@ export const ChatScreen = () => {
       <View className="absolute inset-0 bg-gradient-to-b from-indigo-500/10 to-transparent dark:from-indigo-900/30" />
       <View className="flex-1 pt-4">
         <View className="px-5">
-          <View className="mt-4">
+          <View style={{ marginTop: 30 }}>
             <FriendsSearchBar />
           </View>
         </View>
@@ -58,7 +58,7 @@ export const ChatScreen = () => {
             refetch={refetch}
             isFetching={isFetching}
             themeColors={colors.light}
-          />{" "}
+          />
         </View>
       </View>
     </View>

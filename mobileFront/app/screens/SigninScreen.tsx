@@ -1,4 +1,3 @@
-// app/screens/SignInScreen.tsx
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -10,7 +9,6 @@ import {
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AuthStackParamList } from "../navigation/Authstack";
-// import { useDispatch } from "react-redux";
 import { useSigninMutation } from "../lib/APIs/RTKQuery/authApi";
 import { useDispatch } from "react-redux";
 import { addUserToReducer } from "../store/slices/userSlice";
@@ -18,48 +16,42 @@ import { setCredentials } from "../store/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User } from "../core/types/user";
 import { useGetUserByTokenMutation } from "../lib/APIs/RTKQuery/UserAuth";
-import Config from "react-native-config";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "SignIn">;
 
 const SignInScreen: React.FC<Props> = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  //   const dispatch = useDispatch();
-  const [signin, { isLoading, error }] = useSigninMutation();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [signin, { isLoading }] = useSigninMutation();
   const [getUserByToken] = useGetUserByTokenMutation();
   const dispatch = useDispatch();
+
   useEffect(() => {
     (async () => {
       try {
         const tokenFromStorage = await AsyncStorage.getItem("token");
-        console.log("Token from storage:", tokenFromStorage);
         if (tokenFromStorage) {
           const result = await getUserByToken({ token: tokenFromStorage });
-          console.log("getUserByToken result:", result);
-          if ("data" in result) {
-            console.log("Success:", result.data?.user);
-            if (result.data?.user) {
-              dispatch(addUserToReducer(result.data.user));
-              dispatch(setCredentials(tokenFromStorage));
-            }
+          if ("data" in result && result.data?.user) {
+            dispatch(addUserToReducer(result.data.user));
+            dispatch(setCredentials(tokenFromStorage));
           } else if ("error" in result) {
-            console.log("Error:", result.error);
             await AsyncStorage.removeItem("token");
           }
-        } else {
-          console.log("No token found in storage");
         }
       } catch (error) {
         console.error("Error in useEffect:", error);
       }
     })();
-  }, [getUserByToken, dispatch]); // Add dependencies
+  }, [getUserByToken, dispatch]);
+
   const handleSignin = async () => {
+    setErrorMessage("");
+
     try {
       const result = await signin({ username, password });
       if ("data" in result) {
-        console.log("Success:", result.data);
         if (result.data) {
           const { token, user } = result.data?.data as {
             token: string;
@@ -68,13 +60,15 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
           dispatch(setCredentials(token));
           await AsyncStorage.setItem("token", token);
           dispatch(addUserToReducer(user));
-          // navigation.replace("Home");
+          navigation.replace("Home");
         }
-      } else {
+      } else if ("error" in result) {
+        setErrorMessage("Can not find the account.");
         console.log("RTK error:", result.error);
       }
     } catch (error) {
-      console.error("sign failed:", error);
+      console.error("Sign in failed:", error);
+      setErrorMessage("Something went wrong. Please try again.");
     }
   };
 
@@ -100,11 +94,18 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
         onChangeText={setPassword}
       />
 
+      {errorMessage ? (
+        <Text className="text-red-500 text-center mb-2">{errorMessage}</Text>
+      ) : null}
+
       <TouchableOpacity
         className="bg-blue-500 rounded-full py-3 items-center mt-3"
         onPress={handleSignin}
+        disabled={isLoading}
       >
-        <Text className="text-white font-bold">Log in</Text>
+        <Text className="text-white font-bold">
+          {isLoading ? "Logging in..." : "Log in"}
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => {}}>

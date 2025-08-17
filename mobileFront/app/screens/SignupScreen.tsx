@@ -1,4 +1,3 @@
-//
 import React, { useState } from "react";
 import {
   View,
@@ -24,19 +23,21 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [signup, { isLoading, error }] = useSignupMutation();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [signup, { isLoading }] = useSignupMutation();
   const dispatch = useDispatch();
 
   const handleSignup = async () => {
+    setErrorMessage("");
+
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      setErrorMessage("Passwords do not match!");
       return;
     }
 
     try {
       const result = await signup({ username, password, email });
       if ("data" in result) {
-        console.log("Signup Success:", result.data);
         if (result.data) {
           const { token, createdUser } = result.data?.data as {
             token: string;
@@ -47,11 +48,13 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
           dispatch(addUserToReducer(createdUser));
           navigation.replace("Home");
         }
-      } else {
+      } else if ("error" in result) {
+        setErrorMessage("Account already exists.");
         console.log("Signup RTK error:", result.error);
       }
     } catch (error) {
       console.error("Signup failed:", error);
+      setErrorMessage("Something went wrong. Please try again.");
     }
   };
 
@@ -90,11 +93,18 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
         onChangeText={setConfirmPassword}
       />
 
+      {errorMessage ? (
+        <Text className="text-red-500 text-center mb-2">{errorMessage}</Text>
+      ) : null}
+
       <TouchableOpacity
         className="bg-blue-500 rounded-full py-3 items-center mt-3"
         onPress={handleSignup}
+        disabled={isLoading}
       >
-        <Text className="text-white font-bold">Sign up</Text>
+        <Text className="text-white font-bold">
+          {isLoading ? "Signing up..." : "Sign up"}
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
