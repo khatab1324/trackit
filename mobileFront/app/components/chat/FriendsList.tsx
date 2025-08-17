@@ -20,11 +20,9 @@ const getStatusLabel = (status?: Friend["status"]) => {
 const FriendItem = ({
   item,
   onPress,
-  themeColors,
 }: {
   item: Friend;
   onPress: (f: Friend) => void;
-  themeColors: typeof colors.light;
 }) => {
   const statusLabel = getStatusLabel(item.status);
   return (
@@ -49,28 +47,19 @@ const FriendItem = ({
       />
       <View style={{ marginLeft: 12, flex: 1 }}>
         <Text
-          style={{
-            fontSize: 16,
-            fontWeight: "500",
-            color: themeColors.text,
-          }}
+          className="text-base font-medium text-text"
         >
           {item.username}
         </Text>
         {!!statusLabel && (
-          <Text style={{ fontSize: 14, color: themeColors.secondaryText }}>
+          <Text className="text-sm text-placeholder">
             {statusLabel}
           </Text>
         )}
       </View>
       {item.status === "online" && (
         <View
-          style={{
-            width: 12,
-            height: 12,
-            borderRadius: 6,
-            backgroundColor: "green",
-          }}
+          className="w-3 h-3 rounded-full bg-green-500"
         />
       )}
     </TouchableOpacity>
@@ -82,15 +71,14 @@ export const FriendsList: React.FC<{
   onPressFriend: (friend: Friend) => void;
   refetch: () => void;
   isFetching: boolean;
-  themeColors: typeof colors.light;
-}> = ({ friends = [], onPressFriend, refetch, isFetching, themeColors }) => {
+}> = ({ friends = [], onPressFriend, refetch, isFetching }) => {
   return (
-    <View style={{ flex: 1, backgroundColor: themeColors.background }}>
+    <View className="flex-1 bg-background">
       <FlatList
         data={friends}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <FriendItem item={item} onPress={onPressFriend} themeColors={themeColors} />
+          <FriendItem item={item} onPress={onPressFriend} />
         )}
         ListEmptyComponent={
           <View
@@ -101,7 +89,7 @@ export const FriendsList: React.FC<{
               paddingVertical: 40,
             }}
           >
-            <Text style={{ color: themeColors.secondaryText }}>
+            <Text className="text-placeholder">
               No friends found
             </Text>
           </View>

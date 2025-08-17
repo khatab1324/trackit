@@ -10,6 +10,7 @@ import { InteractionMemo } from "./Memo/InteractionMemo";
 import { UserMemo } from "./Memo/UserMemo";
 import { CommentSection } from "./Memo/CommentSection";
 import MemoryOptionsMenu from "./MemoryOptionsMenu";  
+import { colors } from "../core/theme/colors";
 
 type Props = {
   memory: Memory;
@@ -24,6 +25,8 @@ export const MemoComponent: React.FC<Props> = ({
 }) => {
   const navigation = useNavigation();
   const currentUser = useSelector((state: RootState) => state.user);
+  const theme = useSelector((state: RootState) => state.theme.current);
+  const themeColors = colors[theme];
   const isHomeScreen = useNavigationState(
     (state) => state.routes[state.index].name === "Home"
   );
@@ -40,7 +43,7 @@ export const MemoComponent: React.FC<Props> = ({
 
   return (
     <View
-      className="bg-black relative"
+      className="bg-background relative"
       style={{ height: screenHeight, width: screenWidth }}
     >
       <HeaderMemo />
@@ -74,7 +77,7 @@ export const MemoComponent: React.FC<Props> = ({
           }}
           onPress={() => setMenuOpen(true)}
         >
-          <Ionicons name="ellipsis-vertical" size={20} color="#F3F4F6" />
+          <Ionicons name="ellipsis-vertical" size={20} color={themeColors.text} />
         </TouchableOpacity>
       )}
 

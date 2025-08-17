@@ -9,7 +9,22 @@ module.exports = {
   ],
   presets: [nativewindPreset],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        light: {
+          background: "#ffffff",
+          text: "#000000",
+          card: "#f0f0f0",
+          placeholder: "#a0a0a0",
+        },
+        dark: {
+          background: "#121212",
+          text: "#ffffff",
+          card: "#1e1e1e",
+          placeholder: "#808080",
+        },
+      },
+    },
   },
   plugins: [],
 };

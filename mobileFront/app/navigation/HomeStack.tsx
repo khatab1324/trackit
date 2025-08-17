@@ -3,6 +3,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
+import { colors } from '../core/theme/colors';
 
 import { HomeScreen } from "../screens/HomeScreen";
 import ChatStack from "./ChatStack";
@@ -29,10 +32,12 @@ const Tab = createBottomTabNavigator<HomeStackParamList>();
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const avatarUri: string | undefined = undefined;
   const visibleRoutes = ["Map", "Chat", "Home", "Profile"];
+  const theme = useSelector((s: RootState) => s.theme.current);
+  const themeColors = colors[theme];
 
   return (
-    <SafeAreaView style={styles.safe} edges={["bottom"]}>
-      <View style={styles.container}>
+    <SafeAreaView style={[{ backgroundColor: themeColors.card }, styles.safe]} edges={["bottom"]}>
+      <View style={[{ backgroundColor: themeColors.card }, styles.container]}>
         {state.routes
           .filter((r: any) => visibleRoutes.includes(r.name))
           .map((route: any) => {
@@ -50,7 +55,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
               }
             };
 
-            const color = isFocused ? "#111" : "#767676";
+            const color = isFocused ? themeColors.text : themeColors.placeholder;
             let icon = null;
 
             if (route.name === "Home") {
@@ -61,7 +66,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
               icon = <Ionicons name={isFocused ? "map" : "map-outline"} size={26} color={color} />;
             } else if (route.name === "Profile") {
               icon = avatarUri ? (
-                <View style={[styles.avatarWrap, isFocused && styles.avatarActive]}>
+                <View style={[styles.avatarWrap, isFocused && { borderColor: themeColors.text }]}>
                   <Image source={{ uri: avatarUri }} style={styles.avatar} />
                 </View>
               ) : (
@@ -122,10 +127,9 @@ export default function HomeStack() {
 }
 
 const styles = StyleSheet.create({
-  safe: { backgroundColor: "#fff" },
+  safe: {},
   container: {
     height: 43,
-    backgroundColor: "#fff",
     flexDirection: "row",
     paddingHorizontal: 18,
     justifyContent: "space-between",
@@ -139,6 +143,6 @@ const styles = StyleSheet.create({
   tabBtn: { flex: 1, alignItems: "center" },
   iconLift: { transform: [{ translateY: -2 }] },
   avatarWrap: { borderRadius: 999 },
-  avatarActive: { borderWidth: 2, borderColor: "#111", padding: 2 },
+  avatarActive: { borderWidth: 2, padding: 2 },
   avatar: { width: 26, height: 26, borderRadius: 999 },
 });

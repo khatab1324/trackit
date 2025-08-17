@@ -8,10 +8,8 @@ import { colors } from "../core/theme/colors";
 
 export default function ProfileInfo() {
     const user = useSelector((state: RootState) => state.user) as User;
-    const isDark = useSelector(
-        (state: RootState) => state.sheardDataThrowApp.darkMode
-    );
-    const colorScheme = isDark ? colors.dark : colors.light;
+    const theme = useSelector((state: RootState) => state.theme.current);
+    const themeColors = colors[theme];
 
     return (
         <View className="flex-row items-start">
@@ -25,14 +23,14 @@ export default function ProfileInfo() {
                 style={{
                     borderRadius: 100,
                     borderWidth: 2,
-                    borderColor: colorScheme.primary,
+                    borderColor: themeColors.primary,
                 }}
             />
             <View className="ml-4 mt-2">
-                <Text className={`text-lg font-semibold`} style={{ color: colorScheme.text }}>
+                <Text className={`text-lg font-semibold text-text`}>
                     {user?.username || "Username"}
                 </Text>
-                <Text style={{ color: colorScheme.secondaryText }}>
+                <Text className="text-placeholder">
                     {user?.bio || "Bio goes here..."}
                 </Text>
             </View>

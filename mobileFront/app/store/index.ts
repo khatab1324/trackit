@@ -9,6 +9,7 @@ import authReducer from "./slices/authSlice";
 import userReducer from "./slices/userSlice";
 import sheardDataThrowAppRedReducer from "./slices/sheardDataSlice";
 import notificationsReducer from "./slices/notificationsSlice";
+import themeReducer from "./slices/themeSlice";
 import { chatApi } from "../lib/APIs/RTKQuery/chatApi";
 
 const appReducer = combineReducers({
@@ -22,6 +23,7 @@ const appReducer = combineReducers({
   auth: authReducer,
   user: userReducer,
   notifications: notificationsReducer,
+  theme: themeReducer,
 });
 
 const rootReducer = (state: any, action: any) => {

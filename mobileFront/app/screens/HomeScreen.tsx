@@ -20,8 +20,8 @@ export const HomeScreen = () => {
   const jwt = useSelector((s: RootState) => s.auth.token);
   const user = useSelector((s: RootState) => s.user);
   const coords = useSelector((s: RootState) => s.sheardDataThrowApp.location);
-  const isDark = useSelector((s: RootState) => s.sheardDataThrowApp.darkMode);
-  const themeColors = isDark ? colors.dark : colors.light;
+  const theme = useSelector((s: RootState) => s.theme.current);
+  const themeColors = colors[theme];
 
   useEffect(() => {
     let mounted = true;

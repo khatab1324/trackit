@@ -14,5 +14,5 @@ function timeAgo(iso: string) {
 }
 
 export const TimeAgo = ({ iso }: { iso: string }) => (
-  <Text className="text-gray-500 dark:text-gray-400">{timeAgo(iso)}</Text>
+  <Text className="text-placeholder">{timeAgo(iso)}</Text>
 );

@@ -13,7 +13,7 @@ export const MemoListComp = ({ data }: { data: Memory[] | undefined }) => {
     }
   }, [data]);
   return (
-    <View className=" bg-black">
+    <View className="bg-background">
       <FlatList
         data={data}
         keyExtractor={(m) => m.id}

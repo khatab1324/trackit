@@ -51,7 +51,7 @@ export const NotificationContent = ({ item }: Props) => {
   return (
     <View className="flex-1 ml-3">
       <Text 
-        className="text-black dark:text-white" 
+        className="text-text" 
         style={{ lineHeight: 20 }} 
         numberOfLines={3}
       >

@@ -1,42 +1,34 @@
 export const colors = {
   light: {
-    white: "#fff",
-    black: "#000",
-    primary: "#1FB98E",
-    secondary: "#E2E8F0",
-    background: "#F8FAFC",
-    text: "#1E293B",
-    secondaryText: "#64748B",
-    border: "#CBD5E1",
-    buttonBackground: "#1FB98E",
-    error: "#DC2626",
-
-    // Icon colors
+    background: '#ffffff',
+    text: '#000000',
+    card: '#f0f0f0',
+    placeholder: '#a0a0a0',
+    secondary: '#E2E8F0',
+    primary: '#1FB98E',
+    border: '#CBD5E1',
+    error: '#DC2626',
     icon: {
-      primary: "#1FB98E",
-      secondary: "#64748B",
-      like: "#DC2626",
-      comment: "#1E293B",
+      primary: '#1FB98E',
+      secondary: '#64748B',
+      like: '#DC2626',
+      comment: '#1E293B',
     },
   },
   dark: {
-    white: "#fff",
-    black: "#000",
-    primary: "#34D399",
-    secondary: "#334155",
-    background: "#000000", // ✅ صار أسود كامل
-    text: "#F1F5F9",
-    secondaryText: "#94A3B8",
-    border: "#2E2E2E", // أغمق عشان يناسب الأسود
-    buttonBackground: "#10B981",
-    error: "#F87171",
-
-    // Icon colors
+    background: '#121212',
+    text: '#ffffff',
+    card: '#1e1e1e',
+    placeholder: '#808080',
+    secondary: '#334155',
+    primary: '#34D399',
+    border: '#2E2E2E',
+    error: '#F87171',
     icon: {
-      primary: "#34D399",
-      secondary: "#94A3B8",
-      like: "#F87171",
-      comment: "#F1F5F9",
+      primary: '#34D399',
+      secondary: '#94A3B8',
+      like: '#F87171',
+      comment: '#F1F5F9',
     },
   },
-} as const;
+};

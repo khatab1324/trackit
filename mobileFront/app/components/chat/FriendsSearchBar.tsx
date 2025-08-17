@@ -13,7 +13,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useGetCurrentUserFollowersQuery } from "../../lib/APIs/RTKQuery/InteractionApi";
 import { Friend } from "../../core/types/friends";
-import { colors } from "../../core/theme/colors";
 
 type FriendsSearchBarProps = {
   onSelect?: (friend: Friend) => void;
@@ -30,8 +29,7 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
   emptyText = "No friends found",
   loadingText = "Loading friends...",
 }) => {
-  const isDark = useSelector((s: RootState) => s.sheardDataThrowApp.darkMode);
-  const colorScheme = isDark ? colors.dark : colors.light;
+  const theme = useSelector((s: RootState) => s.theme.current);
 
   const { data: followers, isLoading } = useGetCurrentUserFollowersQuery();
   const [query, setQuery] = useState("");
@@ -60,7 +58,7 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
         setFocused(false);
       }}
     >
-      <Text style={{ color: colorScheme.text, fontSize: 14, fontWeight: "500" }}>
+      <Text className="text-text text-sm font-medium">
         {item.username || "Unknown"}
       </Text>
     </TouchableOpacity>
@@ -69,27 +67,15 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
   return (
     <View style={{ width: "100%" }}>
       <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          borderRadius: 12,
-          paddingHorizontal: 12,
-          height: 48,
-          backgroundColor: colorScheme.secondary,
-        }}
+        className="flex-row items-center rounded-xl px-3 h-12 bg-card"
       >
-        <Ionicons name="search" size={18} color={colorScheme.secondaryText} />
+        <Ionicons name="search" size={18} color={theme === 'dark' ? '#808080' : '#a0a0a0'} />
         <TextInput
-          style={{
-            flex: 1,
-            marginLeft: 8,
-            fontSize: 16,
-            color: colorScheme.text,
-          }}
+          className="flex-1 ml-2 text-base text-text"
           value={query}
           onChangeText={setQuery}
           placeholder={placeholder}
-          placeholderTextColor={colorScheme.secondaryText}
+          placeholderTextColor={theme === 'dark' ? '#808080' : '#a0a0a0'}
           autoFocus={autoFocus}
           onFocus={() => setFocused(true)}
           onBlur={() => setTimeout(() => setFocused(false), 120)}
@@ -98,33 +84,25 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
         />
         {query.length > 0 && (
           <TouchableOpacity onPress={() => setQuery("")} hitSlop={10}>
-            <Ionicons name="close" size={18} color={colorScheme.secondaryText} />
+            <Ionicons name="close" size={18} color={theme === 'dark' ? '#808080' : '#a0a0a0'} />
           </TouchableOpacity>
         )}
       </View>
 
       {focused && (
         <View
-          style={{
-            marginTop: 4,
-            borderRadius: 12,
-            borderWidth: 1,
-            borderColor: colorScheme.border,
-            backgroundColor: colorScheme.background,
-            maxHeight: 288,
-            overflow: "hidden",
-          }}
+          className="mt-1 rounded-xl border border-border bg-card max-h-72 overflow-hidden"
         >
           {isLoading ? (
-            <View style={{ paddingVertical: 20, alignItems: "center" }}>
-              <ActivityIndicator color={colorScheme.text} />
-              <Text style={{ color: colorScheme.secondaryText, marginTop: 8, fontSize: 12 }}>
+            <View className="py-5 items-center">
+              <ActivityIndicator color={theme === 'dark' ? '#ffffff' : '#000000'} />
+              <Text className="text-placeholder mt-2 text-xs">
                 {loadingText}
               </Text>
             </View>
           ) : filteredFollowers.length === 0 ? (
-            <View style={{ paddingVertical: 20, alignItems: "center" }}>
-              <Text style={{ color: colorScheme.secondaryText, fontSize: 12 }}>
+            <View className="py-5 items-center">
+              <Text className="text-placeholder text-xs">
                 {emptyText}
               </Text>
             </View>
@@ -135,7 +113,7 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
               renderItem={renderItem}
               keyboardShouldPersistTaps="handled"
               ItemSeparatorComponent={() => (
-                <View style={{ height: 1, backgroundColor: colorScheme.border }} />
+                <View className="h-px bg-border" />
               )}
               style={{ maxHeight: 288 }}
             />

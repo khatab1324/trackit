@@ -3,7 +3,6 @@ import { View, StyleSheet } from "react-native";
 import MapView from "react-native-maps";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
-import { colors } from "../core/theme/colors";
 
 // ستايل Google Maps للوضع الداكن
 const darkMapStyle = [
@@ -21,14 +20,14 @@ const darkMapStyle = [
 ];
 
 export const MapComponent = () => {
-  const isDark = useSelector((state: RootState) => state.sheardDataThrowApp.darkMode);
+  const theme = useSelector((state: RootState) => state.theme.current);
 
   return (
     <View style={{ flex: 1 }}>
       <MapView
         style={styles.map}
         showsMyLocationButton={true}
-        customMapStyle={isDark ? darkMapStyle : []}
+        customMapStyle={theme === 'dark' ? darkMapStyle : []}
         initialRegion={{
           latitude: 31.98469,
           longitude: 35.918267,

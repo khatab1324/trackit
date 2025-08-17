@@ -18,6 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useChatWithFriend } from "../hooks/useChatWithFriend";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/index";
+import { colors } from "../core/theme/colors";
 
 type RouteParams = {
   friendId: string;
@@ -49,6 +50,9 @@ export const ConversationScreen = () => {
   const currentUser = useSelector((state: RootState) => state.user);
   const currentUserId =
     currentUser && "id" in currentUser ? (currentUser as any).id : undefined;
+
+  const theme = useSelector((state: RootState) => state.theme.current);
+  const themeColors = colors[theme];
 
   const {
     messages,
@@ -95,22 +99,20 @@ export const ConversationScreen = () => {
         <View
           className={`max-w-[80%] px-4 py-3 rounded-2xl ${
             isOwnMessage
-              ? "bg-blue-600 dark:bg-blue-700 rounded-br-md"
-              : "bg-gray-200 dark:bg-gray-700 rounded-bl-md"
+              ? "bg-primary rounded-br-md"
+              : "bg-card rounded-bl-md"
           }`}
         >
           <Text
             className={`text-sm ${
-              isOwnMessage ? "text-white" : "text-gray-800 dark:text-gray-200"
+              isOwnMessage ? "text-white" : "text-text"
             }`}
           >
             {item.message}
           </Text>
         </View>
         <Text
-          className={`text-xs mt-1 ${
-            isOwnMessage ? "text-gray-400" : "text-gray-500"
-          }`}
+          className={`text-xs mt-1 text-placeholder`}
         >
           {new Date(item.create_at).toLocaleTimeString()}
         </Text>
@@ -121,21 +123,21 @@ export const ConversationScreen = () => {
   const keyboardOffset = Platform.select({ ios: headerHeight, android: 0 });
 
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-neutral-900">
+    <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={keyboardOffset}
       >
         <View
-          className="flex-row items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-900"
+          className="flex-row items-center justify-between px-4 border-b border-border bg-card"
           style={{ height: headerHeight }}
         >
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="#3B82F6" />
+            <Ionicons name="arrow-back" size={24} color={themeColors.primary} />
           </TouchableOpacity>
           <View className="flex-1 items-center">
-            <Text className="text-lg font-semibold text-gray-800 dark:text-white" numberOfLines={1}>
+            <Text className="text-lg font-semibold text-text" numberOfLines={1}>
               {friendName || `Chat with ${friendId}`}
             </Text>
           </View>
@@ -157,14 +159,14 @@ export const ConversationScreen = () => {
           }}
         />
 
-        <View className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-900 px-4 py-2">
+        <View className="border-t border-border bg-card px-4 py-2">
           <View className="flex-row items-center">
             <TextInput
               value={newMessage}
               onChangeText={setNewMessage}
               placeholder="Type a message..."
-              placeholderTextColor="#9CA3AF"
-              className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-3 text-gray-800 dark:text-white"
+              placeholderTextColor={themeColors.placeholder}
+              className="flex-1 bg-secondary rounded-full px-4 py-3 text-text"
               multiline
             />
             <TouchableOpacity
@@ -172,20 +174,20 @@ export const ConversationScreen = () => {
               disabled={!newMessage.trim() || !isConnected || sending}
               className={`ml-3 p-3 rounded-full ${
                 newMessage.trim() && isConnected && !sending
-                  ? "bg-blue-500"
+                  ? "bg-primary"
                   : "bg-gray-300 dark:bg-gray-600"
               }`}
             >
               {sending ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
+                <ActivityIndicator size="small" color={themeColors.text} />
               ) : (
                 <Ionicons
                   name="send"  
                   size={20}
                   color={
                     newMessage.trim() && isConnected && !sending
-                      ? "#FFFFFF"
-                      : "#9CA3AF"
+                      ? themeColors.text
+                      : themeColors.placeholder
                   }
                 />
               )}

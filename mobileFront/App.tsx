@@ -6,16 +6,17 @@ import {
 } from "@react-navigation/native";
 import AuthStack from "./app/navigation/Authstack";
 import "./global.css";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { store } from "./app/store";
 import HomeStack from "./app/navigation/HomeStack";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CreateMemoryScreen from "./app/screens/CreateMemoryScreen";
-import { useSelector } from "react-redux";
 import { RootState } from "./app/store";
 import { CurrentUserMemoScreen } from "./app/screens/CurrentUserMemoScreen";
 import FriendsMemoScreen from "./app/screens/FriendsMemoScreen";
+import { StatusBar, View } from 'react-native';
+import { colors } from "./app/core/theme/colors";
 
 export type MainStackParamList = {
   Home: undefined;
@@ -33,11 +34,31 @@ function MainAppNavigator() {
   );
   const token = useSelector((state: RootState) => state.auth.token);
   const isDarkMode = useSelector(
-    (state: RootState) => state.sheardDataThrowApp.darkMode
+    (state: RootState) => state.theme.current === 'dark'
   );
 
+  const customDefaultTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: colors.light.background,
+      text: colors.light.text,
+      card: colors.light.card,
+    },
+  };
+
+  const customDarkTheme = {
+    ...DarkTheme,
+    colors: {
+      ...DarkTheme.colors,
+      background: colors.dark.background,
+      text: colors.dark.text,
+      card: colors.dark.card,
+    },
+  };
+
   return (
-    <NavigationContainer theme={isDarkMode ? DarkTheme : DefaultTheme}>
+    <NavigationContainer theme={isDarkMode ? customDarkTheme : customDefaultTheme}>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         {isAuthenticated && token ? (
           <>
@@ -64,11 +85,23 @@ function MainAppNavigator() {
   );
 }
 
+function RootThemedView() {
+  const theme = useSelector((state: RootState) => state.theme.current);
+  const barStyle = theme === 'dark' ? 'light-content' : 'dark-content';
+
+  return (
+    <View className={`${theme === 'dark' ? 'dark' : 'light'} flex-1`}>
+      <StatusBar barStyle={barStyle} />
+      <MainAppNavigator />
+    </View>
+  );
+}
+
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={store}>
-        <MainAppNavigator />
+        <RootThemedView />
       </Provider>
     </GestureHandlerRootView>
   );

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { View, FlatList, Text } from "react-native";
+import { View, FlatList, Text, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import { setUnreadCount } from "../store/slices/notificationsSlice";
@@ -12,8 +12,7 @@ import { colors } from "../core/theme/colors";
 
 export default function NotificationsScreen() {
   const dispatch = useDispatch();
-  const isDark = useSelector((state: RootState) => state.sheardDataThrowApp.darkMode);
-  const themeColors = isDark ? colors.dark : colors.light;
+  const theme = useSelector((state: RootState) => state.theme.current);
 
   const { data: notificationsData, isLoading: isLoadingNotifications, isError, isFetching } =
     useGetNotificationsQuery(undefined, { refetchOnFocus: true });
@@ -60,14 +59,15 @@ export default function NotificationsScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: themeColors.background }}>
-      <View style={{ paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderColor: themeColors.border }}>
-        <Text style={{ fontSize: 20, fontWeight: "bold", color: themeColors.text }}>Notifications</Text>
+    <SafeAreaView className="flex-1 bg-background">
+      <View className="px-4 py-3 border-b border-border bg-card">
+        <Text className="text-xl font-bold text-text">Notifications</Text>
       </View>
 
       {isLoadingNotifications || isLoadingFollowRequests ? (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <Text style={{ color: themeColors.secondaryText }}>Loading…</Text>
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color={theme === 'dark' ? colors.dark.text : colors.light.text} />
+          <Text className="text-placeholder mt-2">Loading…</Text>
         </View>
       ) : (
         <FlatList
@@ -75,15 +75,15 @@ export default function NotificationsScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <NotificationItem item={item} />}
           ItemSeparatorComponent={() => (
-            <View style={{ height: 1, backgroundColor: themeColors.border, marginHorizontal: 16 }} />
+            <View className="h-px bg-border mx-4" />
           )}
           contentContainerStyle={{ paddingBottom: 12 }}
           showsVerticalScrollIndicator={false}
           onRefresh={handleRefresh}
           refreshing={isFetching || isLoadingFollowRequests}
           ListEmptyComponent={
-            <View style={{ paddingVertical: 64, alignItems: "center" }}>
-              <Text style={{ color: themeColors.secondaryText }}>
+            <View className="py-16 items-center">
+              <Text className="text-placeholder">
                 {isError && "No notifications at the moment"}
               </Text>
             </View>

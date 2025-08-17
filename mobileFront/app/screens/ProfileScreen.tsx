@@ -14,8 +14,8 @@ import ProfileContent from "../components/ProfileContent";
 import { useGetUserBookmarksQuery } from "../lib/APIs/RTKQuery/InteractionApi";
 
 export function ProfileScreen() {
-  const isDark = useSelector((state: RootState) => state.sheardDataThrowApp.darkMode);
-  const themeColors = isDark ? colors.dark : colors.light;
+  const theme = useSelector((state: RootState) => state.theme.current);
+  const themeColors = colors[theme];
 
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
 
@@ -42,22 +42,22 @@ export function ProfileScreen() {
   );
   if (isLoading) {
     content = (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" />
+      <View className="flex-1 justify-center items-center bg-background">
+        <ActivityIndicator size="large" color={themeColors.text} />
       </View>
     );
   } else if (isError) {
     content = (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text style={{ color: themeColors.error }}>Error fetching memories</Text>
+      <View className="flex-1 justify-center items-center bg-background">
+        <Text className="text-error">Error fetching memories</Text>
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 48, backgroundColor: themeColors.background }}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-        <Text style={{ fontSize: 22, fontWeight: "bold", color: themeColors.text }}>Profile</Text>
+    <View className="flex-1 px-4 pt-12 bg-background">
+      <View className="flex-row items-center justify-between mb-8">
+        <Text className="text-2xl font-bold text-text">Profile</Text>
         <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
           <Ionicons name="settings-outline" size={24} color={themeColors.icon.secondary} />
         </TouchableOpacity>
@@ -65,16 +65,16 @@ export function ProfileScreen() {
 
       <ProfileInfo />
 
-      <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 24, marginBottom: 40 }}>
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ fontSize: 18, fontWeight: "bold", color: themeColors.text }}>
+      <View className="flex-row justify-around mt-6 mb-10">
+        <View className="items-center">
+          <Text className="text-xl font-bold text-text">
             {memories.length || 0}
           </Text>
-          <Text style={{ color: themeColors.secondaryText }}>Memories</Text>
+          <Text className="text-placeholder">Memories</Text>
         </View>
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ fontSize: 18, fontWeight: "bold", color: themeColors.text }}>0</Text>
-          <Text style={{ color: themeColors.secondaryText }}>Friends</Text>
+        <View className="items-center">
+          <Text className="text-xl font-bold text-text">0</Text>
+          <Text className="text-placeholder">Friends</Text>
         </View>
       </View>
 

@@ -6,15 +6,15 @@ import { SearchComponent } from "../components/SearchComponent";
 import { MapComponent } from "../components/MapComponent";
 export const MapScreen = () => {
   return (
-    <View className="flex-1">
+    <View className="flex-1 bg-background">
       <MapComponent />
       <View className="absolute top-12 w-full px-4">
-        <View className="bg-white rounded-2xl shadow-lg p-3">
+        <View className="bg-card rounded-2xl shadow-lg p-3">
           <SearchComponent />
         </View>
       </View>
       <View className="absolute left-0 top-0 w-full">
-        <View className="bg-slate-600 opacity-45 shadow-lg p-5"></View>
+        <View className="bg-card opacity-45 shadow-lg p-5"></View>
       </View>
     </View>
   );
