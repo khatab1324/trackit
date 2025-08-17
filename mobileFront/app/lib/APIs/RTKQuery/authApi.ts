@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
@@ -27,7 +28,22 @@ export const authApi = createApi({
         body,
       }),
     }),
+
+    verifyEmail: builder.mutation<
+      { success: boolean; message?: string },
+      { email: string; code: string }
+    >({
+      query: (body) => ({
+        url: "/verify-email", 
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useSigninMutation, useSignupMutation } = authApi;
+export const {
+  useSigninMutation,
+  useSignupMutation,
+  useVerifyEmailMutation, 
+} = authApi;

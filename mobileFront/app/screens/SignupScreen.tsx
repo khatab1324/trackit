@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  View,
   Text,
   TextInput,
   TouchableOpacity,
@@ -10,10 +9,6 @@ import {
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AuthStackParamList } from "../navigation/Authstack";
 import { useSignupMutation } from "../lib/APIs/RTKQuery/authApi";
-import { useDispatch } from "react-redux";
-import { addUserToReducer } from "../store/slices/userSlice";
-import { setCredentials } from "../store/slices/authSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User } from "../core/types/user";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "SignUp">;
@@ -25,7 +20,6 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [signup, { isLoading }] = useSignupMutation();
-  const dispatch = useDispatch();
 
   const handleSignup = async () => {
     setErrorMessage("");
@@ -39,14 +33,7 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
       const result = await signup({ username, password, email });
       if ("data" in result) {
         if (result.data) {
-          const { token, createdUser } = result.data?.data as {
-            token: string;
-            createdUser: User;
-          };
-          dispatch(setCredentials(token));
-          await AsyncStorage.setItem("token", token);
-          dispatch(addUserToReducer(createdUser));
-          navigation.replace("Home");
+          navigation.navigate("VerifyEmail", { email });
         }
       } else if ("error" in result) {
         setErrorMessage("Account already exists.");
@@ -84,7 +71,6 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
         value={password}
         onChangeText={setPassword}
       />
-
       <TextInput
         className="h-12 bg-gray-100 rounded-xl px-4 mb-3"
         placeholder="Confirm password"
