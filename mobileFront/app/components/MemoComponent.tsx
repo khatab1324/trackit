@@ -15,12 +15,14 @@ type Props = {
   memory: Memory;
   screenHeight: number;
   screenWidth: number;
+  showBackButton?: boolean;
 };
 
 export const MemoComponent: React.FC<Props> = ({
   memory,
   screenHeight,
   screenWidth,
+  showBackButton = true,
 }) => {
   const currentUser = useSelector((state: RootState) => state.user);
 
@@ -40,7 +42,7 @@ export const MemoComponent: React.FC<Props> = ({
       className="bg-black relative"
       style={{ height: screenHeight, width: screenWidth }}
     >
-      <HeaderMemo />
+      <HeaderMemo showBackButton={showBackButton} />
 
       <Image
         source={{ uri: memory.content_url }}

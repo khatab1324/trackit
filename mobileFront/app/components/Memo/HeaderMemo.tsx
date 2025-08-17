@@ -9,7 +9,11 @@ import clsx from "clsx";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store";
 
-export const HeaderMemo = () => {
+type Props = {
+  showBackButton?: boolean;
+};
+
+export const HeaderMemo: React.FC<Props> = ({ showBackButton = true }) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
 
@@ -74,13 +78,15 @@ export const HeaderMemo = () => {
           </View>
         </View>
       ) : (
-        <TouchableOpacity
-          className="absolute left-3 top-14 z-10"
-          onPress={() => (navigation as any).goBack?.()}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="arrow-back" size={32} color="white" />
-        </TouchableOpacity>
+        showBackButton && (
+          <TouchableOpacity
+            className="absolute left-3 top-14 z-10"
+            onPress={() => (navigation as any).goBack?.()}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="arrow-back" size={32} color="white" />
+          </TouchableOpacity>
+        )
       )}
     </View>
   );

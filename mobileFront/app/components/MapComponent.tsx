@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { View, StyleSheet, Platform, Text, TouchableOpacity, Dimensions } from "react-native";
-import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
 import { hp } from "../core/theme/responsiveHandler";
 import { RenderMemoryOnMap } from "./RenderMemoryOnMap";
 import { MemoComponent } from "./MemoComponent";
+import { MapSearchComponent } from "./MapSearchComponent";
 import type { Memory } from "../core/types/memory";
 
 type Props = {
@@ -18,6 +19,27 @@ export const MapComponent: React.FC<Props> = ({
   onCloseMemory,
 }) => {
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+  const mapRef = useRef<MapView>(null);
+  const [currentRegion, setCurrentRegion] = useState<Region>({
+    latitude: 31.98469,
+    longitude: 35.918267,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+
+  const handleLocationSelect = (latitude: number, longitude: number, address: string) => {
+    const newRegion: Region = {
+      latitude,
+      longitude,
+      latitudeDelta: 0.01, // Zoom in closer for searched locations
+      longitudeDelta: 0.01,
+    };
+    
+    setCurrentRegion(newRegion);
+    
+    // Animate to the new location
+    mapRef.current?.animateToRegion(newRegion, 1000);
+  };
 
   // If a memory is selected, show the MemoComponent
   if (selectedMemory) {
@@ -27,6 +49,7 @@ export const MapComponent: React.FC<Props> = ({
           memory={selectedMemory}
           screenHeight={screenHeight}
           screenWidth={screenWidth}
+          showBackButton={false}
         />
         {/* Back button */}
         <View style={styles.backButton}>
@@ -44,19 +67,22 @@ export const MapComponent: React.FC<Props> = ({
   return (
     <View style={{ height: hp(100) }}>
       <MapView
+        ref={mapRef}
         style={styles.map}
         provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
         showsMyLocationButton={true}
         showsUserLocation={true}
-        initialRegion={{
-          latitude: 31.98469,
-          longitude: 35.918267,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
+        initialRegion={currentRegion}
+        region={currentRegion}
+        onRegionChangeComplete={setCurrentRegion}
       >
         <RenderMemoryOnMap onMemorySelect={onMemorySelect} />
       </MapView>
+      
+      {/* Map Search Component */}
+      <View style={styles.searchContainer}>
+        <MapSearchComponent onLocationSelect={handleLocationSelect} />
+      </View>
     </View>
   );
 };
@@ -88,5 +114,12 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  searchContainer: {
+    position: 'absolute',
+    top: 60,
+    left: 16,
+    right: 16,
+    zIndex: 1000,
   },
 });
