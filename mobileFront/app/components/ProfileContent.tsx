@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, FlatList } from "react-native";
+import { View, TouchableOpacity, FlatList } from "react-native";
 import { BookmarkedMemory, Memory } from "../core/types/memory";
 import { colors } from "../core/theme/colors";
 import MemoryThumbnail from "../components/MemoryThumbnail";
 import { RootState } from "../store";
 import { useSelector } from "react-redux";
 import { useGetMemoriesQuery } from "../lib/APIs/RTKQuery/memoryApi";
+import { ThemedText } from "../components/ThemedText";
+import { useThemeColors } from "../hooks/useThemeColors";
 
 export default function ProfileContent({
   memories: memoriesList,
@@ -18,10 +20,10 @@ export default function ProfileContent({
   refetch: () => void;
   isFetching: boolean;
 }) {
-  const theme = useSelector(
+  const currentTheme = useSelector(
     (state: RootState) => state.theme.current
   );
-  const themeColors = colors[theme];
+  const themeColors = useThemeColors();
   const [activeTab, setActiveTab] = useState(0);
   console.log("savedList", savedList);
   const tabsList = [
@@ -38,15 +40,17 @@ export default function ProfileContent({
   return (
     <View className="flex-1">
       <View
-        className={`flex-row justify-around border-b border-border mb-4`}
+        className={`flex-row justify-around border-b`}
+        style={{ borderColor: themeColors.border }}
       >
         {tabsList.map((tab, index) => (
           <TouchableOpacity key={tab.name} onPress={() => setActiveTab(index)}>
-            <Text
-              className={`pb-2 ${activeTab === index ? `border-b-2 font-semibold text-primary` : `text-text`}`}
+            <ThemedText
+              className={`pb-2 ${activeTab === index ? `border-b-2 font-semibold` : ``}`}
+              style={{ color: activeTab === index ? themeColors.primary : themeColors.text, borderColor: activeTab === index ? themeColors.primary : undefined }}
             >
               {tab.name}
-            </Text>
+            </ThemedText>
           </TouchableOpacity>
         ))}
       </View>
@@ -65,11 +69,12 @@ export default function ProfileContent({
           showsVerticalScrollIndicator={false}
         />
       ) : (
-        <Text
-          className={`text-center mt-10 text-placeholder`}
+        <ThemedText
+          type="placeholder"
+          className={`text-center mt-10`}
         >
           No memories found.
-        </Text>
+        </ThemedText>
       )}
     </View>
   );
