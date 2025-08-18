@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList, TouchableOpacity, View, Text, Image, ActivityIndicator } from "react-native";
+import { FlatList, TouchableOpacity, View, Image, ActivityIndicator } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useThemeColors } from "../../hooks/useThemeColors";
@@ -15,7 +15,7 @@ const getStatusLabel = (status?: Friend["status"]) => {
     case "away":
       return "Away";
     case "offline":
-      return "Offline";
+      return ""; // Changed from "Offline" to ""
     default:
       return "";
   }
@@ -95,9 +95,11 @@ export const FriendsList: React.FC<{
             {item.username}
           </ThemedText>
         </View>
-        <ThemedText type="placeholder" className="text-sm">
-          {item.is_online ? "Online" : "Offline"}
-        </ThemedText>
+        {item.is_online && (
+          <ThemedText type="placeholder" className="text-sm">
+            Online
+          </ThemedText>
+        )}
       </View>
     </TouchableOpacity>
   );
