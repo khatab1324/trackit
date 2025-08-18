@@ -48,29 +48,30 @@ export class UserRepoDB implements UserRepositories {
       email: users.email,
       profile_image: users.profile_image,
       bio: users.bio,
+      emailVerified: users.emailVerified,
       created_at: users.created_at,
-      is_followed: currentUserId === id
-        ? sql<boolean>`false`
-        : sql<boolean>`EXISTS(
-            SELECT 1 FROM ${follows} f
-            WHERE f.follower_id = ${currentUserId}
-              AND f.followed_id = ${id}
-          )`,
-      is_requested: currentUserId === id
-        ? sql<boolean>`false`
-        : sql<boolean>`EXISTS(
-            SELECT 1 FROM ${followRequests} fr
-            WHERE fr.requester_id = ${currentUserId}
-              AND fr.target_id = ${id}
-              AND fr.status = 'pending'
-          )`,
-    })
-    .from(users)
-    .where(eq(users.id, id))
-    .limit(1);
-
+    }).from(users).where(eq(users.id, id));
+    
     if (!userFromDB) return null;
-    return userFromDB;
+    
+    // Check follow status
+    const [followStatus] = await db.select({
+      is_followed: sql<boolean>`EXISTS(SELECT 1 FROM ${follows} WHERE ${follows.follower_id} = ${currentUserId} AND ${follows.followed_id} = ${id})`,
+      is_requested: sql<boolean>`EXISTS(SELECT 1 FROM ${followRequests} WHERE ${followRequests.requester_id} = ${currentUserId} AND ${followRequests.target_id} = ${id})`,
+    }).from(users).where(eq(users.id, id));
+    
+    return {
+      ...userFromDB,
+      is_followed: followStatus?.is_followed || false,
+      is_requested: followStatus?.is_requested || false,
+    };
+  }
+
+  async updateEmailVerified(email: string, verified: boolean): Promise<void> {
+    await db
+      .update(users)
+      .set({ emailVerified: verified })
+      .where(eq(users.email, email));
   }
 
   async findUserByToken(token: string): Promise<publicUser | null> {

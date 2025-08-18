@@ -3,10 +3,13 @@ import { publicUser } from "../../DTO/publicUserDTO";
 import { UserSignupInput } from "../../DTO/signupDTO";
 import { generateToken } from "../../services/jwtService";
 import { CreateUser } from "./createUser";
+import { EmailService } from "../../services/emailService";
+import { VerificationTokenRepo } from "../../../infrastructure/repositories/verificationTokenRepo";
 import bcrypt from "bcrypt";
 
 export class signupUseCase {
   constructor(private userRepe: UserRepoDB) {}
+  
   async execute(userData: UserSignupInput) {
     // Check if username already exists
     const existingUserByUsername = await this.userRepe.findByUsername(userData.username);
@@ -21,12 +24,28 @@ export class signupUseCase {
     }
 
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-    const createdUser = await this.userRepe.addUserToDB({
+    
+    // Create user with emailVerified: false
+    const userToCreate = {
       ...userData,
       password: hashedPassword,
-    });
-
-    const token = generateToken(createdUser.id);
-    return { createdUser, token };
+      emailVerified: false,
+    };
+    
+    const createdUser = await this.userRepe.addUserToDB(userToCreate);
+    
+    // Generate verification code and send email
+    const verificationCode = Math.floor(100000 + Math.random() * 900000); // 6-digit code
+    const emailService = new EmailService();
+    const verificationTokenRepo = new VerificationTokenRepo();
+    
+    await verificationTokenRepo.createVerificationToken(userData.email, verificationCode);
+    await emailService.sendVerificationEmail(userData.email, verificationCode);
+    
+    // Return user data without token (user needs to verify email first)
+    return { 
+      createdUser,
+      message: "User created successfully. Please check your email for verification code."
+    };
   }
 }

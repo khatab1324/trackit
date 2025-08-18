@@ -4,4 +4,5 @@ export type UserSignupInput = {
   password: string;
   profile_image: string | null;
   bio: string | null;
+  emailVerified: boolean;
 };

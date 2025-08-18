@@ -4,6 +4,7 @@ import {
   signinController,
   signupController,
 } from "../controllers/authController";
+import { verifyEmailController } from "../controllers/emailVerificationController";
 
 export default function authRoute(app: FastifyInstance) {
   app.post("/signin", signinController);
@@ -12,4 +13,5 @@ export default function authRoute(app: FastifyInstance) {
     { schema: { body: createUserValidator } },
     signupController
   );
+  app.post("/verify-email", verifyEmailController);
 }

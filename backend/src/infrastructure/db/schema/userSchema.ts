@@ -5,6 +5,7 @@ import {
   text,
   timestamp,
   uuid,
+  boolean,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -14,5 +15,6 @@ export const users = pgTable("users", {
   password: varchar({ length: 255 }).notNull(),
   profile_image: text(),
   bio: text(),
+  emailVerified: boolean().default(false).notNull(),
   created_at: timestamp().defaultNow().notNull(),
 });

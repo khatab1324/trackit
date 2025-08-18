@@ -5,5 +5,6 @@ export interface User {
   password: string;
   profile_image: string | null;
   bio: string | null;
+  emailVerified: boolean;
   created_at: Date;
 }
