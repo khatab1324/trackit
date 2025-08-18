@@ -3,6 +3,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 import { HomeScreen } from "../screens/HomeScreen";
 import ChatStack from "./ChatStack";
@@ -29,10 +31,20 @@ const Tab = createBottomTabNavigator<HomeStackParamList>();
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const avatarUri: string | undefined = undefined;
   const visibleRoutes = ["Map", "Chat", "Home", "Profile"];
+  const isDark = useSelector((state: RootState) => state.sheardDataThrowApp.darkMode);
 
   return (
-    <SafeAreaView style={styles.safe} edges={["bottom"]}>
-      <View style={styles.container}>
+    <SafeAreaView 
+      style={[
+        styles.safe, 
+        { backgroundColor: isDark ? "#1F2937" : "#fff" }
+      ]} 
+      edges={["bottom"]}
+    >
+      <View style={[
+        styles.container,
+        { backgroundColor: isDark ? "#1F2937" : "#fff" }
+      ]}>
         {state.routes
           .filter((r: any) => visibleRoutes.includes(r.name))
           .map((route: any) => {
@@ -50,7 +62,11 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
               }
             };
 
-            const color = isFocused ? "#111" : "#767676";
+            // Theme-aware colors
+            const focusedColor = isDark ? "#FFFFFF" : "#000000"; // White for dark, Black for light
+            const unfocusedColor = isDark ? "#FFFFFF" : "#000000"; // White for dark, Black for light
+            const color = isFocused ? focusedColor : unfocusedColor;
+            
             let icon = null;
 
             if (route.name === "Home") {
@@ -61,7 +77,11 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
               icon = <Ionicons name={isFocused ? "map" : "map-outline"} size={26} color={color} />;
             } else if (route.name === "Profile") {
               icon = avatarUri ? (
-                <View style={[styles.avatarWrap, isFocused && styles.avatarActive]}>
+                <View style={[
+                  styles.avatarWrap, 
+                  isFocused && styles.avatarActive,
+                  { borderColor: isDark ? "#FFFFFF" : "#000000" }
+                ]}>
                   <Image source={{ uri: avatarUri }} style={styles.avatar} />
                 </View>
               ) : (
@@ -122,10 +142,12 @@ export default function HomeStack() {
 }
 
 const styles = StyleSheet.create({
-  safe: { backgroundColor: "#fff" },
+  safe: { 
+    // backgroundColor will be set dynamically based on theme
+  },
   container: {
     height: 43,
-    backgroundColor: "#fff",
+    // backgroundColor will be set dynamically based on theme
     flexDirection: "row",
     paddingHorizontal: 18,
     justifyContent: "space-between",
@@ -139,6 +161,10 @@ const styles = StyleSheet.create({
   tabBtn: { flex: 1, alignItems: "center" },
   iconLift: { transform: [{ translateY: -2 }] },
   avatarWrap: { borderRadius: 999 },
-  avatarActive: { borderWidth: 2, borderColor: "#111", padding: 2 },
+  avatarActive: { 
+    borderWidth: 2, 
+    // borderColor will be set dynamically based on theme
+    padding: 2 
+  },
   avatar: { width: 26, height: 26, borderRadius: 999 },
 });

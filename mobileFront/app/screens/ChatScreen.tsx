@@ -46,7 +46,6 @@ export const ChatScreen = () => {
     };
   }, [searchQuery]);
 
-  // Filtered friends based on search
   const filteredFriends = useMemo(() => {
     if (!debouncedQuery.trim()) return friends || [];
     return (friends || []).filter((friend) =>
@@ -54,7 +53,6 @@ export const ChatScreen = () => {
     );
   }, [debouncedQuery, friends]);
 
-  // Check if search is processing
   const isSearching = searchQuery !== debouncedQuery;
 
   if (isLoading) {
@@ -90,15 +88,20 @@ export const ChatScreen = () => {
     <View className="flex-1 bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900">
       <View className="pt-16 pb-6 px-6">
         <View className="mb-6">
-          <Text className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <Text className={clsx(
+            "text-3xl font-bold text-gray-900 dark:text-white mb-2",
+            isDark ? "text-white" : "text-gray-900"
+          )}>
             Messages
           </Text>
-          <Text className="text-sm text-gray-600 dark:text-gray-400">
+          <Text className={clsx(
+            "text-sm text-gray-600 dark:text-gray-400",
+            isDark ? "text-gray-300" : "text-gray-600"
+          )}>
             Chat with your friends and followers
           </Text>
         </View>
         
-        {/* Enhanced Search Bar */}
         <View className="mb-4">
           <View
             className={clsx(

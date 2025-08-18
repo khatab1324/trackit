@@ -31,17 +31,14 @@ export const MapComponent: React.FC<Props> = ({
     const newRegion: Region = {
       latitude,
       longitude,
-      latitudeDelta: 0.01, // Zoom in closer for searched locations
+      latitudeDelta: 0.01, 
       longitudeDelta: 0.01,
     };
     
     setCurrentRegion(newRegion);
     
-    // Animate to the new location
     mapRef.current?.animateToRegion(newRegion, 1000);
   };
-
-  // If a memory is selected, show the MemoComponent
   if (selectedMemory) {
     return (
       <View style={styles.memoContainer}>
@@ -51,7 +48,6 @@ export const MapComponent: React.FC<Props> = ({
           screenWidth={screenWidth}
           showBackButton={false}
         />
-        {/* Back button */}
         <View style={styles.backButton}>
           <TouchableOpacity
             style={styles.backButtonTouchable}
