@@ -19,6 +19,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/index";
 import { colors } from "../core/theme/colors";
 import { ThemedText } from "../components/ThemedText";
+import { useThemeColors } from "../hooks/useThemeColors"; // Import useThemeColors
 
 type RouteParams = {
   friendId: string;
@@ -52,7 +53,7 @@ export const ConversationScreen = () => {
     currentUser && "id" in currentUser ? (currentUser as any).id : undefined;
 
   const theme = useSelector((state: RootState) => state.theme.current);
-  const themeColors = colors[theme];
+  const themeColors = useThemeColors(); // Use the hook
 
   const {
     messages,
@@ -97,16 +98,16 @@ export const ConversationScreen = () => {
     return (
       <View className={`mb-3 ${isOwnMessage ? "items-end" : "items-start"}`}>
         <View
-          className={`max-w-[80%] px-4 py-3 rounded-2xl ${
-            isOwnMessage
-              ? "bg-primary rounded-br-md"
-              : "bg-card rounded-bl-md"
-          }`}
+          style={{
+            maxWidth: "80%",
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderRadius: 20,
+            backgroundColor: isOwnMessage ? "#1877F2" : themeColors.card,
+          }}
         >
           <ThemedText
-            className={`text-sm ${
-              isOwnMessage ? "text-white" : "text-text"
-            }`}
+            style={{ color: "white" }}
           >
             {item.message}
           </ThemedText>
@@ -124,15 +125,16 @@ export const ConversationScreen = () => {
   const keyboardOffset = Platform.select({ ios: headerHeight, android: 0 });
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1"
+      style={{ backgroundColor: themeColors.background }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={keyboardOffset}
       >
         <View
-          className="flex-row items-center justify-between px-4 border-b border-border bg-card"
-          style={{ height: headerHeight }}
+          className="flex-row items-center justify-between px-4 border-b"
+          style={{ height: headerHeight, borderColor: themeColors.border, backgroundColor: themeColors.card }}
         >
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color={themeColors.primary} />
@@ -160,14 +162,16 @@ export const ConversationScreen = () => {
           }}
         />
 
-        <View className="border-t border-border bg-card px-4 py-2">
+        <View className="border-t px-4 py-2"
+          style={{ borderColor: themeColors.border, backgroundColor: themeColors.card }}>
           <View className="flex-row items-center">
             <TextInput
               value={newMessage}
               onChangeText={setNewMessage}
               placeholder="Type a message..."
               placeholderTextColor={themeColors.placeholder}
-              className="flex-1 bg-secondary rounded-full px-4 py-3 text-text"
+              className="flex-1 rounded-full px-4 py-3"
+              style={{ backgroundColor: themeColors.secondary, color: themeColors.text }}
               multiline
             />
             <TouchableOpacity
@@ -178,16 +182,17 @@ export const ConversationScreen = () => {
                   ? "bg-primary"
                   : "bg-gray-300 dark:bg-gray-600"
               }`}
+              style={{ backgroundColor: newMessage.trim() && isConnected && !sending ? "#1877F2" : themeColors.secondary }}
             >
               {sending ? (
-                <ActivityIndicator size="small" color={themeColors.text} />
+                <ActivityIndicator size="small" color="white" />
               ) : (
                 <Ionicons
                   name="send"
                   size={20}
                   color={
                     newMessage.trim() && isConnected && !sending
-                      ? themeColors.text
+                      ? "white" // Changed arrow color to white
                       : themeColors.placeholder
                   }
                 />
