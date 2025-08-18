@@ -20,11 +20,11 @@ export default function ProfileInfo() {
                 size={80} 
                 color={themeColors.text} 
             />
-            <View className="ml-4 mt-2">
+            <View className="ml-4 mt-2 flex-1">
                 <ThemedText className={`text-lg font-semibold`}>
                     {user?.username || "Username"}
                 </ThemedText>
-                <ThemedText type="placeholder">
+                <ThemedText type="placeholder" className="flex-shrink">
                     {user?.bio || "Bio goes here..."}
                 </ThemedText>
             </View>
