@@ -26,6 +26,7 @@ type FollowRequest = {
   target_id: Id;
   status: "pending" | "accepted" | "rejected";
   created_at?: string;
+  username: string;
 };
 type Follower = { id: Id; userId: Id; followerId: Id };
 
@@ -61,7 +62,7 @@ type BookmarkedMemory = {
 export const InteractionApi = createApi({
   reducerPath: "InteractionApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.EXPO_PUBLIC_API_URL,
+    baseUrl: process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000",
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as any)?.auth?.token;
       if (token) headers.set("authorization", `Bearer ${token}`);
@@ -200,6 +201,15 @@ export const InteractionApi = createApi({
         data: { success: boolean };
         message: string;
       }) => res.data,
+      async onQueryStarted({ request_id }, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Invalidate follow requests cache to refetch the list
+          dispatch(InteractionApi.util.invalidateTags(["FollowRequest"]));
+        } catch (error) {
+          console.error("Failed to invalidate follow requests cache:", error);
+        }
+      },
     }),
 
     rejectFollowRequest: builder.mutation<
@@ -215,6 +225,15 @@ export const InteractionApi = createApi({
         data: { success: boolean };
         message: string;
       }) => res.data,
+      async onQueryStarted({ request_id }, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Invalidate follow requests cache to refetch the list
+          dispatch(InteractionApi.util.invalidateTags(["FollowRequest"]));
+        } catch (error) {
+          console.error("Failed to invalidate follow requests cache:", error);
+        }
+      },
     }),
 
     getFollowRequests: builder.query<FollowRequest[], void>({
@@ -225,6 +244,7 @@ export const InteractionApi = createApi({
       keepUnusedDataFor: 0, 
       transformResponse: (res: { data: FollowRequest[]; message: string }) =>
         res.data,
+      providesTags: ["FollowRequest"],
     }),
 
     getCurrentUserFollowers: builder.query<Friend[], void>({

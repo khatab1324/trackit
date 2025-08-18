@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, ne } from "drizzle-orm";
 import {
   FollowRequestInput,
   FollowRequestActionInput,
@@ -177,7 +177,13 @@ export class FollowRequestRepositoryImp implements FollowRequestRepository {
         })
         .from(followRequests)
         .innerJoin(users, eq(followRequests.requester_id, users.id))
-        .where(eq(followRequests.target_id, user_id) && eq(followRequests.status, "pending"));
+        .where(
+          and(
+            eq(followRequests.target_id, user_id),
+            eq(followRequests.status, "pending"),
+            ne(followRequests.requester_id, user_id)
+          )
+      );
       return requests as FollowRequest[];
     } catch (error) {
       console.error("Error getting follow requests:", error);

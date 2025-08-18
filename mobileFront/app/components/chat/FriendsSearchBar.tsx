@@ -14,6 +14,7 @@ import { RootState } from "../../store";
 import { useGetCurrentUserFollowersQuery } from "../../lib/APIs/RTKQuery/InteractionApi";
 import { Friend } from "../../core/types/friends";
 import { colors } from "../../core/theme/colors";
+import clsx from "clsx";
 
 type FriendsSearchBarProps = {
   onSelect?: (friend: Friend) => void;
@@ -53,43 +54,56 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
 
   const renderItem = ({ item }: { item: Friend }) => (
     <TouchableOpacity
-      style={{ paddingHorizontal: 12, paddingVertical: 8 }}
+      className="px-4 py-3 mx-2 my-1 rounded-xl bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700"
       onPress={() => {
         onSelect?.(item);
         Keyboard.dismiss();
         setFocused(false);
       }}
+      activeOpacity={0.7}
     >
-      <Text style={{ color: colorScheme.text, fontSize: 14, fontWeight: "500" }}>
-        {item.username || "Unknown"}
-      </Text>
+      <View className="flex-row items-center">
+        <View className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full items-center justify-center mr-3">
+          <Text className="text-blue-600 dark:text-blue-400 text-sm font-medium">
+            {item.username?.charAt(0).toUpperCase()}
+          </Text>
+        </View>
+        <Text className="text-gray-800 dark:text-gray-200 text-base font-medium flex-1">
+          {item.username || "Unknown"}
+        </Text>
+        <Ionicons 
+          name="chevron-forward" 
+          size={16} 
+          color={isDark ? "#94A3B8" : "#64748B"} 
+        />
+      </View>
     </TouchableOpacity>
   );
 
   return (
-    <View style={{ width: "100%" }}>
+    <View className="w-full">
       <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          borderRadius: 12,
-          paddingHorizontal: 12,
-          height: 48,
-          backgroundColor: colorScheme.secondary,
-        }}
+        className={clsx(
+          "flex-row items-center rounded-2xl px-4 h-14",
+          "bg-white dark:bg-neutral-800",
+          "border-2 border-gray-200 dark:border-neutral-700",
+          "shadow-sm dark:shadow-neutral-900/50",
+          focused && "border-blue-500 dark:border-blue-400"
+        )}
       >
-        <Ionicons name="search" size={18} color={colorScheme.secondaryText} />
+        <View className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full items-center justify-center mr-3">
+          <Ionicons 
+            name="search" 
+            size={18} 
+            color={isDark ? "#60A5FA" : "#3B82F6"} 
+          />
+        </View>
         <TextInput
-          style={{
-            flex: 1,
-            marginLeft: 8,
-            fontSize: 16,
-            color: colorScheme.text,
-          }}
+          className="flex-1 text-base text-gray-800 dark:text-white font-medium"
           value={query}
           onChangeText={setQuery}
           placeholder={placeholder}
-          placeholderTextColor={colorScheme.secondaryText}
+          placeholderTextColor={isDark ? "#94A3B8" : "#9CA3AF"}
           autoFocus={autoFocus}
           onFocus={() => setFocused(true)}
           onBlur={() => setTimeout(() => setFocused(false), 120)}
@@ -97,34 +111,44 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
           autoCorrect={false}
         />
         {query.length > 0 && (
-          <TouchableOpacity onPress={() => setQuery("")} hitSlop={10}>
-            <Ionicons name="close" size={18} color={colorScheme.secondaryText} />
+          <TouchableOpacity 
+            onPress={() => setQuery("")} 
+            hitSlop={10}
+            className="w-8 h-8 bg-gray-100 dark:bg-neutral-700 rounded-full items-center justify-center"
+          >
+            <Ionicons 
+              name="close" 
+              size={18} 
+              color={isDark ? "#94A3B8" : "#64748B"} 
+            />
           </TouchableOpacity>
         )}
       </View>
 
       {focused && (
         <View
-          style={{
-            marginTop: 4,
-            borderRadius: 12,
-            borderWidth: 1,
-            borderColor: colorScheme.border,
-            backgroundColor: colorScheme.background,
-            maxHeight: 288,
-            overflow: "hidden",
-          }}
+          className={clsx(
+            "mt-3 rounded-2xl border border-gray-200 dark:border-neutral-700",
+            "bg-white dark:bg-neutral-800",
+            "shadow-lg dark:shadow-neutral-900/50",
+            "max-h-80 overflow-hidden"
+          )}
         >
           {isLoading ? (
-            <View style={{ paddingVertical: 20, alignItems: "center" }}>
-              <ActivityIndicator color={colorScheme.text} />
-              <Text style={{ color: colorScheme.secondaryText, marginTop: 8, fontSize: 12 }}>
+            <View className="py-8 items-center">
+              <View className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full items-center justify-center mb-3">
+                <ActivityIndicator color={isDark ? "#60A5FA" : "#3B82F6"} />
+              </View>
+              <Text className="text-gray-600 dark:text-gray-400 text-sm font-medium">
                 {loadingText}
               </Text>
             </View>
           ) : filteredFollowers.length === 0 ? (
-            <View style={{ paddingVertical: 20, alignItems: "center" }}>
-              <Text style={{ color: colorScheme.secondaryText, fontSize: 12 }}>
+            <View className="py-8 items-center px-6">
+              <View className="w-16 h-16 bg-gray-100 dark:bg-neutral-700 rounded-full items-center justify-center mb-3">
+                <Text className="text-2xl">🔍</Text>
+              </View>
+              <Text className="text-gray-600 dark:text-gray-400 text-sm font-medium text-center">
                 {emptyText}
               </Text>
             </View>
@@ -134,10 +158,8 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
               keyExtractor={(f) => f.id}
               renderItem={renderItem}
               keyboardShouldPersistTaps="handled"
-              ItemSeparatorComponent={() => (
-                <View style={{ height: 1, backgroundColor: colorScheme.border }} />
-              )}
-              style={{ maxHeight: 288 }}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingVertical: 8 }}
             />
           )}
         </View>

@@ -3,7 +3,7 @@ import { FlatList, useWindowDimensions, View } from "react-native";
 import type { Memory } from "../core/types/memory";
 import { MemoComponent } from "./MemoComponent";
 import { FlashList } from "@shopify/flash-list";
-export const MemoListComp = ({ data }: { data: Memory[] | undefined }) => {
+export const MemoListComp = ({ data, refetch, isFetching }: { data: Memory[] | undefined, refetch: () => void, isFetching: boolean }) => {
   const { height, width } = useWindowDimensions();
   useEffect(() => {
     if (!data || data.length === 0) {
@@ -27,6 +27,7 @@ export const MemoListComp = ({ data }: { data: Memory[] | undefined }) => {
             memory={item}
             screenHeight={height}
             screenWidth={width}
+            showBackButton={false}
           />
         )}
         getItemLayout={(_, index) => ({
@@ -34,6 +35,8 @@ export const MemoListComp = ({ data }: { data: Memory[] | undefined }) => {
           offset: height * index,
           index,
         })}
+        onRefresh={refetch}
+        refreshing={isFetching}
       />
     </View>
   );

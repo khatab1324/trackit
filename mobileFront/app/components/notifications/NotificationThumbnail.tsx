@@ -33,18 +33,12 @@ export const NotificationThumbnail = ({ item }: Props) => {
   return (
     <TouchableOpacity
       onPress={goToMemo}
-      className="ml-3"
-      activeOpacity={0.8}
-      style={{ 
-        width: 48, 
-        height: 48, 
-        borderRadius: 8, 
-        overflow: "hidden" 
-      }}
+      className="w-12 h-12 rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700"
+      activeOpacity={0.7}
     >
       <Image 
         source={{ uri: item.memo!.content_url }} 
-        style={{ width: "100%", height: "100%" }} 
+        className="w-full h-full"
       />
     </TouchableOpacity>
   );

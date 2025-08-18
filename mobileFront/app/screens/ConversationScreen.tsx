@@ -20,6 +20,10 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useChatWithFriend } from "../hooks/useChatWithFriend";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/index";
+import { ChatBubble } from "../components/chat/ChatBubble";
+import { ChatInput } from "../components/chat/ChatInput";
+import { ChatHeader } from "../components/chat/ChatHeader";
+import clsx from "clsx";
 
 type RouteParams = {
   friendId: string;
@@ -86,7 +90,6 @@ export const ConversationScreen = () => {
     };
   }, []);
 
-  // Set canRefetch when chatData is available
   useEffect(() => {
     if (friendId && chatData && !canRefetch) {
       console.log("Chat data available, enabling refetch for friendId:", friendId);
@@ -94,13 +97,10 @@ export const ConversationScreen = () => {
     }
   }, [friendId, chatData, canRefetch]);
 
-  // Refetch chat data when the screen opens and refetch is ready
   useEffect(() => {
     if (friendId && canRefetch) {
       console.log("ConversationScreen opened, refetching chat data for friendId:", friendId);
-      // Don't auto-refetch immediately, let user pull to refresh if needed
-      // This prevents the "Cannot refetch a query that has not been started yet" error
-    }
+       }
   }, [friendId, canRefetch]);
 
   const onRefresh = async () => {
@@ -211,54 +211,33 @@ export const ConversationScreen = () => {
 
   const renderMessage = ({ item }: { item: Message }) => {
     const isOwnMessage = item.sender_id === currentUserId;
+    const timestamp = new Date(item.create_at).toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
 
     return (
-      <TouchableOpacity
+      <ChatBubble
+        message={item.message}
+        timestamp={timestamp}
+        isOwnMessage={isOwnMessage}
+        hasMedia={!!item.media_link}
         onLongPress={() => handleMessageLongPress(item)}
-        activeOpacity={0.8}
-        className={`mb-3 ${isOwnMessage ? "items-end" : "items-start"}`}
-      >
-        <View
-          className={`max-w-[80%] px-4 py-3 rounded-2xl ${
-            isOwnMessage
-              ? "bg-blue-600 dark:bg-blue-700 rounded-br-md"
-              : "bg-gray-200 dark:bg-gray-700 rounded-bl-md"
-          }`}
-        >
-          <Text
-            className={`text-sm ${
-              isOwnMessage ? "text-white" : "text-gray-800 dark:text-gray-200"
-            }`}
-          >
-            {item.message}
-          </Text>
-          {!!item.media_link && (
-            <Text
-              className={`text-xs mt-1 ${
-                isOwnMessage ? "text-blue-100" : "text-blue-400"
-              }`}
-            >
-              📎 Media attached
-            </Text>
-          )}
-        </View>
-        <Text
-          className={`text-xs mt-1 ${
-            isOwnMessage ? "text-gray-400" : "text-gray-500"
-          }`}
-        >
-          {new Date(item.create_at).toLocaleTimeString()}
-        </Text>
-      </TouchableOpacity>
+      />
     );
   };
 
   if (isChatLoading && !chatData) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center bg-white dark:bg-neutral-900">
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text className="mt-4 text-gray-600 dark:text-gray-400">
+      <SafeAreaView className="flex-1 justify-center items-center bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800">
+        <View className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-full items-center justify-center mb-4">
+          <ActivityIndicator size="large" color="#3B82F6" />
+        </View>
+        <Text className="text-lg text-gray-600 dark:text-gray-400 font-medium mb-2">
           Loading conversation...
+        </Text>
+        <Text className="text-sm text-gray-500 dark:text-gray-500">
+          Please wait a moment
         </Text>
       </SafeAreaView>
     );
@@ -267,44 +246,25 @@ export const ConversationScreen = () => {
   const keyboardOffset = Platform.select({ ios: headerHeight, android: 0 });
 
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-neutral-900">
+    <SafeAreaView className="flex-1 bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800">
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={keyboardOffset}
       >
-        <View
-          className="flex-row items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-900"
-          style={{
-            height: headerHeight,
-            transform: [{ translateY: keyboardVisible ? 6 : 0 }],
-          }}
-        >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text className="text-blue-500 text-lg">← Back</Text>
-          </TouchableOpacity>
-          <View className="flex-1 items-center">
-            <Text
-              className="text-lg font-semibold text-gray-800 dark:text-white"
-              numberOfLines={1}
-            >
-              {friendName || `Chat with ${friendId}`}
-            </Text>
-            {!isConnected && (
-              <Text className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
-                Connecting...
-              </Text>
-            )}
-          </View>
-          <View className="w-8" />
-        </View>
-
-        <FlatList
+        <ChatHeader
+          friendName={friendName || `Chat with ${friendId}`}
+          isConnected={isConnected}
+          headerHeight={headerHeight}
+          keyboardVisible={keyboardVisible}
+          onMoreOptions={() => {}}
+        />
+ <FlatList
           ref={flatListRef}
           data={messages}
           renderItem={renderMessage}
           keyExtractor={(item) => item.id}
-          className="flex-1 px-4 pt-4"
+          className="flex-1 px-2 pt-4"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingBottom: 16,
@@ -323,15 +283,18 @@ export const ConversationScreen = () => {
           }
           ListEmptyComponent={
             !isChatLoading ? (
-              <View className="flex-1 justify-center items-center py-20">
-                <Text className="text-gray-500 dark:text-gray-400 text-center text-lg">
+              <View className="flex-1 justify-center items-center py-20 px-8">
+                <View className="w-24 h-24 bg-gray-100 dark:bg-neutral-800 rounded-full items-center justify-center mb-4">
+                  <Text className="text-4xl">💬</Text>
+                </View>
+                <Text className="text-xl font-bold text-gray-700 dark:text-gray-300 text-center mb-2">
                   No messages yet
                 </Text>
-                <Text className="text-gray-400 dark:text-gray-500 text-center text-sm mt-2">
+                <Text className="text-gray-500 dark:text-gray-500 text-center text-base">
                   Start the conversation by sending a message!
                 </Text>
                 {!canRefetch && (
-                  <Text className="text-gray-400 dark:text-gray-500 text-center text-xs mt-4">
+                  <Text className="text-gray-400 dark:text-gray-500 text-center text-sm mt-4">
                     Pull down to refresh when ready
                   </Text>
                 )}
@@ -350,74 +313,18 @@ export const ConversationScreen = () => {
           }}
         />
 
-        <View
-          className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-900 px-4 py-2"
-          style={{
-            paddingBottom:
-              Platform.OS === "ios"
-                ? keyboardVisible
-                  ? 0
-                  : insets.bottom
-                : 0,
-          }}
-        >
-          <View className="flex-row items-end">
-            <TextInput
-              value={newMessage}
-              onChangeText={setNewMessage}
-              placeholder="Type a message..."
-              placeholderTextColor="#9CA3AF"
-              className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-3 text-gray-800 dark:text-white"
-              multiline
-              maxLength={500}
-              textAlignVertical="center"
-              onFocus={() =>
-                setTimeout(
-                  () => flatListRef.current?.scrollToEnd({ animated: true }),
-                  100
-                )
-              }
-              underlineColorAndroid="transparent"
-            />
-            <TouchableOpacity
-              onPress={sendMessage}
-              disabled={!newMessage.trim() || !isConnected || sending}
-              className={`ml-3 px-6 py-3 rounded-full ${
-                newMessage.trim() && isConnected && !sending
-                  ? "bg-blue-500"
-                  : "bg-gray-300 dark:bg-gray-600"
-              }`}
-            >
-              {sending ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
-              ) : (
-                <Text
-                  className={`font-semibold ${
-                    newMessage.trim() && isConnected && !sending
-                      ? "text-white"
-                      : "text-gray-500"
-                  }`}
-                >
-                  Send
-                </Text>
-              )}
-            </TouchableOpacity>
-          </View>
-
-          {!isConnected && (
-            <View className="mt-2 bg-yellow-100 dark:bg-yellow-900 px-3 py-2 rounded-lg">
-              <View className="flex-row items-center justify-center">
-                <ActivityIndicator size="small" color="#D97706" className="mr-2" />
-                <Text className="text-yellow-800 dark:text-yellow-200 text-center">
-                  Connecting to chat...
-                </Text>
-              </View>
-            </View>
-          )}
-        </View>
+        {/* Message Input */}
+        <ChatInput
+          value={newMessage}
+          onChangeText={setNewMessage}
+          onSend={sendMessage}
+          disabled={false}
+          sending={sending}
+          isConnected={isConnected}
+        />
       </KeyboardAvoidingView>
 
-            {/* Message Options Modal */}
+      {/* Message Options Modal */}
       <Modal
         visible={showMessageOptions}
         transparent
@@ -430,25 +337,25 @@ export const ConversationScreen = () => {
           onPress={() => setShowMessageOptions(false)}
         >
           <View className="flex-1 justify-center items-center">
-            <View className="bg-white dark:bg-gray-800 rounded-2xl p-4 mx-4 min-w-[200px]">
-              <Text className="text-lg font-semibold text-gray-800 dark:text-white text-center mb-4">
+            <View className="bg-white dark:bg-neutral-800 rounded-3xl p-6 mx-4 min-w-[280px] shadow-2xl dark:shadow-neutral-900/50">
+              <Text className="text-xl font-bold text-gray-800 dark:text-white text-center mb-6">
                 Message Options
               </Text>
               
               <TouchableOpacity
                 onPress={handleEditMessage}
-                className="bg-blue-500 rounded-xl py-3 mb-3"
+                className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl py-4 mb-4 shadow-sm"
               >
-                <Text className="text-white text-center font-medium">
+                <Text className="text-white text-center font-semibold text-base">
                   Edit Message
                 </Text>
               </TouchableOpacity>
               
               <TouchableOpacity
                 onPress={handleDeleteMessage}
-                className="bg-red-500 rounded-xl py-3"
+                className="bg-gradient-to-r from-red-500 to-red-600 rounded-2xl py-4 shadow-sm"
               >
-                <Text className="text-red-100 text-center font-medium">
+                <Text className="text-white text-center font-semibold text-base">
                   Delete Message
                 </Text>
               </TouchableOpacity>
@@ -470,15 +377,15 @@ export const ConversationScreen = () => {
           onPress={() => setShowEditModal(false)}
         >
           <View className="flex-1 justify-center items-center">
-            <View className="bg-white dark:bg-gray-800 rounded-2xl p-6 mx-4 min-w-[300px]">
-              <Text className="text-lg font-semibold text-gray-800 dark:text-white text-center mb-4">
+            <View className="bg-white dark:bg-neutral-800 rounded-3xl p-6 mx-4 min-w-[320px] shadow-2xl dark:shadow-neutral-900/50">
+              <Text className="text-xl font-bold text-gray-800 dark:text-white text-center mb-6">
                 Edit Message
               </Text>
               
               <TextInput
                 value={editText}
                 onChangeText={setEditText}
-                className="bg-gray-100 dark:bg-gray-700 rounded-xl px-4 py-3 text-gray-800 dark:text-white mb-4"
+                className="bg-gray-100 dark:bg-neutral-700 rounded-2xl px-4 py-4 text-gray-800 dark:text-white text-base mb-6 border border-gray-200 dark:border-neutral-600"
                 multiline
                 autoFocus
                 placeholder="Edit your message..."
@@ -489,18 +396,18 @@ export const ConversationScreen = () => {
               <View className="flex-row space-x-3">
                 <TouchableOpacity
                   onPress={() => setShowEditModal(false)}
-                  className="flex-1 bg-gray-500 rounded-xl py-3"
+                  className="flex-1 bg-gray-500 rounded-2xl py-4 shadow-sm"
                 >
-                  <Text className="text-white text-center font-medium">
+                  <Text className="text-white text-center font-semibold text-base">
                     Cancel
                   </Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity
                   onPress={handleSaveEdit}
-                  className="flex-1 bg-blue-500 rounded-xl py-3"
+                  className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl py-4 shadow-sm"
                 >
-                  <Text className="text-white text-center font-medium">
+                  <Text className="text-white text-center font-semibold text-base">
                     Save
                   </Text>
                 </TouchableOpacity>

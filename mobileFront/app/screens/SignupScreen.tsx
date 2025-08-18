@@ -84,14 +84,8 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
       if ("data" in result) {
         console.log("Signup Success:", result.data);
         if (result.data) {
-          const { token, createdUser } = result.data?.data as {
-            token: string;
-            createdUser: User;
-          };
-          dispatch(setCredentials(token));
-          await AsyncStorage.setItem("token", token);
-          dispatch(addUserToReducer(createdUser));
-          navigation.replace("Home");
+          // Navigate to email verification instead of Home
+          navigation.navigate("EmailVerification", { email });
         }
       } else if ("error" in result) {
         console.log("Signup RTK error:", result.error);
@@ -115,18 +109,10 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
           newFieldErrors.email = emailError;
         }
         
-        // Check for password errors
-        const passwordError = getFieldError("password", errorMessage, {});
-        if (passwordError) {
-          newFieldErrors.password = passwordError;
-        }
-        
-        if (Object.keys(newFieldErrors).length > 0) {
-          setFieldErrors(newFieldErrors);
-        }
+        setFieldErrors(newFieldErrors);
       }
     } catch (error) {
-      console.error("Signup failed:", error);
+      console.error("signup failed:", error);
       setErrorMessage("An unexpected error occurred. Please try again.");
     }
   };

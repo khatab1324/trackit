@@ -1,5 +1,6 @@
 import React from "react";
 import { View, TouchableOpacity, Text } from "react-native";
+import clsx from "clsx";
 
 type Props = {
   onAccept?: () => void;
@@ -15,24 +16,34 @@ export const FollowRequestActions: React.FC<Props> = ({
   loadingReject,
 }) => {
   return (
-    <View className="flex-row mt-2">
+    <View className="flex-row mt-4 space-x-3">
       <TouchableOpacity
         onPress={onAccept}
         disabled={loadingAccept}
-        className="bg-black px-3 py-1.5 rounded-full mr-2"
+        className={clsx(
+          "flex-1 py-3 px-4 rounded-xl items-center justify-center",
+          "bg-blue-600",
+          "shadow-lg"
+        )}
         activeOpacity={0.8}
       >
-        <Text className="text-white">{loadingAccept ? "..." : "Accept"}</Text>
+        <Text className="text-white font-semibold text-base">
+          {loadingAccept ? "Accepting..." : "Accept"}
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         onPress={onReject}
         disabled={loadingReject}
-        className="border border-gray-400 px-3 py-1.5 rounded-full"
+        className={clsx(
+          "flex-1 py-3 px-4 rounded-xl items-center justify-center",
+          "border-2 border-gray-300 dark:border-gray-600",
+          "bg-transparent"
+        )}
         activeOpacity={0.8}
       >
-        <Text className="text-black dark:text-white">
-          {loadingReject ? "..." : "Reject"}
+        <Text className="text-gray-700 dark:text-gray-300 font-semibold text-base">
+          {loadingReject ? "Rejecting..." : "Reject"}
         </Text>
       </TouchableOpacity>
     </View>

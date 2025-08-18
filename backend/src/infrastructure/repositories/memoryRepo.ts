@@ -301,7 +301,9 @@ export class MemoryRepositoryImp implements MemoryRepository {
           // eq(memories.isPublic, true),
           notInArray(memories.user_id, [currentUserId])
         )
-      );
+      )
+      .orderBy(desc(memories.created_at));
+
     console.log("Nearby Memories Retrieved:", nearMemoriesFromDB);
     return nearMemoriesFromDB;
   }

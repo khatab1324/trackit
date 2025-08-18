@@ -17,24 +17,39 @@ export class ChatRepositoryImp implements ChatRepository {
 
     if (!chat) return null;
 
-    return chat as any; // TODO: Fix type mapping
+    return chat as any; 
   }
 
   async getOrCreateChatBetweenUsers(userId1: string, userId2: string): Promise<{ chat: Chat; isNew: boolean }> {
     const existingChat = await prisma.chat.findFirst({
       where: {
-        participants: {
-          every: {
-            user_id: {
-              in: [userId1, userId2]
-            }
-          }
-        }
+        AND: [
+          {
+            participants: {
+              some: { user_id: userId1 },
+            },
+          },
+          {
+            participants: {
+              some: { user_id: userId2 },
+            },
+          },
+          {
+            participants: {
+              none: {
+                user_id: {
+                  notIn: [userId1, userId2],
+                },
+              },
+            },
+          },
+        ],
       },
       include: {
         participants: true,
-      }
+      },
     });
+    
 
     if (existingChat) {
       return { chat: existingChat as any, isNew: false };
@@ -141,6 +156,7 @@ export class ChatRepositoryImp implements ChatRepository {
     const result = groupChats.map((groupChat) => {
       const friends = groupChat.participants.map((participant) => {
         const user = userMap.get(participant.user_id);
+        
         return {
           friendId: participant.user_id,
           friendName: user?.username || `User ${participant.user_id}`,
@@ -220,7 +236,7 @@ export class ChatRepositoryImp implements ChatRepository {
         }
       }
 
-      return createGroupInTheDatabase as any; // TODO: Fix type mapping
+      return createGroupInTheDatabase as any; 
     } catch (error) {
       console.log(error);
       throw new Error("Failed to create group");
@@ -237,7 +253,7 @@ export class ChatRepositoryImp implements ChatRepository {
       const addMessage = await prisma.groupChatMessage.create({
         data: { message, sender_id, group_id: group_chat_id, media_link },
       });
-      return addMessage as any; // TODO: Fix type mapping
+      return addMessage as any; 
     } catch (error) {
       console.log(error);
       throw new Error("Failed to add message to group");
@@ -249,7 +265,7 @@ export class ChatRepositoryImp implements ChatRepository {
       where: { id: messageId },
       data: { message: textMessage },
     });
-    return updateMessage as any; // TODO: Fix type mapping
+    return updateMessage as any; 
   }
 
   async deleteGroupMessage(messageId: string): Promise<GroupChatMessage> {

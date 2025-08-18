@@ -36,11 +36,6 @@ const errorHandlingMiddleware =
     try {
       const result = next(action);
 
-      // Log any RTK Query errors
-      if (action.type && action.type.includes("/rejected")) {
-        console.error("RTK Query error:", action.error);
-      }
-
       return result;
     } catch (error) {
       console.error("Store middleware error:", error);

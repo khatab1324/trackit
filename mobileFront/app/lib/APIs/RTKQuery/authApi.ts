@@ -20,7 +20,7 @@ export const authApi = createApi({
     }),
 
     signup: builder.mutation<
-      { message: string; data: { token: string; createdUser: User } },
+      { message: string; data: { createdUser: User; message: string } },
       { username: string; email: string; password: string }
     >({
       query: (body) => ({

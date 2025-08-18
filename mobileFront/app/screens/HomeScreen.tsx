@@ -47,7 +47,7 @@ export const HomeScreen = () => {
     };
   }, [coords, dispatch]);
 
-  const { data, isLoading, isError } = useGetNearMemoryQuery(
+  const { data, isLoading, isError, isFetching, refetch } = useGetNearMemoryQuery(
     coords ? { location: coords } : (skipToken as any)
   );
 
@@ -68,7 +68,7 @@ export const HomeScreen = () => {
       <View style={{ flex: 1, backgroundColor: themeColors.background }}>
         {isLoading && <Text style={{ color: themeColors.text }}>Loading...</Text>}
         {isError && <Text style={{ color: themeColors.text }}>Failed to load.</Text>}
-        {data && <MemoListComp data={data} />}
+        {data && <MemoListComp data={data} refetch={refetch} isFetching={isFetching} />}
         {!coords && !isLoading && !isError && (
           <Text style={{ color: themeColors.text, paddingHorizontal: 16, marginTop: 16 }}>
             Waiting for location permission...

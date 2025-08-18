@@ -32,7 +32,6 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
   const [getUserByToken] = useGetUserByTokenMutation();
   const dispatch = useDispatch();
 
-  // Clear errors when user types
   const clearErrors = () => {
     setErrorMessage("");
     setFieldErrors({});
@@ -76,10 +75,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
   }, [getUserByToken, dispatch]); 
 
   const handleSignin = async () => {
-    // Clear previous errors
     clearErrors();
-
-    // Validate form
     const validation = validateSigninForm({
       username,
       password
@@ -87,7 +83,6 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
 
     if (!validation.isValid) {
       setFieldErrors(validation.errors);
-      // Show first error as general error message
       const firstError = Object.values(validation.errors)[0];
       setErrorMessage(firstError);
       return;
@@ -108,6 +103,15 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
         }
       } else if ("error" in result) {
         console.log("RTK error:", result.error);
+        
+        if (result.error && typeof result.error === 'object' && 'status' in result.error) {
+          const errorStatus = (result.error as any).status;
+          if (errorStatus === 403) {
+            setErrorMessage("Please verify your email address before signing in. Check your email for a verification code.");
+            return;
+          }
+        }
+        
         // Use the centralized error handler
         const errorMessage = parseAuthError(result.error);
         setErrorMessage(errorMessage);
