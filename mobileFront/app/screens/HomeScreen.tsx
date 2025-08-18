@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, Alert } from "react-native";
+import { View, Alert } from "react-native";
 import * as Location from "expo-location";
 import { useDispatch, useSelector } from "react-redux";
 import { skipToken } from "@reduxjs/toolkit/query";
@@ -13,6 +13,7 @@ import { RootState } from "../store";
 import { useGetNearMemoryQuery } from "../lib/APIs/RTKQuery/memoryApi";
 import { MemoListComp } from "../components/MemoList";
 import { colors } from "../core/theme/colors";
+import { ThemedText } from "../components/ThemedText";
 
 export const HomeScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
@@ -66,13 +67,13 @@ export const HomeScreen = () => {
   return (
     <GestureDetector gesture={pan}>
       <View style={{ flex: 1, backgroundColor: themeColors.background }}>
-        {isLoading && <Text style={{ color: themeColors.text }}>Loading...</Text>}
-        {isError && <Text style={{ color: themeColors.text }}>Failed to load.</Text>}
+        {isLoading && <ThemedText>Loading...</ThemedText>}
+        {isError && <ThemedText>Failed to load.</ThemedText>}
         {data && <MemoListComp data={data} />}
         {!coords && !isLoading && !isError && (
-          <Text style={{ color: themeColors.text, paddingHorizontal: 16, marginTop: 16 }}>
+          <ThemedText style={{ paddingHorizontal: 16, marginTop: 16 }}>
             Waiting for location permission...
-          </Text>
+          </ThemedText>
         )}
       </View>
     </GestureDetector>

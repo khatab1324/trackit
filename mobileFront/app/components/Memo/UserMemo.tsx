@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useMakeFollowRequestMutation, useCancelFollowRequestMutation } from "../../lib/APIs/RTKQuery/InteractionApi";
 import {  useMarkFollowRequested } from "../../core/hooks/useFollowRequest";
+import { ThemedText } from "../ThemedText";
 
 export const UserMemo = ({
   username,
@@ -58,7 +59,7 @@ export const UserMemo = ({
     <View className="absolute left-3 right-20 bottom-24">
       <View className="flex-row items-center gap-2 pb-2">
         <TouchableOpacity onPress={() => {}}>
-          <Text className="text-white font-semibold">@{username}</Text>
+          <ThemedText className="font-semibold">@{username}</ThemedText>
         </TouchableOpacity>
 
         {showFollow && (
@@ -73,18 +74,18 @@ export const UserMemo = ({
               {localFollowed ? (
                 <>
                   <Ionicons name="checkmark-circle" size={16} color="#fff" />
-                  <Text className="text-white font-semibold">Following</Text>
+                  <ThemedText className="font-semibold">Following</ThemedText>
                 </>
               ) : localRequested ? (
                 <>
-                  <Text className="text-white font-semibold">
+                  <ThemedText className="font-semibold">
                     {isCancellingRequest ? "Cancelling..." : "Requested"}
-                  </Text>
+                  </ThemedText>
                 </>
               ) : isLoading ? (
-                <Text className="text-white font-semibold">Sending…</Text>
+                <ThemedText className="font-semibold">Sending…</ThemedText>
               ) : (
-                <Text className="text-white font-semibold">Follow</Text>
+                <ThemedText className="font-semibold">Follow</ThemedText>
               )}
             </View>
           </TouchableOpacity>
@@ -92,9 +93,9 @@ export const UserMemo = ({
       </View>
 
       {!!description && (
-        <Text className="text-white text-sm mt-1" numberOfLines={2}>
+        <ThemedText className="text-sm mt-1" numberOfLines={2}>
           {description}
-        </Text>
+        </ThemedText>
       )}
     </View>
   );

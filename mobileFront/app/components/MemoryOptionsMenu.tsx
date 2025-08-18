@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Modal,
   View,
-  Text,
   TouchableOpacity,
   TextInput,
   StyleSheet,
@@ -11,6 +10,8 @@ import {
   Easing,
 } from "react-native";
 import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
+import { ThemedText } from "./ThemedText";
+import { useThemeColors } from "../hooks/useThemeColors";
 
 type Props = {
   visible: boolean;
@@ -34,6 +35,7 @@ export default function MemoryOptionsMenu({
   const [mode, setMode] = useState<"menu" | "edit" | "privacy" | "delete">("menu");
   const [caption, setCaption] = useState(currentCaption);
   const slideAnim = useState(new Animated.Value(300))[0];
+  const themeColors = useThemeColors();
 
   useEffect(() => {
     if (visible) {
@@ -71,19 +73,19 @@ export default function MemoryOptionsMenu({
           <>
             {/* Privacy */}
             <TouchableOpacity style={styles.row} onPress={() => setMode("privacy")}>
-              <Ionicons name="shield-outline" size={22} color="#111827" style={styles.icon} />
-              <Text style={styles.itemText}>Privacy</Text>
+              <Ionicons name="shield-outline" size={22} color={themeColors.text} style={styles.icon} />
+              <ThemedText style={styles.itemText}>Privacy</ThemedText>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.row} onPress={() => setMode("edit")}>
-              <MaterialIcons name="edit" size={22} color="#111827" style={styles.icon} />
-              <Text style={styles.itemText}>Edit Caption</Text>
+              <MaterialIcons name="edit" size={22} color={themeColors.text} style={styles.icon} />
+              <ThemedText style={styles.itemText}>Edit Caption</ThemedText>
             </TouchableOpacity>
 
             <View style={styles.divider} />
             <TouchableOpacity style={styles.row} onPress={() => setMode("delete")}>
-              <Feather name="trash-2" size={22} color="#EF4444" style={styles.icon} />
-              <Text style={[styles.itemText, { color: "#EF4444" }]}>Delete</Text>
+              <Feather name="trash-2" size={22} color={themeColors.error} style={styles.icon} />
+              <ThemedText style={[styles.itemText, { color: themeColors.error }]}>Delete</ThemedText>
             </TouchableOpacity>
           </>
         )}
@@ -97,7 +99,7 @@ export default function MemoryOptionsMenu({
                 closeMenu();
               }}
             >
-              <Text style={styles.privacyOption}>🌍 Public</Text>
+              <ThemedText style={styles.privacyOption}>🌍 Public</ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.row}
@@ -106,37 +108,37 @@ export default function MemoryOptionsMenu({
                 closeMenu();
               }}
             >
-              <Text style={styles.privacyOption}>🔒 Private</Text>
+              <ThemedText style={styles.privacyOption}>🔒 Private</ThemedText>
             </TouchableOpacity>
           </>
         )}
 
         {mode === "edit" && (
           <>
-            <Text style={styles.label}>Edit caption</Text>
+            <ThemedText style={styles.label}>Edit caption</ThemedText>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: themeColors.text }]} // Apply text color to TextInput
               value={caption}
               onChangeText={setCaption}
               placeholder="Enter a new caption"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={themeColors.placeholder}
               multiline
             />
             <View style={{ flexDirection: "row", marginTop: 12 }}>
               <TouchableOpacity
-                style={[styles.actionBtn, { backgroundColor: "#2563EB", flex: 1, marginRight: 6 }]}
+                style={[styles.actionBtn, { backgroundColor: themeColors.primary, flex: 1, marginRight: 6 }]}
                 onPress={() => {
                   onUpdateCaption(caption.trim());
                   closeMenu();
                 }}
               >
-                <Text style={styles.actionBtnText}>Save</Text>
+                <ThemedText style={styles.actionBtnText}>Save</ThemedText>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.actionBtn, { backgroundColor: "#9CA3AF", flex: 1, marginLeft: 6 }]}
+                style={[styles.actionBtn, { backgroundColor: themeColors.placeholder, flex: 1, marginLeft: 6 }]}
                 onPress={closeMenu}
               >
-                <Text style={styles.actionBtnText}>Cancel</Text>
+                <ThemedText style={styles.actionBtnText}>Cancel</ThemedText>
               </TouchableOpacity>
             </View>
           </>
@@ -151,12 +153,12 @@ export default function MemoryOptionsMenu({
                 closeMenu();
               }}
             >
-              <Feather name="trash-2" size={22} color="#EF4444" style={styles.icon} />
-              <Text style={[styles.itemText, { color: "#EF4444" }]}>Delete</Text>
+              <Feather name="trash-2" size={22} color={themeColors.error} style={styles.icon} />
+              <ThemedText style={[styles.itemText, { color: themeColors.error }]}>Delete</ThemedText>
             </TouchableOpacity>
             <TouchableOpacity style={styles.row} onPress={closeMenu}>
-              <Ionicons name="close-circle" size={22} color="#DC2626" style={styles.icon} />
-              <Text style={[styles.itemText, { color: "#111827" }]}>Cancel</Text>
+              <Ionicons name="close-circle" size={22} color={themeColors.error} style={styles.icon} />
+              <ThemedText style={[styles.itemText, { color: themeColors.text }]}>Cancel</ThemedText>
             </TouchableOpacity>
           </>
         )}
@@ -172,7 +174,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: themeColors.card, // Use theme color
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     paddingHorizontal: 18,
@@ -184,7 +186,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 5,
     borderRadius: 999,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: themeColors.border, // Use theme color
     alignSelf: "center",
     marginBottom: 8,
   },
@@ -194,30 +196,30 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   icon: { marginRight: 12 },
-  itemText: { fontSize: 16, color: "#111827" },
+  itemText: { fontSize: 16, color: themeColors.text }, // Use theme color
   divider: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: themeColors.border, // Use theme color
     marginVertical: 4,
   },
-  label: { fontSize: 16, color: "#111827", marginBottom: 8, fontWeight: "600" },
+  label: { fontSize: 16, color: themeColors.text, marginBottom: 8, fontWeight: "600" }, // Use theme color
   input: {
     minHeight: 90,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: themeColors.border, // Use theme color
     borderRadius: 12,
     padding: 12,
-    color: "#111827",
+    color: themeColors.text, // Set by component already
   },
   actionBtn: {
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: "center",
   },
-  actionBtnText: { color: "#fff", fontWeight: "600", fontSize: 16 },
+  actionBtnText: { color: "#fff", fontWeight: "600", fontSize: 16 }, // This text is on a colored button, keep white
   privacyOption: {
     fontSize: 16,
-    color: "#111827",
+    color: themeColors.text,
     fontWeight: "500",
     marginLeft: 4,
   },

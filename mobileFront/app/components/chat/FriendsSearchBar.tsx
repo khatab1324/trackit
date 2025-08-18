@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   TextInput,
-  Text,
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
@@ -13,6 +12,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useGetCurrentUserFollowersQuery } from "../../lib/APIs/RTKQuery/InteractionApi";
 import { Friend } from "../../core/types/friends";
+import { ThemedText } from "../ThemedText";
+import { useThemeColors } from "../../hooks/useThemeColors";
 
 type FriendsSearchBarProps = {
   onSelect?: (friend: Friend) => void;
@@ -29,7 +30,7 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
   emptyText = "No friends found",
   loadingText = "Loading friends...",
 }) => {
-  const theme = useSelector((s: RootState) => s.theme.current);
+  const themeColors = useThemeColors();
 
   const { data: followers, isLoading } = useGetCurrentUserFollowersQuery();
   const [query, setQuery] = useState("");
@@ -58,9 +59,9 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
         setFocused(false);
       }}
     >
-      <Text className="text-text text-sm font-medium">
+      <ThemedText className="text-sm font-medium">
         {item.username || "Unknown"}
-      </Text>
+      </ThemedText>
     </TouchableOpacity>
   );
 
@@ -69,13 +70,13 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
       <View
         className="flex-row items-center rounded-xl px-3 h-12 bg-card"
       >
-        <Ionicons name="search" size={18} color={theme === 'dark' ? '#808080' : '#a0a0a0'} />
+        <Ionicons name="search" size={18} color={themeColors.placeholder} />
         <TextInput
-          className="flex-1 ml-2 text-base text-text"
+          className="flex-1 ml-2 text-base"
           value={query}
           onChangeText={setQuery}
           placeholder={placeholder}
-          placeholderTextColor={theme === 'dark' ? '#808080' : '#a0a0a0'}
+          placeholderTextColor={themeColors.placeholder}
           autoFocus={autoFocus}
           onFocus={() => setFocused(true)}
           onBlur={() => setTimeout(() => setFocused(false), 120)}
@@ -84,7 +85,7 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
         />
         {query.length > 0 && (
           <TouchableOpacity onPress={() => setQuery("")} hitSlop={10}>
-            <Ionicons name="close" size={18} color={theme === 'dark' ? '#808080' : '#a0a0a0'} />
+            <Ionicons name="close" size={18} color={themeColors.placeholder} />
           </TouchableOpacity>
         )}
       </View>
@@ -95,16 +96,16 @@ export const FriendsSearchBar: React.FC<FriendsSearchBarProps> = ({
         >
           {isLoading ? (
             <View className="py-5 items-center">
-              <ActivityIndicator color={theme === 'dark' ? '#ffffff' : '#000000'} />
-              <Text className="text-placeholder mt-2 text-xs">
+              <ActivityIndicator color={themeColors.text} />
+              <ThemedText type="placeholder" className="mt-2 text-xs">
                 {loadingText}
-              </Text>
+              </ThemedText>
             </View>
           ) : filteredFollowers.length === 0 ? (
             <View className="py-5 items-center">
-              <Text className="text-placeholder text-xs">
+              <ThemedText type="placeholder" className="text-xs">
                 {emptyText}
-              </Text>
+              </ThemedText>
             </View>
           ) : (
             <FlatList

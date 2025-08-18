@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { View, FlatList, Text, ActivityIndicator } from "react-native";
+import { View, FlatList, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import { setUnreadCount } from "../store/slices/notificationsSlice";
@@ -9,6 +9,7 @@ import { NotificationItemData } from "../components/notifications/types";
 import { useGetFollowRequestsQuery } from "../lib/APIs/RTKQuery/InteractionApi";
 import { RootState } from "../store";
 import { colors } from "../core/theme/colors";
+import { ThemedText } from "../components/ThemedText";
 
 export default function NotificationsScreen() {
   const dispatch = useDispatch();
@@ -61,13 +62,13 @@ export default function NotificationsScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <View className="px-4 py-3 border-b border-border bg-card">
-        <Text className="text-xl font-bold text-text">Notifications</Text>
+        <ThemedText className="text-xl font-bold">Notifications</ThemedText>
       </View>
 
       {isLoadingNotifications || isLoadingFollowRequests ? (
         <View className="flex-1 justify-center items-center">
           <ActivityIndicator size="large" color={theme === 'dark' ? colors.dark.text : colors.light.text} />
-          <Text className="text-placeholder mt-2">Loading…</Text>
+          <ThemedText type="placeholder" className="mt-2">Loading…</ThemedText>
         </View>
       ) : (
         <FlatList
@@ -83,9 +84,9 @@ export default function NotificationsScreen() {
           refreshing={isFetching || isLoadingFollowRequests}
           ListEmptyComponent={
             <View className="py-16 items-center">
-              <Text className="text-placeholder">
+              <ThemedText type="placeholder">
                 {isError && "No notifications at the moment"}
-              </Text>
+              </ThemedText>
             </View>
           }
         />

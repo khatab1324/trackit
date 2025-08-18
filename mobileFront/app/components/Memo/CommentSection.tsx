@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  Text,
   TouchableOpacity,
   FlatList,
   Animated,
@@ -11,6 +10,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useGetMemoryCommentsQuery } from "../../lib/APIs/RTKQuery/InteractionApi";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AddComment } from "./AddComment";
+import { ThemedText } from "../ThemedText";
+import { useThemeColors } from "../../hooks/useThemeColors";
 
 const { height: screenHeight } = Dimensions.get("window");
 
@@ -27,6 +28,7 @@ export const CommentSection: React.FC<Props> = ({
 }) => {
   const [slideAnim] = useState(new Animated.Value(screenHeight));
   const [backdropOpacity] = useState(new Animated.Value(0));
+  const themeColors = useThemeColors();
 
   const {
     data: comments,
@@ -75,24 +77,25 @@ export const CommentSection: React.FC<Props> = ({
 
     return (
       <View className="flex-row items-start space-x-3 px-4 py-3">
-        <View className="w-8 h-8 rounded-full bg-gray-300 items-center justify-center">
-          <Text className="text-gray-600 font-semibold text-sm">
+        <View className="w-8 h-8 rounded-full items-center justify-center"
+          style={{ backgroundColor: themeColors.card }}>
+          <ThemedText className="font-semibold text-sm">
             {avatarInitial}
-          </Text>
+          </ThemedText>
         </View>
         <View className="flex-1">
           <View className="flex-row items-center space-x-2">
-            <Text className="text-white font-semibold text-sm">{username}</Text>
-            <Text className="text-gray-400 text-xs">
+            <ThemedText className="font-semibold text-sm">{username}</ThemedText>
+            <ThemedText type="placeholder" className="text-xs">
               {formatTimeAgo(item.created_at || new Date().toISOString())}
-            </Text>
+            </ThemedText>
           </View>
-          <Text className="text-white text-sm mt-1 leading-5">
+          <ThemedText className="text-sm mt-1 leading-5">
             {item.content}
-          </Text>
+          </ThemedText>
         </View>
         <TouchableOpacity className="p-2">
-          <Ionicons name="heart-outline" size={16} color="white" />
+          <Ionicons name="heart-outline" size={16} color={themeColors.icon.like} />
         </TouchableOpacity>
       </View>
     );
@@ -114,18 +117,20 @@ export const CommentSection: React.FC<Props> = ({
       </Animated.View>
 
       <Animated.View
-        className="absolute left-0 right-0 bg-gray-900 rounded-t-3xl"
+        className="absolute left-0 right-0 rounded-t-3xl"
         style={{
           transform: [{ translateY: slideAnim }],
           bottom: 43,
           maxHeight: (screenHeight - 43) * 0.8,
+          backgroundColor: themeColors.background,
         }}
       >
         <SafeAreaView edges={["bottom"]}>
-          <View className="flex-row items-center justify-between px-4 py-3 border-b border-gray-700">
-            <Text className="text-white font-semibold text-lg">Comments</Text>
+          <View className="flex-row items-center justify-between px-4 py-3 border-b border-gray-700"
+            style={{ borderColor: themeColors.border }}>
+            <ThemedText className="font-semibold text-lg">Comments</ThemedText>
             <TouchableOpacity onPress={onClose} className="p-2">
-              <Ionicons name="close" size={24} color="white" />
+              <Ionicons name="close" size={24} color={themeColors.text} />
             </TouchableOpacity>
           </View>
 
@@ -139,9 +144,9 @@ export const CommentSection: React.FC<Props> = ({
             onRefresh={handleRefresh}
             ListEmptyComponent={
               <View className="py-16 items-center">
-                <Text className="text-gray-400">
+                <ThemedText type="placeholder">
                   {isLoading ? "Loading comments..." : "No comments yet"}
-                </Text>
+                </ThemedText>
               </View>
             }
           />

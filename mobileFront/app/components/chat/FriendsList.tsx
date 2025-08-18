@@ -1,5 +1,9 @@
 import React from "react";
-import { FlatList, TouchableOpacity, View, Text, Image } from "react-native";
+import { FlatList, TouchableOpacity, View, Text, Image, ActivityIndicator } from "react-native";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { useThemeColors } from "../../hooks/useThemeColors";
+import { ThemedText } from "../ThemedText";
 import { Friend } from "../../core/types/friends";
 import { imgRegistry } from "../../core/utils/assetsRegistry";
 import { colors } from "../../core/theme/colors";
@@ -25,6 +29,7 @@ const FriendItem = ({
   onPress: (f: Friend) => void;
 }) => {
   const statusLabel = getStatusLabel(item.status);
+  const themeColors = useThemeColors();
   return (
     <TouchableOpacity
       style={{
@@ -46,15 +51,15 @@ const FriendItem = ({
         style={{ width: 48, height: 48, borderRadius: 24 }}
       />
       <View style={{ marginLeft: 12, flex: 1 }}>
-        <Text
+        <ThemedText
           className="text-base font-medium text-text"
         >
           {item.username}
-        </Text>
+        </ThemedText>
         {!!statusLabel && (
-          <Text className="text-sm text-placeholder">
+          <ThemedText className="text-sm text-placeholder">
             {statusLabel}
-          </Text>
+          </ThemedText>
         )}
       </View>
       {item.status === "online" && (
@@ -72,32 +77,51 @@ export const FriendsList: React.FC<{
   refetch: () => void;
   isFetching: boolean;
 }> = ({ friends = [], onPressFriend, refetch, isFetching }) => {
-  return (
-    <View className="flex-1 bg-background">
-      <FlatList
-        data={friends}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <FriendItem item={item} onPress={onPressFriend} />
-        )}
-        ListEmptyComponent={
+  const themeColors = useThemeColors();
+  const isLoading = isFetching;
+  const filteredFriends = friends;
+
+  const renderFriendItem = ({ item }: { item: Friend }) => (
+    <TouchableOpacity
+      onPress={() => onPressFriend(item)}
+    >
+      <View className="flex-row items-center justify-between p-3">
+        <View className="flex-row items-center">
           <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              paddingVertical: 40,
-            }}
-          >
-            <Text className="text-placeholder">
-              No friends found
-            </Text>
-          </View>
-        }
-        onRefresh={refetch}
-        refreshing={isFetching}
-        keyboardShouldPersistTaps="handled"
-      />
+            className="w-10 h-10 rounded-full bg-gray-200"
+            style={{ backgroundColor: themeColors.card }}
+          />
+          <ThemedText className="ml-3 text-base font-medium">
+            {item.username}
+          </ThemedText>
+        </View>
+        <ThemedText type="placeholder" className="text-sm">
+          {item.is_online ? "Online" : "Offline"}
+        </ThemedText>
+      </View>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View className="flex-1">
+      {isLoading ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color={themeColors.text} />
+          <ThemedText type="placeholder" className="mt-2">Loading friends...</ThemedText>
+        </View>
+      ) : (filteredFriends.length === 0 && !isLoading) ? (
+        <View className="flex-1 justify-center items-center">
+          <ThemedText type="placeholder">No friends found.</ThemedText>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredFriends}
+          keyExtractor={(item) => item.id}
+          renderItem={renderFriendItem}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </View>
   );
 };

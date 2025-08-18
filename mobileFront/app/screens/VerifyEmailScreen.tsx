@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  Text,
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -9,6 +8,8 @@ import {
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AuthStackParamList } from "../navigation/Authstack";
 import { useVerifyEmailMutation } from "../lib/APIs/RTKQuery/authApi";
+import { ThemedText } from "../components/ThemedText";
+import { useThemeColors } from "../hooks/useThemeColors";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "VerifyEmail">;
 
@@ -17,6 +18,7 @@ const VerifyEmailScreen: React.FC<Props> = ({ route, navigation }) => {
   const [code, setCode] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
+  const themeColors = useThemeColors();
 
   const handleVerify = async () => {
     setErrorMessage("");
@@ -36,41 +38,44 @@ const VerifyEmailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 justify-center bg-white px-6"
+      className="flex-1 justify-center px-6"
+      style={{ backgroundColor: themeColors.background }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Text className="text-2xl font-bold text-center mb-6">
+      <ThemedText className="text-2xl font-bold text-center mb-6">
         Verify your email
-      </Text>
+      </ThemedText>
 
-      <Text className="text-gray-500 text-center mb-4">
+      <ThemedText type="placeholder" className="text-center mb-4">
         We sent a verification code to {email}
-      </Text>
+      </ThemedText>
 
       <TextInput
-        className="h-12 bg-gray-100 rounded-xl px-4 mb-3 text-center"
+        className="h-12 rounded-xl px-4 mb-3 text-center"
+        style={{ backgroundColor: themeColors.card, color: themeColors.text }}
         placeholder="Enter verification code"
+        placeholderTextColor={themeColors.placeholder}
         keyboardType="number-pad"
         value={code}
         onChangeText={setCode}
       />
 
       {errorMessage ? (
-        <Text className="text-red-500 text-center mb-2">{errorMessage}</Text>
+        <ThemedText type="error" className="text-center mb-2">{errorMessage}</ThemedText>
       ) : null}
 
       <TouchableOpacity
-        className="bg-blue-500 rounded-full py-3 items-center mt-3"
+        className="bg-primary rounded-full py-3 items-center mt-3"
         onPress={handleVerify}
         disabled={isLoading}
       >
-        <Text className="text-white font-bold">
+        <ThemedText type="text" className="font-bold">
           {isLoading ? "Verifying..." : "Verify"}
-        </Text>
+        </ThemedText>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.replace("SignIn")}>
-        <Text className="text-gray-500 text-center mt-6">Back to login</Text>
+        <ThemedText type="placeholder" className="text-center mt-6">Back to login</ThemedText>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );

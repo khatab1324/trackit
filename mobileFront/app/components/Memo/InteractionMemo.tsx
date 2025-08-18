@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import {
   useToggleMemoryLikeMutation,
   useToggleBookmarkMutation,
   useGetUserBookmarksQuery,
 } from "../../lib/APIs/RTKQuery/InteractionApi";
+import { ThemedText } from "../ThemedText";
+import { useThemeColors } from "../../hooks/useThemeColors";
 
 type Props = {
   memoryId: string;
@@ -34,6 +36,7 @@ export const InteractionMemo: React.FC<Props> = ({
     useToggleBookmarkMutation();
 
   const { refetch: refetchBookmarks } = useGetUserBookmarksQuery();
+  const themeColors = useThemeColors();
 
   const onPressLikeHandler = async () => {
     if (isLikeLoading) return;
@@ -80,9 +83,9 @@ export const InteractionMemo: React.FC<Props> = ({
         <Ionicons
           name={liked ? "heart" : "heart-outline"}
           size={40}
-          color={liked ? "#ff3040" : "white"}
+          color={liked ? themeColors.icon.like : themeColors.icon.secondary}
         />
-        <Text className="text-white text-lg mt-1 font-medium">{likeCount}</Text>
+        <ThemedText className="text-lg mt-1 font-medium">{likeCount}</ThemedText>
       </TouchableOpacity>
 
       {/* Comment */}
@@ -91,10 +94,10 @@ export const InteractionMemo: React.FC<Props> = ({
         className="items-center"
         activeOpacity={0.7}
       >
-        <Ionicons name="chatbubble-outline" size={40} color="white" />
-        <Text className="text-white text-lg mt-1 font-medium">
+        <Ionicons name="chatbubble-outline" size={40} color={themeColors.icon.comment} />
+        <ThemedText className="text-lg mt-1 font-medium">
           {num_comments}
-        </Text>
+        </ThemedText>
       </TouchableOpacity>
 
       {/* Save */}
@@ -107,11 +110,11 @@ export const InteractionMemo: React.FC<Props> = ({
         <Ionicons
           name={saved ? "bookmark" : "bookmark-outline"}
           size={40}
-          color={saved ? "#ffd700" : "white"}
+          color={saved ? themeColors.icon.primary : themeColors.icon.secondary}
         />
         {isSaveLoading && (
           <View className="mt-1">
-            <Text className="text-white text-xs">Saving...</Text>
+            <ThemedText type="text" className="text-xs">Saving...</ThemedText>
           </View>
         )}
       </TouchableOpacity>

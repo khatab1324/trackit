@@ -5,6 +5,7 @@ import { Image, Text, View } from "react-native";
 import React from "react";
 import { imgRegistry } from "../core/utils/assetsRegistry";
 import { colors } from "../core/theme/colors";
+import { ThemedText } from "../components/ThemedText";
 
 export default function ProfileInfo() {
     const user = useSelector((state: RootState) => state.user) as User;
@@ -27,12 +28,12 @@ export default function ProfileInfo() {
                 }}
             />
             <View className="ml-4 mt-2">
-                <Text className={`text-lg font-semibold text-text`}>
+                <ThemedText className={`text-lg font-semibold`}>
                     {user?.username || "Username"}
-                </Text>
-                <Text className="text-placeholder">
+                </ThemedText>
+                <ThemedText type="placeholder">
                     {user?.bio || "Bio goes here..."}
-                </Text>
+                </ThemedText>
             </View>
         </View>
     );

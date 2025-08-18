@@ -1,4 +1,4 @@
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { Memory } from "../core/types/memory";
 import { useSelector } from "react-redux";
@@ -9,12 +9,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../../App";
+import { ThemedText } from "./ThemedText";
+import { useThemeColors } from "../hooks/useThemeColors";
 
 export default function MemoryThumbnail({ item }: { item: Memory }) {
   const isDark = useSelector(
     (state: RootState) => state.sheardDataThrowApp.darkMode
   );
   const colorScheme = isDark ? colors.dark : colors.light;
+  const themeColors = useThemeColors();
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
@@ -64,14 +67,11 @@ export default function MemoryThumbnail({ item }: { item: Memory }) {
           paddingVertical: 6,
         }}
       >
-        <Text
+        <ThemedText
           className="font-light text-sm"
-          style={{
-            color: colorScheme.white,
-          }}
         >
           {`${item.num_likes} likes, ${item.num_comments} comments`}
-        </Text>
+        </ThemedText>
       </View>
     </TouchableOpacity>
   );

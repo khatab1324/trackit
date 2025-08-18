@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text } from "react-native";
+import { ThemedText } from "../ThemedText";
 import { TimeAgo } from "./TimeAgo";
 import { FollowRequestActions } from "./FollowRequestActions";
 import { NotificationItemData } from "./types";
@@ -50,16 +51,15 @@ export const NotificationContent = ({ item }: Props) => {
 
   return (
     <View className="flex-1 ml-3">
-      <Text 
-        className="text-text" 
+      <ThemedText 
         style={{ lineHeight: 20 }} 
         numberOfLines={3}
       >
-        <Text className="font-semibold">{item.actor.username}</Text>
+        <ThemedText className="font-semibold">{item.actor.username}</ThemedText>
         {getNotificationText()}
         {" · "}
         <TimeAgo iso={item.createdAt} />
-      </Text>
+      </ThemedText>
 
       {item.type === "FOLLOW_REQUEST" && (
         <FollowRequestActions 

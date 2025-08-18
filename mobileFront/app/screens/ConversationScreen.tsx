@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   FlatList,
@@ -19,6 +18,7 @@ import { useChatWithFriend } from "../hooks/useChatWithFriend";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/index";
 import { colors } from "../core/theme/colors";
+import { ThemedText } from "../components/ThemedText";
 
 type RouteParams = {
   friendId: string;
@@ -103,19 +103,20 @@ export const ConversationScreen = () => {
               : "bg-card rounded-bl-md"
           }`}
         >
-          <Text
+          <ThemedText
             className={`text-sm ${
               isOwnMessage ? "text-white" : "text-text"
             }`}
           >
             {item.message}
-          </Text>
+          </ThemedText>
         </View>
-        <Text
-          className={`text-xs mt-1 text-placeholder`}
+        <ThemedText
+          type="placeholder"
+          className={`text-xs mt-1`}
         >
           {new Date(item.create_at).toLocaleTimeString()}
-        </Text>
+        </ThemedText>
       </View>
     );
   };
@@ -137,9 +138,9 @@ export const ConversationScreen = () => {
             <Ionicons name="arrow-back" size={24} color={themeColors.primary} />
           </TouchableOpacity>
           <View className="flex-1 items-center">
-            <Text className="text-lg font-semibold text-text" numberOfLines={1}>
+            <ThemedText className="text-lg font-semibold" numberOfLines={1}>
               {friendName || `Chat with ${friendId}`}
-            </Text>
+            </ThemedText>
           </View>
           <View style={{ width: 24 }} />
         </View>
@@ -182,7 +183,7 @@ export const ConversationScreen = () => {
                 <ActivityIndicator size="small" color={themeColors.text} />
               ) : (
                 <Ionicons
-                  name="send"  
+                  name="send"
                   size={20}
                   color={
                     newMessage.trim() && isConnected && !sending

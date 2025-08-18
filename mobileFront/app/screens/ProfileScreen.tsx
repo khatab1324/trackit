@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, TouchableOpacity, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
@@ -7,18 +7,22 @@ import { RootState } from "../store";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParamList } from "../navigation/HomeStack";
 import { useGetCurrentUserMemoriesQuery } from "../lib/APIs/RTKQuery/memoryApi";
+import { useGetUserBookmarksQuery } from "../lib/APIs/RTKQuery/InteractionApi";
 import { Memory } from "../core/types/memory";
-import { colors } from "../core/theme/colors";
+import { useThemeColors } from "../hooks/useThemeColors";
+import ThemedView from "../components/ui/ThemedView";
+import ThemedText from "../components/ui/ThemedText";
 import ProfileInfo from "../components/ProfileInfo";
 import ProfileContent from "../components/ProfileContent";
-import { useGetUserBookmarksQuery } from "../lib/APIs/RTKQuery/InteractionApi";
 
 export function ProfileScreen() {
-  const theme = useSelector((state: RootState) => state.theme.current);
-  const themeColors = colors[theme];
+  const navigation =
+    useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
 
-  const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
+  // نجيب الألوان حسب الثيم
+  const c = useThemeColors();
 
+  // queries
   const { data, isLoading, isError, refetch, isFetching } =
     useGetCurrentUserMemoriesQuery(undefined, {
       refetchOnFocus: true,
@@ -40,45 +44,66 @@ export function ProfileScreen() {
       isFetching={isFetching}
     />
   );
+
   if (isLoading) {
     content = (
-      <View className="flex-1 justify-center items-center bg-background">
-        <ActivityIndicator size="large" color={themeColors.text} />
-      </View>
+      <ThemedView style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color={c.text} />
+      </ThemedView>
     );
   } else if (isError) {
     content = (
-      <View className="flex-1 justify-center items-center bg-background">
-        <Text className="text-error">Error fetching memories</Text>
-      </View>
+      <ThemedView style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ThemedText variant="error">Error fetching memories</ThemedText>
+      </ThemedView>
     );
   }
 
   return (
-    <View className="flex-1 px-4 pt-12 bg-background">
-      <View className="flex-row items-center justify-between mb-8">
-        <Text className="text-2xl font-bold text-text">Profile</Text>
+    <ThemedView style={{ flex: 1, paddingHorizontal: 16, paddingTop: 48 }}>
+      {/* Header */}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 32,
+        }}
+      >
+        <ThemedText style={{ fontSize: 22, fontWeight: "bold" }}>
+          Profile
+        </ThemedText>
         <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
-          <Ionicons name="settings-outline" size={24} color={themeColors.icon.secondary} />
+          <Ionicons name="settings-outline" size={24} color={c.icon.secondary} />
         </TouchableOpacity>
       </View>
 
+      {/* Profile Info */}
       <ProfileInfo />
 
-      <View className="flex-row justify-around mt-6 mb-10">
-        <View className="items-center">
-          <Text className="text-xl font-bold text-text">
+      {/* Counters */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-around",
+          marginTop: 24,
+          marginBottom: 40,
+        }}
+      >
+        <View style={{ alignItems: "center" }}>
+          <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>
             {memories.length || 0}
-          </Text>
-          <Text className="text-placeholder">Memories</Text>
+          </ThemedText>
+          <ThemedText variant="muted">Memories</ThemedText>
         </View>
-        <View className="items-center">
-          <Text className="text-xl font-bold text-text">0</Text>
-          <Text className="text-placeholder">Friends</Text>
+        <View style={{ alignItems: "center" }}>
+          <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>0</ThemedText>
+          <ThemedText variant="muted">Friends</ThemedText>
         </View>
       </View>
 
+      {/* Content */}
       {content}
-    </View>
+    </ThemedView>
   );
 }

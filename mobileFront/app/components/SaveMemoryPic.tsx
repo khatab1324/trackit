@@ -1,7 +1,6 @@
 import React from "react";
 import {
   View,
-  Text,
   TouchableOpacity,
   SafeAreaView,
   Image,
@@ -21,6 +20,8 @@ import { ContentType, Coords, MemoryInput } from "../core/types/memory";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { User } from "../core/types/user";
+import { ThemedText } from "./ThemedText";
+import { useThemeColors } from "../hooks/useThemeColors";
 interface RootStackParamList extends ParamListBase {
   Home: undefined;
 }
@@ -45,6 +46,8 @@ export default function SaveMemoryPic({
   const [uploadProgress, setUploadProgress] = React.useState(0);
   const user = useSelector((state: RootState) => state.user) as User;
   const { refetch: refetchMemories } = useGetCurrentUserMemoriesQuery();
+  const themeColors = useThemeColors();
+
   const retakePicture = () => {
     navigation.goBack();
   };
@@ -135,22 +138,23 @@ export default function SaveMemoryPic({
       {/* Loading Overlay */}
       {isProcessing && (
         <View className="absolute inset-0 bg-black/50 justify-center items-center z-20">
-          <View className="bg-white/90 rounded-lg p-6 items-center min-w-48">
-            <ActivityIndicator size="large" color="#3B82F6" />
-            <Text className="text-gray-800 font-semibold mt-4 text-center">
+          <View className="rounded-lg p-6 items-center min-w-48"
+            style={{ backgroundColor: themeColors.card }}>
+            <ActivityIndicator size="large" color={themeColors.text} />
+            <ThemedText className="font-semibold mt-4 text-center">
               {isGettingSignature
                 ? "Preparing upload..."
                 : "Uploading memory..."}
-            </Text>
+            </ThemedText>
             {isUploading && (
               <>
-                <Text className="text-gray-600 mt-2 text-sm">
+                <ThemedText type="placeholder" className="mt-2 text-sm">
                   {uploadProgress}% complete
-                </Text>
+                </ThemedText>
                 <View className="w-40 h-2 bg-gray-200 rounded-full mt-2">
                   <View
-                    className="h-2 bg-blue-500 rounded-full transition-all duration-300"
-                    style={{ width: `${uploadProgress}%` }}
+                    className="h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${uploadProgress}%`, backgroundColor: themeColors.primary }}
                   />
                 </View>
               </>
@@ -165,24 +169,26 @@ export default function SaveMemoryPic({
         <View className="absolute bottom-12 left-0 right-0 flex-row justify-center space-x-6">
           <TouchableOpacity
             className={`flex-1 mx-6 rounded-lg py-4 ${
-              isProcessing ? "bg-gray-400" : "bg-gray-600/80"
+              isProcessing ? "opacity-60" : "opacity-100"
             }`}
+            style={{ backgroundColor: isProcessing ? themeColors.secondary : themeColors.card }}
             onPress={() => photoUriSetter(null)}
             disabled={isProcessing}
           >
-            <Text className="text-white text-center font-semibold">Retake</Text>
+            <ThemedText className="text-center font-semibold">Retake</ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity
             className={`flex-1 mx-6 rounded-lg py-4 ${
-              isProcessing ? "bg-gray-400" : "bg-blue-500"
+              isProcessing ? "opacity-60" : "opacity-100"
             }`}
+            style={{ backgroundColor: isProcessing ? themeColors.secondary : themeColors.primary }}
             onPress={saveMemoryHandler}
             disabled={isProcessing}
           >
-            <Text className="text-white text-center font-semibold">
+            <ThemedText className="text-center font-semibold">
               {isProcessing ? "Processing..." : "Save Memory"}
-            </Text>
+            </ThemedText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

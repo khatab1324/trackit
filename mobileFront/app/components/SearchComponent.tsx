@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, TextInput, Pressable, Text, Keyboard } from "react-native";
+import { View, TextInput, Pressable, Keyboard } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { ThemedText } from "./ThemedText";
+import { useThemeColors } from "../hooks/useThemeColors";
 
 type SearchComponentProps = {
   value?: string;
@@ -39,23 +41,24 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
   const handleSubmit = () => {
     Keyboard.dismiss();
   };
+  const themeColors = useThemeColors();
 
   return (
     <View className={`flex-row items-center `}>
-      <View className="flex-1 flex-row items-center rounded-2xl bg-gray-100 dark:bg-gray-800 px-3 py-2">
-        <Text className="mr-2 text-lg text-gray-500 dark:text-gray-400">
-          <FontAwesome name="search" size={24} color="black" />
-        </Text>
+      <View className="flex-1 flex-row items-center rounded-2xl px-3 py-2"
+        style={{ backgroundColor: themeColors.card }}>
+        <FontAwesome name="search" size={24} color={themeColors.placeholder} />
         <TextInput
-          className="flex-1 px-1 text-base text-gray-900 dark:text-gray-100"
+          className="flex-1 px-1 text-base"
           placeholder={placeholder}
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={themeColors.placeholder}
           value={query}
           onChangeText={handleChange}
           onSubmitEditing={handleSubmit}
           returnKeyType="search"
           autoCapitalize="none"
           autoCorrect={false}
+          style={{ color: themeColors.text }}
         />
         {query.length > 0 && (
           <Pressable
@@ -63,9 +66,7 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
             hitSlop={8}
             className="ml-2 rounded-full px-2 py-1"
           >
-            <Text className="text-base text-gray-500 dark:text-gray-400">
-              <MaterialIcons name="cancel" size={24} color="black" />
-            </Text>
+            <MaterialIcons name="cancel" size={24} color={themeColors.placeholder} />
           </Pressable>
         )}
       </View>
@@ -78,9 +79,9 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
           }}
           className="ml-3 px-2 py-1"
         >
-          <Text className="text-base text-blue-600 dark:text-blue-400">
+          <ThemedText type="primary" className="text-base">
             Cancel
-          </Text>
+          </ThemedText>
         </Pressable>
       )}
     </View>

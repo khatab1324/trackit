@@ -1,5 +1,5 @@
 import React from "react";
-import { Text } from "react-native";
+import { ThemedText } from '../ThemedText';
 
 function timeAgo(iso: string) {
   const then = new Date(iso).getTime();
@@ -14,5 +14,5 @@ function timeAgo(iso: string) {
 }
 
 export const TimeAgo = ({ iso }: { iso: string }) => (
-  <Text className="text-placeholder">{timeAgo(iso)}</Text>
+  <ThemedText type="placeholder">{timeAgo(iso)}</ThemedText>
 );

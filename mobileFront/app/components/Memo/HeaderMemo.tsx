@@ -1,13 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useNavigationState } from "@react-navigation/native";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { HomeStackParamList } from "../../navigation/HomeStack";
+import { NativeStackNavigationProp } from "../../navigation/HomeStack";
 import clsx from "clsx";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store";
+import { ThemedText } from "../ThemedText";
+import { useThemeColors } from "../../hooks/useThemeColors";
 
 export const HeaderMemo = () => {
   const navigation =
@@ -21,6 +22,7 @@ export const HeaderMemo = () => {
   const isFriendsScreen = useNavigationState(
     (state) => state.routes[state.index].name === "FriendsMemo"
   );
+  const themeColors = useThemeColors();
 
   return (
     <View>
@@ -33,13 +35,13 @@ export const HeaderMemo = () => {
                 activeOpacity={0.7}
                 className="relative"
               >
-                <Feather name="bell" size={24} color="white" />
+                <Feather name="bell" size={24} color={themeColors.text} />
                 {unread > 0 && (
                   <View
                     className="absolute -top-1 -right-1 bg-red-500 rounded-full items-center justify-center"
                     style={{ minWidth: 16, height: 16, paddingHorizontal: 3 }}
                   >
-                    <Text className="text-white text-[10px]">{unread}</Text>
+                    <ThemedText className="text-[10px]">{unread}</ThemedText>
                   </View>
                 )}
               </TouchableOpacity>
@@ -49,27 +51,27 @@ export const HeaderMemo = () => {
               className="items-center gap-2"
               onPress={() => (navigation as any).navigate("NearMemories")}
             >
-              <Text
+              <ThemedText
                 className={clsx(
                   "text-lg font-semibold",
-                  isHomeScreen ? "text-slate-400" : "text-white"
+                  isHomeScreen ? "text-slate-400" : ""
                 )}
               >
                 Near Memo
-              </Text>
+              </ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
               className="flex-row items-center gap-2"
               onPress={() => (navigation as any).navigate("FriendsMemo")}
             >
-              <Text
+              <ThemedText
                 className={clsx(
                   "text-lg font-semibold",
-                  isFriendsScreen ? "text-slate-400" : "text-white"
+                  isFriendsScreen ? "text-slate-400" : ""
                 )}
               >
                 Friends Memo
-              </Text>
+              </ThemedText>
             </TouchableOpacity>
           </View>
         </View>
@@ -79,7 +81,7 @@ export const HeaderMemo = () => {
           onPress={() => (navigation as any).goBack?.()}
           activeOpacity={0.8}
         >
-          <Ionicons name="arrow-back" size={32} color="white" />
+          <Ionicons name="arrow-back" size={32} color={themeColors.text} />
         </TouchableOpacity>
       )}
     </View>

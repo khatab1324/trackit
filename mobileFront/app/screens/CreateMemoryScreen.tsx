@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 
 import {
   View,
-  Text,
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
@@ -20,6 +19,8 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+import { ThemedText } from "../components/ThemedText";
+import { useThemeColors } from "../hooks/useThemeColors";
 
 type Nav = NativeStackNavigationProp<MainStackParamList, "CreateMemory">;
 
@@ -140,10 +141,12 @@ export default function CreateMemoryScreen() {
     }
   };
 
+  const themeColors = useThemeColors();
+
   if (!permission || permission.status === "undetermined")
     return (
       <View className="flex-1 items-center justify-center bg-black">
-        <Text className="text-white">Requesting camera permission…</Text>
+        <ThemedText>Requesting camera permission…</ThemedText>
       </View>
     );
 
@@ -152,9 +155,9 @@ export default function CreateMemoryScreen() {
   if (!coords) {
     return (
       <View className="flex-1 items-center justify-center bg-black px-6">
-        <Text className="text-white text-center">
+        <ThemedText className="text-center">
           Waiting for location… Please allow location access on Home first.
-        </Text>
+        </ThemedText>
       </View>
     );
   }
@@ -251,13 +254,13 @@ export default function CreateMemoryScreen() {
                         <View className="flex-1 bg-white/10" />
                       )}
                     </View>
-                    <Text
+                    <ThemedText
                       className={`mt-1 text-xs ${
-                        active ? "text-white" : "text-white/80"
+                        active ? "" : "opacity-80"
                       }`}
                     >
                       {f.label}
-                    </Text>
+                    </ThemedText>
                   </TouchableOpacity>
                 );
               })}

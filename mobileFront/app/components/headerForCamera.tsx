@@ -1,17 +1,20 @@
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
+import { ThemedText } from "./ThemedText";
+import { useThemeColors } from "../hooks/useThemeColors";
 
 export const HeaderForCamera = ({
   callBackToNavigate,
 }: {
   callBackToNavigate: () => void;
 }) => {
+  const themeColors = useThemeColors();
   return (
     <View className="flex-row items-center justify-between bg-black/70 px-4 py-8">
       <TouchableOpacity onPress={callBackToNavigate}>
-        <Text className="text-base font-medium text-white">X back</Text>
+        <ThemedText className="text-base font-medium">X back</ThemedText>
       </TouchableOpacity>
-      <Text className="text-lg font-bold text-white">Preview</Text>
+      <ThemedText className="text-lg font-bold">Preview</ThemedText>
     </View>
   );
 };
