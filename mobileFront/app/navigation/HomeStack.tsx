@@ -137,6 +137,7 @@ export default function HomeStack() {
         component={NotificationsScreen}
         options={{ tabBarButton: () => null, headerShown: false }}
       />
+
     </Tab.Navigator>
   );
 }
