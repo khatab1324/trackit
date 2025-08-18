@@ -13,6 +13,8 @@ import { CurrentUserMemoScreen } from "../screens/CurrentUserMemoScreen";
 import NotificationsScreen from "../screens/NotificationsScreen";
 
 import { withResponsive } from "../components/withResponsive";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 export type HomeStackParamList = {
   Map: undefined;
@@ -30,9 +32,13 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
   const avatarUri: string | undefined = undefined;
   const visibleRoutes = ["Map", "Chat", "Home", "Profile"];
 
+  const isDark = useSelector(
+    (state: RootState) => state.sheardDataThrowApp.darkMode
+  );
+
   return (
-    <SafeAreaView style={styles.safe} edges={["bottom"]}>
-      <View style={styles.container}>
+    <SafeAreaView style={{ backgroundColor: isDark ? "#000" : "#fff" }} edges={["bottom"]}>
+      <View style={{ backgroundColor: isDark ? "#000" : "#fff", ...styles.container }}>
         {state.routes
           .filter((r: any) => visibleRoutes.includes(r.name))
           .map((route: any) => {
@@ -50,7 +56,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
               }
             };
 
-            const color = isFocused ? "#111" : "#767676";
+            const color = isFocused ? (isDark ? "#fff" : "#111") : "#767676";
             let icon = null;
 
             if (route.name === "Home") {
@@ -122,10 +128,8 @@ export default function HomeStack() {
 }
 
 const styles = StyleSheet.create({
-  safe: { backgroundColor: "#fff" },
   container: {
     height: 43,
-    backgroundColor: "#fff",
     flexDirection: "row",
     paddingHorizontal: 18,
     justifyContent: "space-between",

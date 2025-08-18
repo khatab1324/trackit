@@ -22,7 +22,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
   onLongPress,
   isTyping = false,
 }) => {
-  const isDark = useSelector((state: RootState) => state.sheardDataThrowApp.darkMode);
+  const isDark = useSelector((state: RootState) => state.sheardDataThrowApp.darkMode); 
   return (
     <TouchableOpacity
       onLongPress={onLongPress}
