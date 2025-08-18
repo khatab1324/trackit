@@ -1,4 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { User } from "../../../core/types/user";
+
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
@@ -7,7 +9,7 @@ export const authApi = createApi({
 
   endpoints: (builder) => ({
     signin: builder.mutation<
-      { token: string },
+      { message: string; data: { token: string; user: User } },
       { username: string; password: string }
     >({
       query: (body) => ({
@@ -18,7 +20,7 @@ export const authApi = createApi({
     }),
 
     signup: builder.mutation<
-      { message: string },
+      { message: string; data: { token: string; createdUser: User } },
       { username: string; email: string; password: string }
     >({
       query: (body) => ({

@@ -1,4 +1,3 @@
-// app/screens/SignInScreen.tsx
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -7,10 +6,10 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AuthStackParamList } from "../navigation/Authstack";
-// import { useDispatch } from "react-redux";
 import { useSigninMutation } from "../lib/APIs/RTKQuery/authApi";
 import { useDispatch } from "react-redux";
 import { addUserToReducer } from "../store/slices/userSlice";
@@ -18,6 +17,8 @@ import { setCredentials } from "../store/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User } from "../core/types/user";
 import { useGetUserByTokenMutation } from "../lib/APIs/RTKQuery/UserAuth";
+import { parseAuthError } from "../core/utils/errorHandler";
+import { validateSigninForm } from "../core/utils/validation";
 import Config from "react-native-config";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "SignIn">;
@@ -25,10 +26,28 @@ type Props = NativeStackScreenProps<AuthStackParamList, "SignIn">;
 const SignInScreen: React.FC<Props> = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  //   const dispatch = useDispatch();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [signin, { isLoading, error }] = useSigninMutation();
   const [getUserByToken] = useGetUserByTokenMutation();
   const dispatch = useDispatch();
+
+  // Clear errors when user types
+  const clearErrors = () => {
+    setErrorMessage("");
+    setFieldErrors({});
+  };
+
+  const handleUsernameChange = (text: string) => {
+    setUsername(text);
+    clearErrors();
+  };
+
+  const handlePasswordChange = (text: string) => {
+    setPassword(text);
+    clearErrors();
+  };
+
   useEffect(() => {
     (async () => {
       try {
@@ -54,8 +73,26 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
         console.error("Error in useEffect:", error);
       }
     })();
-  }, [getUserByToken, dispatch]); // Add dependencies
+  }, [getUserByToken, dispatch]); 
+
   const handleSignin = async () => {
+    // Clear previous errors
+    clearErrors();
+
+    // Validate form
+    const validation = validateSigninForm({
+      username,
+      password
+    });
+
+    if (!validation.isValid) {
+      setFieldErrors(validation.errors);
+      // Show first error as general error message
+      const firstError = Object.values(validation.errors)[0];
+      setErrorMessage(firstError);
+      return;
+    }
+
     try {
       const result = await signin({ username, password });
       if ("data" in result) {
@@ -68,14 +105,25 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
           dispatch(setCredentials(token));
           await AsyncStorage.setItem("token", token);
           dispatch(addUserToReducer(user));
-          // navigation.replace("Home");
         }
-      } else {
+      } else if ("error" in result) {
         console.log("RTK error:", result.error);
+        // Use the centralized error handler
+        const errorMessage = parseAuthError(result.error);
+        setErrorMessage(errorMessage);
       }
     } catch (error) {
       console.error("sign failed:", error);
+      setErrorMessage("An unexpected error occurred. Please try again.");
     }
+  };
+
+  const getInputStyle = (fieldName: string) => {
+    const baseStyle = "h-12 bg-gray-100 rounded-xl px-4 mb-3";
+    if (fieldErrors[fieldName]) {
+      return `${baseStyle} border-2 border-red-300`;
+    }
+    return baseStyle;
   };
 
   return (
@@ -86,25 +134,47 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
       <Text className="text-3xl font-bold text-center mb-8">TrackIt 📍</Text>
 
       <TextInput
-        className="h-12 bg-gray-100 rounded-xl px-4 mb-3"
+        className={getInputStyle("username")}
         placeholder="Username or email"
         value={username}
-        onChangeText={setUsername}
+        onChangeText={handleUsernameChange}
+        autoCapitalize="none"
+        autoCorrect={false}
       />
+      {fieldErrors.username && (
+        <Text className="text-red-500 text-xs mb-2 px-2">{fieldErrors.username}</Text>
+      )}
 
       <TextInput
-        className="h-12 bg-gray-100 rounded-xl px-4 mb-3"
+        className={getInputStyle("password")}
         placeholder="Password"
         secureTextEntry
         value={password}
-        onChangeText={setPassword}
+        onChangeText={handlePasswordChange}
+        autoCapitalize="none"
+        autoCorrect={false}
       />
+      {fieldErrors.password && (
+        <Text className="text-red-500 text-xs mb-2 px-2">{fieldErrors.password}</Text>
+      )}
+
+      {/* General Error Message Display */}
+      {errorMessage ? (
+        <View className="mb-3 px-2 py-2 bg-red-50 rounded-lg border border-red-200">
+          <Text className="text-red-600 text-sm text-center font-medium">{errorMessage}</Text>
+        </View>
+      ) : null}
 
       <TouchableOpacity
-        className="bg-blue-500 rounded-full py-3 items-center mt-3"
+        className={`rounded-full py-3 items-center mt-3 ${
+          isLoading ? "bg-gray-400" : "bg-blue-500"
+        }`}
         onPress={handleSignin}
+        disabled={isLoading}
       >
-        <Text className="text-white font-bold">Log in</Text>
+        <Text className="text-white font-bold">
+          {isLoading ? "Signing in..." : "Log in"}
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => {}}>
