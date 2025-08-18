@@ -6,6 +6,7 @@ import React from "react";
 import { imgRegistry } from "../core/utils/assetsRegistry";
 import { colors } from "../core/theme/colors";
 import { ThemedText } from "../components/ThemedText";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function ProfileInfo() {
     const user = useSelector((state: RootState) => state.user) as User;
@@ -14,18 +15,10 @@ export default function ProfileInfo() {
 
     return (
         <View className="flex-row items-start">
-            <Image
-                source={{
-                    uri:
-                        user?.profileImage ||
-                        imgRegistry.defaultProfileIcon,
-                }}
-                className="w-20 h-20 rounded-full bg-gray-200"
-                style={{
-                    borderRadius: 100,
-                    borderWidth: 2,
-                    borderColor: themeColors.primary,
-                }}
+            <Ionicons 
+                name={"person-circle"} 
+                size={80} 
+                color={themeColors.text} 
             />
             <View className="ml-4 mt-2">
                 <ThemedText className={`text-lg font-semibold`}>

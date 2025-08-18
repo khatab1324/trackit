@@ -110,7 +110,7 @@ export const InteractionMemo: React.FC<Props> = ({
         <Ionicons
           name={saved ? "bookmark" : "bookmark-outline"}
           size={40}
-          color={saved ? themeColors.icon.primary : themeColors.icon.secondary}
+          color={saved ? "#1E90FF" : themeColors.icon.secondary}
         />
         {isSaveLoading && (
           <View className="mt-1">

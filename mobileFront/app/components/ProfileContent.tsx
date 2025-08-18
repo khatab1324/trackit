@@ -47,7 +47,7 @@ export default function ProfileContent({
           <TouchableOpacity key={tab.name} onPress={() => setActiveTab(index)}>
             <ThemedText
               className={`pb-2 ${activeTab === index ? `border-b-2 font-semibold` : ``}`}
-              style={{ color: activeTab === index ? themeColors.primary : themeColors.text, borderColor: activeTab === index ? themeColors.primary : undefined }}
+              style={{ color: activeTab === index ? "#1E90FF" : themeColors.text, borderColor: activeTab === index ? "#1E90FF" : undefined }}
             >
               {tab.name}
             </ThemedText>
