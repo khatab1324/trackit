@@ -9,6 +9,8 @@ import { RootState } from "../store";
 import { Ionicons } from "@expo/vector-icons";
 
 export const ChatScreen = () => {
+  const isDark = useAppSelector((state: RootState) => state.sheardDataThrowApp.darkMode);
+
   const {
     data: friends,
     isLoading,
@@ -22,7 +24,6 @@ export const ChatScreen = () => {
     onPressFriend,
   } = useChatWithFriend();
 
-  const isDark = useAppSelector((state: RootState) => state.sheardDataThrowApp.darkMode);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);

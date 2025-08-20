@@ -75,7 +75,6 @@ export const MapComponent: React.FC<Props> = ({
         <RenderMemoryOnMap onMemorySelect={onMemorySelect} />
       </MapView>
       
-      {/* Map Search Component */}
       <View style={styles.searchContainer}>
         <MapSearchComponent onLocationSelect={handleLocationSelect} />
       </View>

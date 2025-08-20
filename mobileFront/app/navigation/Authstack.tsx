@@ -15,13 +15,12 @@ const Stack = createStackNavigator<AuthStackParamList>();
 
 export default function AuthStack() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="SignIn" component={SigninScreen} />
       <Stack.Screen name="SignUp" component={SignupScreen} />
       <Stack.Screen 
         name="EmailVerification" 
         component={EmailVerificationScreen}
-        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

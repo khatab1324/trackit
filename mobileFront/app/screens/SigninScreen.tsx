@@ -123,74 +123,124 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const getInputStyle = (fieldName: string) => {
-    const baseStyle = "h-12 bg-gray-100 rounded-xl px-4 mb-3";
+    const baseClasses = "h-14 rounded-2xl px-5 mb-4 text-base font-medium bg-gray-800 text-white border-2 border-gray-700";
+    
     if (fieldErrors[fieldName]) {
-      return `${baseStyle} border-2 border-red-300`;
+      return `${baseClasses} border-red-500`;
     }
-    return baseStyle;
+    
+    return baseClasses;
   };
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 justify-center bg-white px-6"
+      className="flex-1 justify-center px-6 bg-black"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Text className="text-3xl font-bold text-center mb-8">TrackIt 📍</Text>
-
-      <TextInput
-        className={getInputStyle("username")}
-        placeholder="Username or email"
-        value={username}
-        onChangeText={handleUsernameChange}
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
-      {fieldErrors.username && (
-        <Text className="text-red-500 text-xs mb-2 px-2">{fieldErrors.username}</Text>
-      )}
-
-      <TextInput
-        className={getInputStyle("password")}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={handlePasswordChange}
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
-      {fieldErrors.password && (
-        <Text className="text-red-500 text-xs mb-2 px-2">{fieldErrors.password}</Text>
-      )}
-
-      {/* General Error Message Display */}
-      {errorMessage ? (
-        <View className="mb-3 px-2 py-2 bg-red-50 rounded-lg border border-red-200">
-          <Text className="text-red-600 text-sm text-center font-medium">{errorMessage}</Text>
+      {/* Logo and Title Section */}
+      <View className="items-center mb-12">
+        <View className="w-20 h-20 rounded-full items-center justify-center mb-6 bg-gray-800">
+          <Text className="text-4xl">📍</Text>
         </View>
-      ) : null}
-
-      <TouchableOpacity
-        className={`rounded-full py-3 items-center mt-3 ${
-          isLoading ? "bg-gray-400" : "bg-blue-500"
-        }`}
-        onPress={handleSignin}
-        disabled={isLoading}
-      >
-        <Text className="text-white font-bold">
-          {isLoading ? "Signing in..." : "Log in"}
+        
+        <Text className="text-4xl font-bold mb-3 text-white">
+          TrackIt
         </Text>
-      </TouchableOpacity>
+        
+        <Text className="text-lg text-center px-8 text-gray-400">
+          Sign in to continue your journey
+        </Text>
+      </View>
 
-      <TouchableOpacity onPress={() => {}}>
-        <Text className="text-gray-500 text-center mt-4">Forgot password?</Text>
-      </TouchableOpacity>
+      {/* Form Section */}
+      <View className="mb-8">
+        <TextInput
+          className={getInputStyle("username")}
+          placeholder="Username or email"
+          placeholderTextColor="#9CA3AF"
+          value={username}
+          onChangeText={handleUsernameChange}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        {fieldErrors.username && (
+          <Text className="text-red-500 text-sm mb-2 ml-2 font-medium">
+            {fieldErrors.username}
+          </Text>
+        )}
 
-      <TouchableOpacity
-        className="bg-gray-100 rounded-full py-3 items-center mt-6"
-        onPress={() => navigation.navigate("SignUp")}
-      >
-        <Text className="font-semibold text-black">Create new account</Text>
-      </TouchableOpacity>
+        <TextInput
+          className={getInputStyle("password")}
+          placeholder="Password"
+          placeholderTextColor="#9CA3AF"
+          secureTextEntry
+          value={password}
+          onChangeText={handlePasswordChange}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        {fieldErrors.password && (
+          <Text className="text-red-500 text-sm mb-2 ml-2 font-medium">
+            {fieldErrors.password}
+          </Text>
+        )}
+
+        {/* General Error Message Display */}
+        {errorMessage ? (
+          <View className="mb-6 px-4 py-3 rounded-xl border bg-red-900/20 border-red-800">
+            <Text className="text-sm text-center font-medium text-red-400">
+              {errorMessage}
+            </Text>
+          </View>
+        ) : null}
+
+        {/* Sign In Button */}
+        <TouchableOpacity
+          className={`h-14 rounded-2xl items-center justify-center mb-6 ${
+            isLoading ? "bg-gray-700" : "bg-blue-600"
+          }`}
+          onPress={handleSignin}
+          disabled={isLoading}
+          activeOpacity={0.8}
+        >
+          <Text className={`text-lg font-bold ${
+            isLoading ? "text-gray-400" : "text-white"
+          }`}>
+            {isLoading ? "Signing in..." : "Sign In"}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Forgot Password */}
+        <TouchableOpacity 
+          onPress={() => {}}
+          className="items-center mb-8"
+          activeOpacity={0.7}
+        >
+          <Text className="text-base font-medium text-gray-400">
+            Forgot password?
+          </Text>
+        </TouchableOpacity>
+
+        {/* Divider */}
+        <View className="flex-row items-center mb-8">
+          <View className="flex-1 h-px bg-gray-700" />
+          <Text className="text-sm font-medium mx-4 text-gray-500">
+            OR
+          </Text>
+          <View className="flex-1 h-px bg-gray-700" />
+        </View>
+
+        {/* Create Account Button */}
+        <TouchableOpacity
+          className="h-14 rounded-2xl items-center justify-center border-2 border-gray-700 bg-transparent"
+          onPress={() => navigation.navigate("SignUp")}
+          activeOpacity={0.8}
+        >
+          <Text className="text-base font-semibold text-white">
+            Create new account
+          </Text>
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
   );
 };

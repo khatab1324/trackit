@@ -259,7 +259,7 @@ export const ConversationScreen = () => {
           keyboardVisible={keyboardVisible}
           onMoreOptions={() => {}}
         />
- <FlatList
+       <FlatList
           ref={flatListRef}
           data={messages}
           renderItem={renderMessage}

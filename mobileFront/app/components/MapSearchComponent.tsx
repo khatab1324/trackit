@@ -23,19 +23,17 @@ export const MapSearchComponent: React.FC<MapSearchComponentProps> = ({
     Keyboard.dismiss();
 
     try {
-      // Use expo-location geocoding to search for the location
       const results = await Location.geocodeAsync(query);
       
       if (results.length > 0) {
         const location = results[0];
         
-        // Get the address details for the found location
         const addressResults = await Location.reverseGeocodeAsync({
           latitude: location.latitude,
           longitude: location.longitude,
         });
 
-        let address = query; // Default to search query
+        let address = query; 
         if (addressResults.length > 0) {
           const addressInfo = addressResults[0];
           const addressParts = [
@@ -48,7 +46,7 @@ export const MapSearchComponent: React.FC<MapSearchComponentProps> = ({
         }
 
         onLocationSelect(location.latitude, location.longitude, address);
-        setQuery(""); // Clear search after successful selection
+        setQuery(""); 
       } else {
         Alert.alert("Location Not Found", "Could not find the location you searched for. Please try a different search term.");
       }
@@ -107,7 +105,7 @@ export const MapSearchComponent: React.FC<MapSearchComponentProps> = ({
       <Pressable
         onPress={handleSearch}
         disabled={isSearching || !query.trim()}
-        className={`ml-3 px-4 py-2 rounded-xl ${
+        className={`ml-3 px-5 py-5 rounded-xl ${
           isSearching || !query.trim() 
             ? 'bg-gray-300' 
             : 'bg-blue-500'
