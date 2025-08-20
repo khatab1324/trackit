@@ -1,14 +1,23 @@
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 const SplashScreen = ({ navigation }: any) => {
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const token = useSelector((state: RootState) => state.auth.token);
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace("Auth"); 
-    }, 1000);  
+      if (isAuthenticated && token) {
+        navigation.replace("Home");
+      } else {
+        navigation.replace("Auth");
+      }
+    }, 500);  
 
     return () => clearTimeout(timer);
-  }, [navigation]);
+  }, [navigation, isAuthenticated, token]);
 
   return (
     <View style={styles.container}>

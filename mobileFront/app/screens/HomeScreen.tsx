@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { View, Text, Alert } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, Text, Alert, ActivityIndicator } from "react-native";
 import * as Location from "expo-location";
 import { useDispatch, useSelector } from "react-redux";
 import { skipToken } from "@reduxjs/toolkit/query";
@@ -12,7 +12,8 @@ import { MainStackParamList } from "../../App";
 import { RootState } from "../store";
 import { useGetNearMemoryQuery } from "../lib/APIs/RTKQuery/memoryApi";
 import { MemoListComp } from "../components/MemoList";
-import { colors } from "../core/theme/colors";
+import clsx from "clsx";
+import { Ionicons } from "@expo/vector-icons";
 
 export const HomeScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
@@ -21,31 +22,71 @@ export const HomeScreen = () => {
   const user = useSelector((s: RootState) => s.user);
   const coords = useSelector((s: RootState) => s.sheardDataThrowApp.location);
   const isDark = useSelector((s: RootState) => s.sheardDataThrowApp.darkMode);
-  const themeColors = isDark ? colors.dark : colors.light;
+  const watchingRef = useRef<{ remove: () => void } | null>(null);
 
-  useEffect(() => {
-    let mounted = true;
+useEffect(() => {
+    let cancelled = false;
+
     (async () => {
+      if (coords) return;
+
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Location", "Permission to access location was denied");
+        return;
+      }
+
+      const last = await Location.getLastKnownPositionAsync();
+      if (last && !cancelled) {
+        dispatch(setLocation({ lang: last.coords.latitude, long: last.coords.longitude }));
+      }
+
       try {
-        if (coords) return;
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("Location", "Permission to access location was denied");
-          return;
-        }
-        const pos = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
+        const quick = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Low, 
         });
-        if (!mounted) return;
-        dispatch(setLocation({ lang: pos.coords.latitude, long: pos.coords.longitude }));
+        if (!cancelled) {
+          dispatch(setLocation({ lang: quick.coords.latitude, long: quick.coords.longitude }));
+        }
       } catch (e) {
-        console.warn("Location error:", e);
+        console.warn("Quick fix failed:", e);
+      }
+
+      try {
+        watchingRef.current = await Location.watchPositionAsync(
+          {
+            accuracy: Location.Accuracy.Balanced, 
+            timeInterval: 2000,                   
+            distanceInterval: 5,                  
+            mayShowUserSettingsDialog: true,      
+          },
+          (update) => {
+            if (cancelled) return;
+            dispatch(setLocation({ lang: update.coords.latitude, long: update.coords.longitude }));
+          }
+        );
+
+        // Stop the watch after 10 seconds; we already have something usable.
+        setTimeout(() => {
+          if (watchingRef.current) {
+            watchingRef.current.remove();
+            watchingRef.current = null;
+          }
+        }, 10000);
+      } catch (e) {
+        console.warn("Watch failed:", e);
       }
     })();
+
     return () => {
-      mounted = false;
+      cancelled = true;
+      if (watchingRef.current) {
+        watchingRef.current.remove();
+        watchingRef.current = null;
+      }
     };
   }, [coords, dispatch]);
+
 
   const { data, isLoading, isError, isFetching, refetch } = useGetNearMemoryQuery(
     coords ? { location: coords } : (skipToken as any)
@@ -63,17 +104,128 @@ export const HomeScreen = () => {
       }
     });
 
+  const renderLoadingState = () => (
+    <View className="flex-1 justify-center items-center px-6">
+      <View className={clsx(
+        "w-24 h-24 rounded-full items-center justify-center mb-6",
+        isDark ? "bg-gray-800" : "bg-gray-100"
+      )}>
+        <ActivityIndicator size="large" color="#3B82F6" />
+      </View>
+      <Text className={clsx(
+        "text-lg font-medium",
+        isDark ? "text-gray-300" : "text-gray-600"
+      )}>
+        Loading memories...
+      </Text>
+    </View>
+  );
+
+  const renderErrorState = () => (
+    <View className="flex-1 justify-center items-center px-6">
+      <View className={clsx(
+        "w-24 h-24 rounded-full items-center justify-center mb-6",
+        isDark ? "bg-gray-800" : "bg-gray-100"
+      )}>
+        <Ionicons 
+          name="alert-circle-outline" 
+          size={48} 
+          color={isDark ? "#F87171" : "#DC2626"} 
+        />
+      </View>
+      <Text className={clsx(
+        "text-xl font-semibold mb-2",
+        isDark ? "text-white" : "text-black"
+      )}>
+        Failed to load memories
+      </Text>
+      <Text className={clsx(
+        "text-base text-center px-8",
+        isDark ? "text-gray-400" : "text-gray-600"
+      )}>
+        Pull down to refresh and try again
+      </Text>
+    </View>
+  );
+
+  const renderLocationWaiting = () => (
+    <View className="flex-1 justify-center items-center px-6">
+      <View className={clsx(
+        "w-24 h-24 rounded-full items-center justify-center mb-6",
+        isDark ? "bg-gray-800" : "bg-gray-100"
+      )}>
+        <Ionicons 
+          name="location-outline" 
+          size={48} 
+          color="#3B82F6" 
+        />
+      </View>
+      <Text className={clsx(
+        "text-xl font-semibold mb-2",
+        isDark ? "text-white" : "text-black"
+      )}>
+        Location Access Required
+      </Text>
+      <Text className={clsx(
+        "text-base text-center px-8",
+        isDark ? "text-gray-400" : "text-gray-600"
+      )}>
+        Please enable location access to see nearby memories
+      </Text>
+    </View>
+  );
+
+  const renderNoMemories = () => (
+    <View className="flex-1 justify-center items-center px-6">
+      <View className={clsx(
+        "w-24 h-24 rounded-full items-center justify-center mb-6",
+        isDark ? "bg-gray-800" : "bg-gray-100"
+      )}>
+        <Ionicons 
+          name="images-outline" 
+          size={48} 
+          color="#3B82F6" 
+        />
+      </View>
+      <Text className={clsx(
+        "text-xl font-semibold mb-2",
+        isDark ? "text-white" : "text-black"
+      )}>
+        No Memories Nearby
+      </Text>
+      <Text className={clsx(
+        "text-base text-center px-8",
+        isDark ? "text-gray-400" : "text-gray-600"
+      )}>
+        There are no memories in your area yet. Be the first to create one!
+      </Text>
+    </View>
+  );
+
+  const renderContent = () => {
+    if (isLoading) return renderLoadingState();
+    if (isError) return renderErrorState();
+    if (!coords) return renderLocationWaiting();
+    if (data && data.length > 0) {
+      return (
+        <View className="flex-1">
+          <MemoListComp data={data} refetch={refetch} isFetching={isFetching} />
+        </View>
+      );
+    }
+    if (data && data.length === 0) {
+      return renderNoMemories();
+    }
+    return null;
+  };
+
   return (
     <GestureDetector gesture={pan}>
-      <View style={{ flex: 1, backgroundColor: themeColors.background }}>
-        {isLoading && <Text style={{ color: themeColors.text }}>Loading...</Text>}
-        {isError && <Text style={{ color: themeColors.text }}>Failed to load.</Text>}
-        {data && <MemoListComp data={data} refetch={refetch} isFetching={isFetching} />}
-        {!coords && !isLoading && !isError && (
-          <Text style={{ color: themeColors.text, paddingHorizontal: 16, marginTop: 16 }}>
-            Waiting for location permission...
-          </Text>
-        )}
+      <View className={clsx(
+        "flex-1",
+        isDark ? "bg-black" : "bg-white"
+      )}>
+        {renderContent()}
       </View>
     </GestureDetector>
   );
