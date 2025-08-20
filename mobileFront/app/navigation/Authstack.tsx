@@ -1,14 +1,14 @@
-import React, { useEffect } from "react";
-import SignupScreen from "../screens/SignupScreen";
-import SigninScreen from "../screens/SigninScreen";
-import EmailVerificationScreen from "../screens/EmailVerificationScreen";
+import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
+
+import SigninScreen from "../screens/SigninScreen";
+import SignupScreen from "../screens/SignupScreen";
+import EmailVerificationScreen from "../screens/EmailVerificationScreen";
 
 export type AuthStackParamList = {
   SignIn: undefined;
   SignUp: undefined;
   EmailVerification: { email: string };
-  Home: undefined;
 };
 
 const Stack = createStackNavigator<AuthStackParamList>();
@@ -18,8 +18,8 @@ export default function AuthStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="SignIn" component={SigninScreen} />
       <Stack.Screen name="SignUp" component={SignupScreen} />
-      <Stack.Screen 
-        name="EmailVerification" 
+      <Stack.Screen
+        name="EmailVerification"
         component={EmailVerificationScreen}
       />
     </Stack.Navigator>

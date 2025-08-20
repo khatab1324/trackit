@@ -4,21 +4,22 @@ import {
   DefaultTheme,
   DarkTheme,
 } from "@react-navigation/native";
-import AuthStack from "./app/navigation/Authstack";
 import "./global.css";
-import { Provider } from "react-redux";
-import { store } from "./app/store";
-import HomeStack from "./app/navigation/HomeStack";
+import { Provider, useSelector } from "react-redux";
+import { store, RootState } from "./app/store";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+import AuthStack from "./app/navigation/Authstack";
+import HomeStack from "./app/navigation/HomeStack";
 import CreateMemoryScreen from "./app/screens/CreateMemoryScreen";
-import { useSelector } from "react-redux";
-import { RootState } from "./app/store";
 import { CurrentUserMemoScreen } from "./app/screens/CurrentUserMemoScreen";
 import FriendsMemoScreen from "./app/screens/FriendsMemoScreen";
 import { HomeScreen } from "./app/screens/HomeScreen";
+import SplashScreen from "./app/screens/SplashScreen";
 
 export type MainStackParamList = {
+  Splash: undefined;
   Home: undefined;
   Auth: undefined;
   CreateMemory: undefined;
@@ -44,6 +45,8 @@ function MainAppNavigator() {
   return (
     <NavigationContainer theme={isDarkMode ? DarkTheme : DefaultTheme}>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
+        <RootStack.Screen name="Splash" component={SplashScreen} />
+
         {isAuthenticated && token ? (
           <>
             <RootStack.Screen name="Home" component={HomeStack} />
@@ -56,10 +59,9 @@ function MainAppNavigator() {
               component={HomeScreen}
             />
             <RootStack.Screen
-              name="MemoDetails" 
+              name="MemoDetails"
               component={CurrentUserMemoScreen}
             />
-                        
             <RootStack.Screen
               name="FriendsMemo"
               component={FriendsMemoScreen}
