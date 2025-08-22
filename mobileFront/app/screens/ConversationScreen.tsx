@@ -336,26 +336,26 @@ export const ConversationScreen = () => {
           activeOpacity={1}
           onPress={() => setShowMessageOptions(false)}
         >
-          <View className="flex-1 justify-center items-center">
-            <View className="bg-white dark:bg-neutral-800 rounded-3xl p-6 mx-4 min-w-[280px] shadow-2xl dark:shadow-neutral-900/50">
+          <View className="flex-1 justify-center items-center gap-x-4">
+            <View className="bg-white dark:bg-neutral-800 rounded-3xl p-6 mx-4 min-w-[280px] shadow-2xl dark:shadow-neutral-900/50 border border-gray-200 dark:border-neutral-700">
               <Text className="text-xl font-bold text-gray-800 dark:text-white text-center mb-6">
                 Message Options
               </Text>
               
               <TouchableOpacity
                 onPress={handleEditMessage}
-                className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl py-4 mb-4 shadow-sm"
+                className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-2xl py-4 mb-4 active:bg-blue-100 dark:active:bg-blue-900/30"
               >
-                <Text className="text-white text-center font-semibold text-base">
+                <Text className="text-blue-700 dark:text-blue-300 text-center font-semibold text-base">
                   Edit Message
                 </Text>
               </TouchableOpacity>
               
               <TouchableOpacity
                 onPress={handleDeleteMessage}
-                className="bg-gradient-to-r from-red-500 to-red-600 rounded-2xl py-4 shadow-sm"
+                className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-2xl py-4 active:bg-red-100 dark:active:bg-red-900/30"
               >
-                <Text className="text-white text-center font-semibold text-base">
+                <Text className="text-red-700 dark:text-red-300 text-center font-semibold text-base">
                   Delete Message
                 </Text>
               </TouchableOpacity>
@@ -377,7 +377,7 @@ export const ConversationScreen = () => {
           onPress={() => setShowEditModal(false)}
         >
           <View className="flex-1 justify-center items-center">
-            <View className="bg-white dark:bg-neutral-800 rounded-3xl p-6 mx-4 min-w-[320px] shadow-2xl dark:shadow-neutral-900/50">
+            <View className="bg-white dark:bg-neutral-800 rounded-3xl p-6 mx-4 min-w-[320px] shadow-2xl dark:shadow-neutral-900/50 border border-gray-200 dark:border-neutral-700">
               <Text className="text-xl font-bold text-gray-800 dark:text-white text-center mb-6">
                 Edit Message
               </Text>
@@ -393,21 +393,21 @@ export const ConversationScreen = () => {
                 maxLength={500}
               />
               
-              <View className="flex-row space-x-3">
+              <View className="flex-row gap-x-3">
                 <TouchableOpacity
                   onPress={() => setShowEditModal(false)}
-                  className="flex-1 bg-gray-500 rounded-2xl py-4 shadow-sm"
+                  className="flex-1 bg-gray-100 dark:bg-neutral-700 border border-gray-300 dark:border-neutral-600 rounded-2xl py-4 active:bg-gray-200 dark:active:bg-neutral-600"
                 >
-                  <Text className="text-white text-center font-semibold text-base">
+                  <Text className="text-gray-700 dark:text-gray-300 text-center font-semibold text-base">
                     Cancel
                   </Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity
                   onPress={handleSaveEdit}
-                  className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl py-4 shadow-sm"
+                  className="flex-1 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-2xl py-4 active:bg-blue-100 dark:active:bg-blue-900/30"
                 >
-                  <Text className="text-white text-center font-semibold text-base">
+                  <Text className="text-blue-700 dark:text-blue-300 text-center font-semibold text-base">
                     Save
                   </Text>
                 </TouchableOpacity>

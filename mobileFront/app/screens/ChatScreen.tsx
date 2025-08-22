@@ -189,7 +189,7 @@ export const ChatScreen = () => {
       </View>
 
       {/* Friends List Section */}
-      <View className={clsx(isDark ? "flex-1 bg-neutral-900" : "flex-1 bg-white rounded-t-3xl shadow-2xl dark:shadow-neutral-900/50")}>
+      <View className={clsx(isDark ? "flex-1 bg-gray-950" : "flex-1 bg-white rounded-t-3xl shadow-2xl dark:shadow-neutral-900/50")}>
         <View className="w-16 h-1 bg-gray-300 dark:bg-neutral-600 rounded-full mx-auto mt-4 mb-2" />
         <View className="flex-1 px-2">
           <FriendsList

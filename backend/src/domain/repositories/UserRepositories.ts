@@ -8,4 +8,8 @@ export interface UserRepositories {
   findByUsername(username: string): Promise<User | null>;
   findById(id: string): Promise<publicUser | null>;
   findByIdWithFollowStatus(id: string, currentUserId: string): Promise<publicUserWithFollowStatus | null>;
+  updateUsername(userId: string, username: string): Promise<void>;
+  updateBio(userId: string, bio: string): Promise<void>;
+  updatePassword(userId: string, hashedPassword: string): Promise<void>;
+  findByIdWithPassword(id: string): Promise<User | null>;
 }

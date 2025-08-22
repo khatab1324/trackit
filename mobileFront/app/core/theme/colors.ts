@@ -8,7 +8,7 @@ export const colors = {
     text: "#1E293B",
     secondaryText: "#64748B",
     border: "#CBD5E1",
-    buttonBackground: "#1FB98E",
+    buttonBackground: "#10B981",
     error: "#DC2626",
     icon: {
       primary: "#1FB98E",

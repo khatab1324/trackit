@@ -85,4 +85,30 @@ export class UserRepoDB implements UserRepositories {
     const { password, ...publicUserData } = userFromDB;
     return publicUserData;
   }
+
+  async updateUsername(userId: string, username: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ username })
+      .where(eq(users.id, userId));
+  }
+
+  async updateBio(userId: string, bio: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ bio })
+      .where(eq(users.id, userId));
+  }
+
+  async updatePassword(userId: string, hashedPassword: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, userId));
+  }
+
+  async findByIdWithPassword(id: string): Promise<User | null> {
+    const [userFromDB] = await db.select().from(users).where(eq(users.id, id));
+    return userFromDB || null;
+  }
 }

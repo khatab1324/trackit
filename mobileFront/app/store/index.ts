@@ -4,6 +4,7 @@ import { UserApi } from "../lib/APIs/RTKQuery/UserAuth";
 import { MemoryApi } from "../lib/APIs/RTKQuery/memoryApi";
 import { InteractionApi } from "../lib/APIs/RTKQuery/InteractionApi";
 import { NotificationsApi } from "../lib/APIs/RTKQuery/notificationsApi";
+import { userProfileApi } from "../lib/APIs/RTKQuery/userProfileApi";
 
 import authReducer from "./slices/authSlice";
 import userReducer from "./slices/userSlice";
@@ -18,6 +19,7 @@ const appReducer = combineReducers({
   [InteractionApi.reducerPath]: InteractionApi.reducer,
   [NotificationsApi.reducerPath]: NotificationsApi.reducer,
   [chatApi.reducerPath]: chatApi.reducer,
+  [userProfileApi.reducerPath]: userProfileApi.reducer,
   sheardDataThrowApp: sheardDataThrowAppRedReducer,
   auth: authReducer,
   user: userReducer,
@@ -57,7 +59,8 @@ export const store = configureStore({
       .concat(MemoryApi.middleware)
       .concat(InteractionApi.middleware)
       .concat(NotificationsApi.middleware)
-      .concat(chatApi.middleware),
+      .concat(chatApi.middleware)
+      .concat(userProfileApi.middleware),
 });
 
 export const resetStore = () => ({ type: "RESET_STORE" });
