@@ -5,6 +5,8 @@ import { colors } from "../core/theme/colors";
 import MemoryThumbnail from "../components/MemoryThumbnail";
 import { RootState } from "../store";
 import { useSelector } from "react-redux";
+import { Ionicons } from "@expo/vector-icons";
+import clsx from "clsx";
 type BookmarkedMemory = {
   id: string;
   memory_id: string;
@@ -44,59 +46,81 @@ export default function ProfileContent({
   );
   const colorScheme = isDark ? colors.dark : colors.light;
   const [activeTab, setActiveTab] = useState(0);
-  
-  const tabsList = isOwnProfile ? [
-    {
-      name: "Memories",
-      data: memoriesList,
-    },
-    {
-      name: "Saved",
-      data: savedList,
-    },
-  ] : [
-    {
-      name: "Memories",
-      data: memoriesList,
-    },
-  ];
+
+  const tabsList = isOwnProfile
+    ? [
+        {
+          name: "Memories",
+          data: memoriesList,
+        },
+        {
+          name: "Saved",
+          data: savedList,
+        },
+      ]
+    : [
+        {
+          name: "Memories",
+          data: memoriesList,
+        },
+      ];
 
   console.log("ProfileContent - activeTab:", activeTab);
   console.log("ProfileContent - activeTab name:", tabsList[activeTab]?.name);
 
   return (
     <View className="flex-1">
+      {/* Tabs Section - Above the memories */}
       <View
-        className={`flex-row justify-around border-b mb-4`}
+        className="flex-row border-b mb-4"
         style={{ borderColor: colorScheme.border }}
       >
-        {tabsList.map((tab, index) => (
-          <TouchableOpacity key={tab.name} onPress={() => setActiveTab(index)}>
-            <Text
-              className={`pb-2 ${activeTab === index ? `border-b-2 font-semibold` : ``}`}
+        {tabsList.map((tab, index) => {
+          const isActive = activeTab === index;
+          const isSavedTab = tab.name === "Saved";
+          return (
+            <TouchableOpacity
+              key={tab.name}
+              className="flex-1 py-3 items-center"
+              onPress={() => setActiveTab(index)}
+              activeOpacity={0.7}
               style={{
-                color:
-                  activeTab === index
-                    ? colorScheme.primary
-                    : colorScheme.primary,
-                borderColor: colorScheme.primary,
+                borderBottomWidth: isActive ? 2 : 0,
+                borderColor: isActive
+                  ? (isDark ? "#3B82F6" : "#3B82F6")
+                  : "transparent",
               }}
             >
-              {tab.name}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Ionicons
+                name={isSavedTab ? "bookmark-outline" : "grid-outline"}
+                size={24}
+                color={
+                  isActive
+                    ? (isDark ? "#3B82F6" : "#3B82F6")
+                    : (isDark
+                        ? (isSavedTab ? "#9CA3AF" : "#374151")
+                        : (isSavedTab ? "#6B7280" : "#9CA3AF"))
+                }
+              />
+
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
+      {/* Memories Display Section - Below the tabs */}
       {tabsList[activeTab].data?.length ? (
         <FlatList
           data={tabsList[activeTab].data}
           keyExtractor={(item) => item.id}
           renderItem={({ item }: { item: Memory | BookmarkedMemory }) => {
             console.log("ProfileContent - renderItem - item:", item);
-            console.log("ProfileContent - renderItem - item type:", 'memory_id' in item ? 'BookmarkedMemory' : 'Memory');
+            console.log(
+              "ProfileContent - renderItem - item type:",
+              "memory_id" in item ? "BookmarkedMemory" : "Memory"
+            );
             // Check if this is a BookmarkedMemory (has memory_id property)
-            if ('memory_id' in item) {
+            if ("memory_id" in item) {
               // Transform BookmarkedMemory to Memory format
               const memoryData: Memory = {
                 id: item.memory_id,
@@ -117,12 +141,28 @@ export default function ProfileContent({
                   username: item.user.username,
                 },
               };
-              console.log("ProfileContent - transformed BookmarkedMemory to Memory:", memoryData);
-              return <MemoryThumbnail item={memoryData} nameTap={tabsList[activeTab].name.toLowerCase()}/>;
+              console.log(
+                "ProfileContent - transformed BookmarkedMemory to Memory:",
+                memoryData
+              );
+              return (
+                <MemoryThumbnail
+                  item={memoryData}
+                  nameTap={tabsList[activeTab].name.toLowerCase()}
+                />
+              );
             } else {
               // This is already a Memory object
-              console.log("ProfileContent - using existing Memory object:", item);
-              return <MemoryThumbnail item={item} nameTap={tabsList[activeTab].name.toLowerCase()}/>;
+              console.log(
+                "ProfileContent - using existing Memory object:",
+                item
+              );
+              return (
+                <MemoryThumbnail
+                  item={item}
+                  nameTap={tabsList[activeTab].name.toLowerCase()}
+                />
+              );
             }
           }}
           onRefresh={refetch}
@@ -133,7 +173,7 @@ export default function ProfileContent({
         />
       ) : (
         <Text
-          className={`text-center mt-10`}
+          className="text-center mt-10"
           style={{ color: colorScheme.secondaryText }}
         >
           No memories found.
@@ -143,4 +183,3 @@ export default function ProfileContent({
   );
 }
 const styles = {};
-

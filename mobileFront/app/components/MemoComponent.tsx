@@ -17,7 +17,7 @@ type Props = {
   screenWidth: number;
   showBackButton?: boolean;
 };
-
+  
 export const MemoComponent: React.FC<Props> = ({
   memory,
   screenHeight,

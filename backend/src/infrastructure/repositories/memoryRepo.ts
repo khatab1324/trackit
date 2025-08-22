@@ -310,7 +310,6 @@ export class MemoryRepositoryImp implements MemoryRepository {
 
   async recordMemoryView(input: MemoryViewInput): Promise<MemoryViewResponse> {
     try {
-      // this for check if the user already viewed this memory
       const existingView = await db
         .select()
         .from(viewCounts)

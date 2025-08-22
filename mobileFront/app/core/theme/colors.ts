@@ -4,14 +4,12 @@ export const colors = {
     black: "#000",
     primary: "#1FB98E",
     secondary: "#E2E8F0",
-    background: "#F8FAFC",
+    background: "#FFFFFF",
     text: "#1E293B",
     secondaryText: "#64748B",
     border: "#CBD5E1",
     buttonBackground: "#1FB98E",
     error: "#DC2626",
-
-    // Icon colors
     icon: {
       primary: "#1FB98E",
       secondary: "#64748B",
@@ -28,7 +26,7 @@ export const colors = {
     text: "#F1F5F9",
     secondaryText: "#94A3B8",
     border: "#2E2E2E", // أغمق عشان يناسب الأسود
-    buttonBackground: "#10B981",
+    buttonBackground: "#F8FAFC",
     error: "#F87171",
 
     // Icon colors

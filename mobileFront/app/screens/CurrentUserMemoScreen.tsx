@@ -38,6 +38,8 @@ export const CurrentUserMemoScreen = () => {
   const route = useRoute<RouteProp<MainStackParamList, 'MemoDetails'>>();
   const { tabComingFrom, memoId } = route.params;
 
+  console.log("CurrentUserMemoScreen - tabComingFrom:", tabComingFrom);
+  console.log("CurrentUserMemoScreen - memoId:", memoId);
   
   const { data: currentUserMemories, isLoading: isLoadingMemories, error: memoriesError } = useGetCurrentUserMemoriesQuery();
   const {data: bookmarks, isLoading: isLoadingBookmarks, error: bookmarksError } = useGetUserBookmarksQuery();
@@ -45,8 +47,6 @@ export const CurrentUserMemoScreen = () => {
     
   });
 
-  console.log("tabComingFrom",tabComingFrom);
-  console.log("memoId",memoId);
   const getDataToDisplay = (): Memory[] | undefined => {
     switch (tabComingFrom) {
       case 'memories':
@@ -87,9 +87,56 @@ export const CurrentUserMemoScreen = () => {
     }
   };
 
+  const getRefetchFunction = () => {
+    switch (tabComingFrom) {
+      case 'memories':
+        return () => {}; // Add refetch function when available
+      case 'saved':
+        return () => {}; // Add refetch function when available
+      case 'friend':
+        return () => {}; // Add refetch function when available
+      default:
+        return () => {}; // Add refetch function when available
+    }
+  };
+
+  const getIsFetchingState = () => {
+    switch (tabComingFrom) {
+      case 'memories':
+        return isLoadingMemories;
+      case 'saved':
+        return isLoadingBookmarks;
+      case 'friend':
+        return isLoadingUserMemo;
+      default:
+        return isLoadingMemories;
+    }
+  };
+
+  // Find the index of the memo with the specified memoId
+  const getInitialIndex = (): number => {
+    const data = getDataToDisplay();
+    if (!data || !memoId) return 0;
+    
+    const memoIndex = data.findIndex(memo => memo.id === memoId);
+    console.log("Finding initial index for memoId:", memoId);
+    console.log("Available memo IDs:", data.map(m => m.id));
+    console.log("Found index:", memoIndex);
+    return memoIndex >= 0 ? memoIndex : 0;
+  };
+
   const dataToDisplay = getDataToDisplay();
   const isLoading = getLoadingState();
   const error = getErrorState();
+  const refetch = getRefetchFunction();
+  const isFetching = getIsFetchingState();
+  const initialIndex = getInitialIndex();
+
+  console.log("CurrentUserMemoScreen - dataToDisplay length:", dataToDisplay?.length);
+  console.log("CurrentUserMemoScreen - initialIndex:", initialIndex);
+  console.log("CurrentUserMemoScreen - currentUserMemories length:", currentUserMemories?.length);
+  console.log("CurrentUserMemoScreen - bookmarks length:", bookmarks?.length);
+  console.log("CurrentUserMemoScreen - userMemo length:", userMemo?.length);
 
   if (isLoading) {
     return (
@@ -121,7 +168,12 @@ export const CurrentUserMemoScreen = () => {
 
   return (
     <View className="flex-1">
-      <MemoListComp data={dataToDisplay} />
+      <MemoListComp 
+        data={dataToDisplay} 
+        refetch={refetch}
+        isFetching={isFetching}
+        initialIndex={initialIndex}
+      />
     </View>
   );
 };

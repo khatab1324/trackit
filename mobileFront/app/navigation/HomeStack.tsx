@@ -115,9 +115,10 @@ export default function HomeStack() {
       screenOptions={{ headerShown: false }}
       tabBar={(props) => <CustomTabBar {...props} />}
     >
+      <Tab.Screen name="Home" component={HomeScreen} />
+
       <Tab.Screen name="Map" component={MapScreen} />
       <Tab.Screen name="Chat" component={ChatStack} />
-      <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
 
       <Tab.Screen

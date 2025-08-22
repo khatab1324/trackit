@@ -40,22 +40,19 @@ type BookmarkedMemory = {
   id: string;
   memory_id: string;
   saved_at: string;
-  memory: {
+  title: string;
+  description?: string;
+  content_url: string;
+  content_type: string;
+  latitude: number;
+  longitude: number;
+  isPublic: boolean;
+  created_at: string;
+  user: {
     id: string;
-    title: string;
-    description?: string;
-    content_url: string;
-    content_type: string;
-    latitude: number;
-    longitude: number;
-    isPublic: boolean;
-    created_at: string;
-    user: {
-      id: string;
-      username: string;
-      profile_image: string;
-      bio: string;
-    };
+    username: string;
+    profile_image: string;
+    bio: string;
   };
 };
 

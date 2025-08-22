@@ -7,6 +7,8 @@ export default function FriendsMemoScreen() {
   const {
     data,
     isLoading,
+    refetch = () => {},
+    isFetching = false,
   } = useGetUserFriendsMemoriesQuery();
 
   console.log("friendss ", data);
@@ -20,7 +22,7 @@ export default function FriendsMemoScreen() {
 
   return (
     <View className="flex-1 bg-white dark:bg-black">
-      {data && <MemoListComp data={data} />}
+      {data && <MemoListComp data={data} refetch={refetch} isFetching={isFetching} />}
     </View>
   );
 }

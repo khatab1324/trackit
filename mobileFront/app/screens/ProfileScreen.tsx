@@ -15,6 +15,27 @@ import ProfileContent from "../components/ProfileContent";
 import { useGetUserBookmarksQuery } from "../lib/APIs/RTKQuery/InteractionApi";
 import clsx from "clsx";
 
+
+// Define the BookmarkedMemory type that matches the backend response structure
+type BookmarkedMemory = {
+  id: string;
+  memory_id: string;
+  saved_at: string;
+  title: string;
+  description?: string;
+  content_url: string;
+  content_type: string;
+  latitude: number;
+  longitude: number;
+  isPublic: boolean;
+  created_at: string;
+  user: {
+    id: string;
+    username: string;
+    
+  };
+};
+
 export function ProfileScreen() {
   const isDark = useSelector(
     (state: RootState) => state.sheardDataThrowApp.darkMode
@@ -82,6 +103,27 @@ export function ProfileScreen() {
   const bookmarks = isOwnProfile ? bookmarksQuery.data ?? null : null;
   const memories = data ?? [];
 
+  // Transform bookmarks to match the expected BookmarkedMemory type
+  const transformedBookmarks = bookmarks ? bookmarks.map(bookmark => ({
+    id: bookmark.id,
+    memory_id: bookmark.memory_id,
+    saved_at: bookmark.saved_at,
+    title: bookmark.title, // Direct property, not nested
+    description: bookmark.description, // Direct property, not nested
+    content_url: bookmark.content_url, // Direct property, not nested
+    content_type: bookmark.content_type, // Direct property, not nested
+    latitude: bookmark.latitude, // Direct property, not nested
+    longitude: bookmark.longitude, // Direct property, not nested
+    isPublic: bookmark.isPublic, // Direct property, not nested
+    created_at: bookmark.created_at, // Direct property, not nested
+    user: {
+      id: bookmark.user.id,
+      username: bookmark.user.username,
+      profile_image: bookmark.user.profile_image || "",
+      bio: bookmark.user.bio || "",
+    },
+  })) : null;
+
   const renderLoadingState = () => (
     <View className="flex-1 justify-center items-center">
       <View className={clsx(
@@ -129,7 +171,7 @@ export function ProfileScreen() {
   let content = (
     <ProfileContent
       memories={memories}
-      saved={isOwnProfile ? bookmarks : null}
+      saved={isOwnProfile ? transformedBookmarks : null}
       refetch={refetch}
       isFetching={isFetching}
       isOwnProfile={isOwnProfile}
@@ -195,127 +237,14 @@ export function ProfileScreen() {
             )}
           </View>
         </View>
-
-        {/* Profile Info Section */}
-        <ProfileInfo targetUserId={targetUserId} />
-
-        {/* Instagram-style Stats Section */}
-        <View className="flex-row justify-around mt-8 mb-6 py-4">
-          <View className="items-center">
-            <Text className={clsx(
-              "text-2xl font-bold mb-1",
-              isDark ? "text-white" : "text-black"
-            )}>
-              {memories.length || 0}
-            </Text>
-            <Text className={clsx(
-              "text-sm font-medium",
-              isDark ? "text-gray-400" : "text-gray-600"
-            )}>
-              Memories
-            </Text>
-          </View>
-          
-          <View className="items-center">
-            <Text className={clsx(
-              "text-2xl font-bold mb-1",
-              isDark ? "text-white" : "text-black"
-            )}>
-              0
-            </Text>
-            <Text className={clsx(
-              "text-sm font-medium",
-              isDark ? "text-gray-400" : "text-gray-600"
-            )}>
-              Friends
-            </Text>
-          </View>
-
-          <View className="items-center">
-            <Text className={clsx(
-              "text-2xl font-bold mb-1",
-              isDark ? "text-white" : "text-black"
-            )}>
-              {isOwnProfile ? (bookmarks?.length || 0) : 0}
-            </Text>
-            <Text className={clsx(
-              "text-sm font-medium",
-              isDark ? "text-gray-400" : "text-gray-600"
-            )}>
-              Saved
-            </Text>
-          </View>
-        </View>
-
-        {/* Action Buttons */}
-        {isOwnProfile && (
-          <View className="flex-row space-x-3 mb-6">
-            <TouchableOpacity 
-              className={clsx(
-                "flex-1 py-3 rounded-lg items-center",
-                isDark ? "bg-gray-800" : "bg-gray-100"
-              )}
-              activeOpacity={0.7}
-            >
-              <Text className={clsx(
-                "font-semibold",
-                isDark ? "text-white" : "text-black"
-              )}>
-                Edit Profile
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              className={clsx(
-                "flex-1 py-3 rounded-lg items-center",
-                isDark ? "bg-gray-800" : "bg-gray-100"
-              )}
-              activeOpacity={0.7}
-            >
-              <Text className={clsx(
-                "font-semibold",
-                isDark ? "text-white" : "text-black"
-              )}>
-                Share Profile
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Content Tabs */}
-        <View className="flex-row border-b mb-4">
-          <TouchableOpacity className="flex-1 py-3 items-center">
-            <Ionicons 
-              name="grid-outline" 
-              size={24} 
-              color={isDark ? "#3B82F6" : "#3B82F6"} 
-            />
-            <Text className={clsx(
-              "text-xs mt-1 font-medium",
-              isDark ? "text-blue-500" : "text-blue-600"
-            )}>
-              Memories
-            </Text>
-          </TouchableOpacity>
-          
-          {isOwnProfile && (
-            <TouchableOpacity className="flex-1 py-3 items-center">
-              <Ionicons 
-                name="bookmark-outline" 
-                size={24} 
-                color={isDark ? "#9CA3AF" : "#6B7280"} 
-              />
-              <Text className={clsx(
-                "text-xs mt-1 font-medium",
-                isDark ? "text-gray-400" : "text-gray-600"
-              )}>
-                Saved
-              </Text>
-            </TouchableOpacity>
-          )}
+        <View className="mb-4">
+          <ProfileInfo 
+            targetUserId={targetUserId} 
+            memoriesCount={memories.length}
+            friendsCount={0} // TODO: Add friends count when available
+          />
         </View>
       </View>
-
-      {/* Content Section */}
       <View className="flex-1">
         {content}
       </View>
