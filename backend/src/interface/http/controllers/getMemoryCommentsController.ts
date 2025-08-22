@@ -8,6 +8,8 @@ export const getMemoryCommentsController = async (
 ) => {
   try {
     const { memoryId } = request.params as { memoryId: string };
+    const userReq = request.user as { id: string };
+    const currentUserId = userReq?.id;
     
     if (!memoryId) {
       return reply.code(400).send({ error: "Memory ID is required" });
@@ -15,7 +17,7 @@ export const getMemoryCommentsController = async (
 
     const comments = await new GetMemoryCommentsUseCase(
       new CommentRepositoryImp()
-    ).execute(memoryId);
+    ).execute(memoryId, currentUserId);
 
     reply.code(200).send({
       message: "Comments retrieved successfully",

@@ -2,14 +2,16 @@ import React, { useState } from "react";
 import { View, Image, TouchableOpacity } from "react-native";
 import type { Memory } from "../core/types/memory";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, useNavigationState } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { HeaderMemo } from "./Memo/HeaderMemo";
 import { InteractionMemo } from "./Memo/InteractionMemo";
 import { UserMemo } from "./Memo/UserMemo";
 import { CommentSection } from "./Memo/CommentSection";
-import MemoryOptionsMenu from "./MemoryOptionsMenu";  
+import MemoryOptionsMenu from "./MemoryOptionsMenu";
+import { HomeStackParamList } from "../navigation/HomeStack";
 
 type Props = {
   memory: Memory;
@@ -25,6 +27,7 @@ export const MemoComponent: React.FC<Props> = ({
   showBackButton = true,
 }) => {
   const currentUser = useSelector((state: RootState) => state.user);
+  const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
 
 
   const [isCommentSectionVisible, setIsCommentSectionVisible] = useState(false);
@@ -102,6 +105,14 @@ export const MemoComponent: React.FC<Props> = ({
         memoryId={memory.id}
         isVisible={isCommentSectionVisible}
         onClose={() => setIsCommentSectionVisible(false)}
+        onNavigateToProfile={(userId) => {
+          // Close comment section first
+          setIsCommentSectionVisible(false);
+          // Navigate to profile after a short delay
+          setTimeout(() => {
+            navigation.navigate("Profile", { userId });
+          }, 100);
+        }}
       />
     </View>
   );

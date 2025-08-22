@@ -3,7 +3,7 @@ import { CommentRepository } from "../../../domain/repositories/commentRepositor
 export class GetMemoryCommentsUseCase {
   constructor(private commentRepository: CommentRepository) {}
 
-  async execute(memoryId: string): Promise<any[]> {
-    return await this.commentRepository.getCommentsByMemoryId(memoryId);
+  async execute(memoryId: string, currentUserId?: string): Promise<any[]> {
+    return await this.commentRepository.getCommentsByMemoryId(memoryId, currentUserId);
   }
 } 

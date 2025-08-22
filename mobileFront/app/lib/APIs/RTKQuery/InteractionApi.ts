@@ -11,14 +11,17 @@ type Comment = {
   created_at?: string;
   updated_at?: string;
   parentCommentId?: Id | null;
+  username?: string;
+  likeCount?: number;
+  isLiked?: boolean;
 };
 type Reply = Comment;
 
 type AddCommentInput = { memory_id: Id; content: string; parentCommentId?: Id };
-type EditCommentInput = { commentId: Id; content: string };
-type DeleteCommentInput = { commentId: Id };
-type LikeCommentInput = { commentId: Id };
-type ReplyCommentInput = { commentId: Id; content: string };
+type EditCommentInput = { comment_id: Id; content: string };
+type DeleteCommentInput = { comment_id: Id };
+type LikeCommentInput = { comment_id: Id };
+type ReplyCommentInput = { comment_id: Id; content: string };
 
 type FollowRequest = {
   id: Id;
@@ -94,6 +97,7 @@ export const InteractionApi = createApi({
       transformResponse: (res: { data: Comment[]; message: string }) =>
         res.data,
       keepUnusedDataFor: 0, // Disable caching
+      providesTags: ["Comment"],
       // Add error handling
       async onQueryStarted(arg, { queryFulfilled }) {
         try {
@@ -123,6 +127,36 @@ export const InteractionApi = createApi({
         data: { success: boolean };
         message: string;
       }) => res.data,
+      async onQueryStarted({ comment_id }, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Invalidate comments cache to refetch with updated like status
+          dispatch(InteractionApi.util.invalidateTags(["Comment"]));
+        } catch (error) {
+          console.error("Failed to invalidate comments cache:", error);
+        }
+      },
+    }),
+
+    unlikeComment: builder.mutation<{ success: boolean }, LikeCommentInput>({
+      query: (body) => ({
+        url: "/unlikeComment",
+        method: "POST",
+        body,
+      }),
+      transformResponse: (res: {
+        data: { success: boolean };
+        message: string;
+      }) => res.data,
+      async onQueryStarted({ comment_id }, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Invalidate comments cache to refetch with updated like status
+          dispatch(InteractionApi.util.invalidateTags(["Comment"]));
+        } catch (error) {
+          console.error("Failed to invalidate comments cache:", error);
+        }
+      },
     }),
 
     deleteComment: builder.mutation<{ success: boolean }, DeleteCommentInput>({
@@ -135,6 +169,15 @@ export const InteractionApi = createApi({
         data: { success: boolean };
         message: string;
       }) => res.data,
+      async onQueryStarted({ comment_id }, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Invalidate comments cache to refetch without deleted comment
+          dispatch(InteractionApi.util.invalidateTags(["Comment"]));
+        } catch (error) {
+          console.error("Failed to invalidate comments cache:", error);
+        }
+      },
     }),
 
     editComment: builder.mutation<Comment, EditCommentInput>({
@@ -144,6 +187,15 @@ export const InteractionApi = createApi({
         body,
       }),
       transformResponse: (res: { data: Comment; message: string }) => res.data,
+      async onQueryStarted({ comment_id }, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Invalidate comments cache to refetch with updated content
+          dispatch(InteractionApi.util.invalidateTags(["Comment"]));
+        } catch (error) {
+          console.error("Failed to invalidate comments cache:", error);
+        }
+      },
     }),
 
     replyComment: builder.mutation<Reply, ReplyCommentInput>({
@@ -310,6 +362,7 @@ export const {
   useGetMemoryCommentsQuery,
   useAddCommentMutation,
   useLikeCommentMutation,
+  useUnlikeCommentMutation,
   useDeleteCommentMutation,
   useEditCommentMutation,
   useReplyCommentMutation,
